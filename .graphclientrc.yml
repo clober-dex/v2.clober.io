@@ -2,7 +2,7 @@ sources:
   - name: clober-v1
     handler:
       graphql:
-        endpoint: '{context.url:https://subgraph.satsuma-prod.com/f6a8c4889b7b/clober/core-v1-subgraph/api}'
+        endpoint: '{context.url:https://api.goldsky.com/api/public/project_clsljw95chutg01w45cio46j0/subgraphs/core-v1-subgraph/v1.0.0/gn}'
 
 documents:
   - ./apis/**/*.graphql

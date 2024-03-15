@@ -4,6 +4,7 @@ import { useNetwork, useSwitchNetwork } from 'wagmi'
 import { Chain } from '../model/chain'
 import { findSupportChain, supportChains } from '../constants/chain'
 import { setQueryParams } from '../utils/url'
+import { beraTestnetChain } from '../constants/dev-chain'
 
 type ChainContext = {
   selectedChain: Chain
@@ -11,7 +12,9 @@ type ChainContext = {
 }
 
 const Context = React.createContext<ChainContext>({
-  selectedChain: supportChains.find((chain) => chain.id === 42161)!,
+  selectedChain: supportChains.find(
+    (chain) => chain.id === beraTestnetChain.id,
+  )!,
   setSelectedChain: (_) => _,
 })
 

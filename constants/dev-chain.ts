@@ -1,32 +1,33 @@
 import { Chain } from 'wagmi'
 
-export const couponFinanceChain: Chain = {
-  id: 7777,
-  name: 'Coupon Finance Chain',
-  network: 'coupon-finance-chain',
+export const beraTestnetChain: Chain = {
+  id: 80085,
+  name: 'Berachain Artio',
+  network: 'bera',
   nativeCurrency: {
-    name: 'Ether',
-    symbol: 'ETH',
     decimals: 18,
+    name: 'BERA Token',
+    symbol: 'BERA',
   },
   rpcUrls: {
     default: {
-      http: ['https://dev-rpc.coupon.finance'],
+      http: ['https://artio.rpc.berachain.com'],
     },
     public: {
-      http: ['https://dev-rpc.coupon.finance'],
+      http: ['https://artio.rpc.berachain.com'],
     },
   },
   blockExplorers: {
     default: {
-      name: 'Coupon Finance Explorer',
-      url: 'http://dev-rpc.coupon.finance:4000',
+      name: 'Berachain',
+      url: 'https://artio.beratrail.io',
     },
   },
+  testnet: true,
   contracts: {
     multicall3: {
-      address: '0xca11bde05977b3631167028862be2a173976ca11',
-      blockCreated: 7654707,
+      address: '0x5a5E58992AadA8770d3220f0af7c39c8476f7A1d',
+      blockCreated: 420880,
     },
   },
 }
