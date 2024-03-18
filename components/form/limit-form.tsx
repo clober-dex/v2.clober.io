@@ -10,6 +10,7 @@ import { ActionButton, ActionButtonProps } from '../button/action-button'
 import CurrencySelect from '../selector/currency-select'
 import { Balances } from '../../model/balances'
 import { Prices } from '../../model/prices'
+import { Market } from '../../model/market'
 
 export const LimitForm = ({
   currencies,
@@ -17,6 +18,8 @@ export const LimitForm = ({
   prices,
   priceInput,
   setPriceInput,
+  selectedMarket,
+  isBid,
   setSelectMode,
   showInputCurrencySelect,
   setShowInputCurrencySelect,
@@ -40,6 +43,8 @@ export const LimitForm = ({
   prices: Prices
   priceInput: string
   setPriceInput: (priceInput: string) => void
+  selectedMarket?: Market
+  isBid: boolean
   setSelectMode: (selectMode: 'none' | 'settings') => void
   showInputCurrencySelect: boolean
   setShowInputCurrencySelect: (showInputCurrencySelect: boolean) => void
@@ -99,7 +104,7 @@ export const LimitForm = ({
       <div className="flex rounded-lg border-solid border-[1.5px] border-gray-700 p-4 mb-3 sm:mb-4 bg-gray-800">
         <div className="flex flex-col flex-1 gap-2">
           <div className="text-gray-500 text-xs sm:text-sm">
-            {'Buy'} {'TEST'} at rate
+            {isBid ? 'Buy' : 'Sell'} {selectedMarket?.base.symbol} at rate
           </div>
           <NumberInput
             value={priceInput}
