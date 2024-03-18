@@ -2,9 +2,9 @@ import BigNumber from 'bignumber.js'
 import { formatUnits as _formatUnits } from 'viem'
 
 export const max = (...args: bigint[]) =>
-  args.reduce((m, e) => (e > m ? e : m), args[0])
+  args.reduce((m, e) => (e > m ? e : m), 0n)
 export const min = (...args: bigint[]) =>
-  args.reduce((m, e) => (e < m ? e : m), args[0])
+  args.reduce((m, e) => (e < m ? e : m), 2n ** 256n - 1n)
 
 export const dollarValue = (
   value: bigint,
