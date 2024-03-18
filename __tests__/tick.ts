@@ -4,6 +4,13 @@ import { arbitrumSepolia } from 'viem/chains'
 import { Tick } from '../model/tick'
 import { CONTROLLER_ABI } from '../abis/core/controller-abi'
 
+const MAX_TICK = Math.pow(2, 19) - 1
+const MIN_TICK = -1 * MAX_TICK
+
+const MIN_PRICE = 5800731190957938n
+const MAX_PRICE =
+  19961636804996334433808922353085948875386438476189866322430503n
+
 const randomInteger = (start: number, end: number) => {
   return Math.floor(Math.random() * (end - start + 1) + start)
 }
@@ -16,9 +23,11 @@ describe('Tick', () => {
   const tick = new Tick()
 
   it('index to price', async () => {
-    const randomPriceIndices = Array.from({ length: 1000 }, () =>
-      randomInteger(-500000, 500000),
-    )
+    const randomPriceIndices = [
+      MIN_TICK,
+      ...Array.from({ length: 1000 }, () => randomInteger(-500000, 500000)),
+      MAX_TICK,
+    ]
     const actualPrices = (
       (await publicClient.multicall({
         contracts: randomPriceIndices.map((priceIndex) => ({
@@ -37,9 +46,11 @@ describe('Tick', () => {
   }, 10000)
 
   it('price to index', async () => {
-    const randomPriceIndices = Array.from({ length: 1000 }, () =>
-      randomInteger(-500000, 500000),
-    )
+    const randomPriceIndices = [
+      MIN_TICK,
+      ...Array.from({ length: 1000 }, () => randomInteger(-500000, 500000)),
+      MAX_TICK,
+    ]
 
     const actualPrices = (
       (await publicClient.multicall({
@@ -67,4 +78,22 @@ describe('Tick', () => {
     )
     expect(expectedPriceIndices).toEqual(actualPriceIndices)
   }, 10000)
+
+  it('price to index for min and max', async () => {
+    const actualPrices = [MIN_PRICE, MAX_PRICE]
+    const actualPriceIndices = (
+      (await publicClient.multicall({
+        contracts: actualPrices.map((price) => ({
+          address: CONTROLLER_ADDRESS,
+          abi: CONTROLLER_ABI,
+          functionName: 'fromPrice',
+          args: [price],
+        })),
+      })) as { result: number }[]
+    ).map(({ result }) => BigInt(result))
+    const expectedPriceIndices = actualPrices.map((price) =>
+      tick.fromPrice(price),
+    )
+    expect(expectedPriceIndices).toEqual(actualPriceIndices)
+  })
 })

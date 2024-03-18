@@ -1,13 +1,6 @@
 export class Tick {
   private readonly MAX_UINT256 = 2n ** 256n - 1n
 
-  private readonly MAX_TICK = 2n ** 19n - 1n
-  private readonly MIN_TICK = -1n * this.MAX_TICK
-
-  private readonly MIN_PRICE = 5800731190957938n
-  private readonly MAX_PRICE =
-    19961636804996334433808922353085948875386438476189866322430503n
-
   private readonly _R0 = 0xfff97272373d413259a46990580e2139n // 2^128 / r^(2^0)
   private readonly _R1 = 0xfff2e50f5f656932ef12357cf3c7fdcbn
   private readonly _R2 = 0xffe5caca7e10e4e61c3624eaa0941ccfn
