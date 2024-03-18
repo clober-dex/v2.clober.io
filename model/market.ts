@@ -1,6 +1,7 @@
 import { isAddressEqual } from 'viem'
 
 import { getMarketId } from '../utils/market'
+import { CHAIN_IDS } from '../constants/chain'
 
 import { Book } from './book'
 import { Currency } from './currency'
@@ -17,17 +18,20 @@ export class Market {
   books: Book[]
 
   constructor({
+    chainId,
     tokens,
     latestPriceIndex,
     latestPrice,
     books,
   }: {
+    chainId: CHAIN_IDS
     tokens: [Currency, Currency]
     latestPriceIndex: bigint
     latestPrice: bigint
     books: Book[]
   }) {
     const { marketId, quote, base } = getMarketId(
+      chainId,
       tokens.map((token) => token.address),
     )
     this.id = marketId

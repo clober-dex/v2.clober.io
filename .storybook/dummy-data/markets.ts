@@ -2,6 +2,7 @@ import { Market } from '../../model/market'
 import { Book } from '../../model/book'
 import { Depth } from '../../model/depth'
 import { quoteToBase, toPrice } from '../../model/tick'
+import { arbitrumSepolia } from 'viem/chains'
 
 const ticks = [
   -524287, -325538, -98510, 479399, -68697, 425140, 35128, 329697, -217553,
@@ -11,6 +12,7 @@ const ticks = [
 
 export const dummyMarkets: Market[] = [
   new Market({
+    chainId: arbitrumSepolia.id,
     tokens: [
       {
         address: '0x0000000000000000000000000000000000000000',

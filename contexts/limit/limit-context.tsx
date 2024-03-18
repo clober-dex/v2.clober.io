@@ -219,7 +219,10 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       const market = markets.find(
         (m) =>
           m.id ===
-          getMarketId([inputCurrency.address, outputCurrency.address]).marketId,
+          getMarketId(selectedChain.id, [
+            inputCurrency.address,
+            outputCurrency.address,
+          ]).marketId,
       )
       if (market) {
         setSelectedMarket(market)
