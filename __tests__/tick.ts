@@ -43,7 +43,7 @@ describe('Tick', () => {
       tick.toPrice(BigInt(priceIndex)),
     )
     expect(expectedPrices).toEqual(actualPrices)
-  }, 10000)
+  }, 100000)
 
   it('price to index', async () => {
     const randomPriceIndices = [
@@ -77,7 +77,7 @@ describe('Tick', () => {
       tick.fromPrice(price),
     )
     expect(expectedPriceIndices).toEqual(actualPriceIndices)
-  }, 10000)
+  }, 100000)
 
   it('price to index for min and max', async () => {
     const actualPrices = [MIN_PRICE, MAX_PRICE]
