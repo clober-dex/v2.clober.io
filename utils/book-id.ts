@@ -1,0 +1,27 @@
+import { encodeAbiParameters, keccak256 } from 'viem'
+
+import { BookKey } from '../model/book-key'
+
+export const toId = (key: BookKey) => {
+  const value = keccak256(
+    encodeAbiParameters(
+      [
+        { name: 'base', type: 'address' },
+        { name: 'unit', type: 'uint64' },
+        { name: 'quote', type: 'address' },
+        { name: 'makerPolicy', type: 'uint24' },
+        { name: 'hooks', type: 'address' },
+        { name: 'takerPolicy', type: 'uint24' },
+      ],
+      [
+        key.base,
+        key.unit,
+        key.quote,
+        key.makerPolicy,
+        key.hooks,
+        key.takerPolicy,
+      ],
+    ),
+  )
+  return BigInt(value) & (2n ** 192n - 1n)
+}
