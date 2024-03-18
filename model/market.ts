@@ -1,11 +1,13 @@
 import { isAddressEqual } from 'viem'
 
+import { getMarketId } from '../utils/market'
+
 import { Book } from './book'
 import { Currency } from './currency'
 import { Depth } from './depth'
 
 export class Market {
-  id: `0x${string}/0x${string}`
+  id: string
   quote: Currency
   base: Currency
   latestTick: bigint
@@ -25,13 +27,12 @@ export class Market {
     latestPrice: bigint
     books: Book[]
   }) {
-    if (tokens.length !== 2) {
-      throw new Error('Invalid token pair')
-    }
-    const _tokens = tokens.sort((a, b) => a.address.localeCompare(b.address))
-    this.id = `${_tokens[0].address}/${_tokens[1].address}`
-    this.quote = _tokens[0]
-    this.base = _tokens[1]
+    const { marketId, quote, base } = getMarketId(
+      tokens.map((token) => token.address),
+    )
+    this.id = marketId
+    this.quote = tokens.find((token) => isAddressEqual(token.address, quote))!
+    this.base = tokens.find((token) => isAddressEqual(token.address, base))!
     this.latestTick = latestPriceIndex
     this.latestPrice = latestPrice
     this.bids = books
