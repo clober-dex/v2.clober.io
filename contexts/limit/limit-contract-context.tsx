@@ -18,6 +18,7 @@ import { writeContract } from '../../utils/wallet'
 import { CONTROLLER_ABI } from '../../abis/core/controller-abi'
 import { WETH_ADDRESSES } from '../../constants/currency'
 import { fromPrice } from '../../model/tick'
+import { calculateUnit } from '../../utils/unit'
 
 type LimitContractContext = {
   make: (
@@ -85,10 +86,11 @@ export const LimitContractProvider = ({
           ],
         })
 
+        const unit = await calculateUnit(selectedChain.id, inputCurrency)
         const param = {
           id: toId({
             base: outputCurrency.address,
-            unit: 1n, // todo
+            unit,
             quote: inputCurrency.address,
             makerPolicy: MAKER_DEFAULT_POLICY,
             hooks: zeroAddress,
