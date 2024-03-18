@@ -9,6 +9,7 @@ import { getPriceDecimals, PRICE_DECIMAL } from '../../utils/prices'
 import { parseDepth } from '../../utils/order-book'
 import { useChainContext } from '../chain-context'
 import { Chain } from '../../model/chain'
+import { getMarketId } from '../../utils/market'
 
 import { useMarketContext } from './market-context'
 import { useLimitCurrencyContext } from './limit-currency-context'
@@ -81,7 +82,7 @@ const QUERY_PARAM_INPUT_CURRENCY_KEY = 'inputCurrency'
 const QUERY_PARAM_OUTPUT_CURRENCY_KEY = 'outputCurrency'
 
 export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
-  const { selectedMarket } = useMarketContext()
+  const { markets, selectedMarket, setSelectedMarket } = useMarketContext()
   const { currencies } = useLimitCurrencyContext()
   const { selectedChain } = useChainContext()
 
@@ -202,21 +203,41 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       localStorageOutputCurrencyAddress ||
       undefined
 
-    setInputCurrency(
-      inputCurrencyAddress
-        ? currencies.find((currency) =>
-            isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
-          )
-        : undefined,
-    )
-    setOutputCurrency(
-      outputCurrencyAddress
-        ? currencies.find((currency) =>
-            isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
-          )
-        : undefined,
-    )
-  }, [currencies, selectedChain])
+    const inputCurrency = inputCurrencyAddress
+      ? currencies.find((currency) =>
+          isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
+        )
+      : undefined
+    const outputCurrency = outputCurrencyAddress
+      ? currencies.find((currency) =>
+          isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
+        )
+      : undefined
+    setInputCurrency(inputCurrency)
+    setOutputCurrency(outputCurrency)
+    if (inputCurrency && outputCurrency) {
+      const market = markets.find(
+        (m) =>
+          m.id ===
+          getMarketId([inputCurrency.address, outputCurrency.address]).marketId,
+      )
+      if (market) {
+        setSelectedMarket(market)
+      }
+    } else {
+      // visit website first time
+      if (markets.length > 0) {
+        setSelectedMarket(markets[0])
+      }
+    }
+  }, [
+    currencies,
+    markets,
+    selectedChain,
+    setInputCurrency,
+    setOutputCurrency,
+    setSelectedMarket,
+  ])
 
   return (
     <Context.Provider
