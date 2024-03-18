@@ -1,15 +1,17 @@
 import React, { useEffect } from 'react'
 
 import { LimitContainer } from '../containers/limit-container'
-import { useMarketContext } from '../contexts/limit/market-context'
 import { cleanAndSetQueryParams } from '../utils/url'
+import { useLimitContext } from '../contexts/limit/limit-context'
 
 export default function Limit() {
-  const { selectedMarket } = useMarketContext()
+  const { inputCurrency, outputCurrency } = useLimitContext()
+
   useEffect(() => {
     cleanAndSetQueryParams(['chain'], {
-      market: selectedMarket?.address,
+      inputCurrency: inputCurrency?.address,
+      outputCurrency: outputCurrency?.address,
     })
-  }, [selectedMarket])
+  }, [inputCurrency, outputCurrency])
   return <LimitContainer />
 }
