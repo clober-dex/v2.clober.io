@@ -8,7 +8,7 @@ export class Book {
   makerPolicy: bigint
   hooks: `0x${string}`
   takerPolicy: bigint
-  latestPriceIndex: bigint
+  latestTick: bigint
   latestPrice: bigint
   depths: Depth[]
 
@@ -19,7 +19,7 @@ export class Book {
     makerPolicy,
     hooks,
     takerPolicy,
-    latestPriceIndex,
+    latestTick,
     latestPrice,
     depths,
   }: {
@@ -29,7 +29,7 @@ export class Book {
     makerPolicy: bigint
     hooks: `0x${string}`
     takerPolicy: bigint
-    latestPriceIndex: bigint
+    latestTick: bigint
     latestPrice: bigint
     depths: Depth[]
   }) {
@@ -39,8 +39,12 @@ export class Book {
     this.makerPolicy = makerPolicy
     this.hooks = hooks
     this.takerPolicy = takerPolicy
-    this.latestPriceIndex = latestPriceIndex
+    this.latestTick = latestTick
     this.latestPrice = latestPrice
     this.depths = depths
   }
+
+  // take function
+
+  // spend function
 }

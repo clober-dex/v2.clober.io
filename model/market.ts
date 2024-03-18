@@ -7,7 +7,7 @@ import { Depth } from './depth'
 export class Market {
   quote: Currency
   base: Currency
-  latestPriceIndex: bigint
+  latestTick: bigint
   latestPrice: bigint
   bids: Depth[]
   asks: Depth[]
@@ -30,7 +30,7 @@ export class Market {
     const _tokens = tokens.sort((a, b) => a.address.localeCompare(b.address))
     this.quote = _tokens[0]
     this.base = _tokens[1]
-    this.latestPriceIndex = latestPriceIndex
+    this.latestTick = latestPriceIndex
     this.latestPrice = latestPrice
     this.bids = books
       .filter((book) => isAddressEqual(book.quote.address, this.quote.address))
@@ -40,4 +40,8 @@ export class Market {
       .flatMap((book) => book.depths)
     this.books = books
   }
+
+  // take function
+
+  // spend function
 }
