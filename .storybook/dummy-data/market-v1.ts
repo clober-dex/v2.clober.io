@@ -1,6 +1,6 @@
 import { MarketV1 } from '../../model/market-v1'
 
-export const dummyMarkets = [
+export const dummyMarketV1s = [
   new MarketV1(
     '0xcA4C669093572c5a23DE04B848a7f706eCBdFAC2',
     '0x0207EA1fC260325Dd67FdEc06C1b4ED6f6DF3924',

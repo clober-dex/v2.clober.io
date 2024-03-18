@@ -31,7 +31,7 @@ export type MarketDto = {
   baseToken: Currency
   depths: DepthDto[]
 }
-export async function fetchMarkets(chainId: CHAIN_IDS): Promise<MarketV1[]> {
+export async function fetchMarketV1s(chainId: CHAIN_IDS): Promise<MarketV1[]> {
   const { markets } = await getMarkets(
     {},
     {

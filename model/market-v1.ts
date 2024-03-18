@@ -1,6 +1,6 @@
 import { getAddress, isAddressEqual } from 'viem'
 
-import { MarketDto } from '../apis/market'
+import { MarketDto } from '../apis/market-v1'
 
 import { Currency } from './currency'
 import { ArithmeticPriceBook } from './price-book/arithmetic-price-book'

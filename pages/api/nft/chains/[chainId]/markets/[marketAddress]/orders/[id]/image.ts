@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import BigNumber from 'bignumber.js'
 
-import { fetchMarkets } from '../../../../../../../../../apis/market'
+import { fetchMarketV1s } from '../../../../../../../../../apis/market-v1'
 import { fetchOpenOrder } from '../../../../../../../../../apis/open-orders'
 
 import orderSvg from './order-svg'
@@ -29,7 +29,7 @@ export default async function handler(
       return
     }
 
-    const markets = await fetchMarkets(Number(chainId))
+    const markets = await fetchMarketV1s(Number(chainId))
     const market = markets.find(
       (m) => m.address.toLowerCase() === String(marketAddress).toLowerCase(),
     )

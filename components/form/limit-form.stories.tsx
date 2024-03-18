@@ -2,7 +2,7 @@ import React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
 import '../../styles/globals.css'
 
-import { dummyMarkets } from '../../.storybook/dummy-data/market'
+import { dummyMarketV1s } from '../../.storybook/dummy-data/market-v1'
 import { dummyCurrencies } from '../../.storybook/dummy-data/currencies'
 
 import { LimitForm } from './limit-form'
@@ -24,8 +24,8 @@ type Story = StoryObj<typeof LimitForm>
 
 export const Default: Story = {
   args: {
-    markets: dummyMarkets,
-    selectedMarket: dummyMarkets[0],
+    markets: dummyMarketV1s,
+    selectedMarket: dummyMarketV1s[0],
     isBid: true,
     setSelectMode: () => {},
     inputCurrency: undefined,
@@ -42,8 +42,8 @@ export const Default: Story = {
 
 export const Selected: Story = {
   args: {
-    markets: dummyMarkets,
-    selectedMarket: dummyMarkets[0],
+    markets: dummyMarketV1s,
+    selectedMarket: dummyMarketV1s[0],
     isBid: true,
     setSelectMode: () => {},
     inputCurrency: dummyCurrencies[0],

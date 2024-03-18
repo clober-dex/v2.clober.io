@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { fetchMarkets } from '../../../../../../../../../apis/market'
+import { fetchMarketV1s } from '../../../../../../../../../apis/market-v1'
 
 export default async function handler(
   req: NextApiRequest,
@@ -8,7 +8,7 @@ export default async function handler(
 ) {
   const query = req.query
   const { id, chainId, marketAddress } = query
-  const markets = await fetchMarkets(Number(chainId))
+  const markets = await fetchMarketV1s(Number(chainId))
   const market = markets.find(
     (m) => m.address.toLowerCase() === String(marketAddress).toLowerCase(),
   )

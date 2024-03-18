@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react'
 
 import '../../styles/globals.css'
-import { dummyMarkets } from '../../.storybook/dummy-data/market'
+import { dummyMarketV1s } from '../../.storybook/dummy-data/market-v1'
 
 import MarketSelect from './market-select'
 
@@ -16,7 +16,7 @@ export default {
 type Story = StoryObj<typeof MarketSelect>
 export const Default: Story = {
   args: {
-    markets: dummyMarkets,
+    markets: dummyMarketV1s,
     onBack: () => {},
     onMarketSelect: () => {},
   },
