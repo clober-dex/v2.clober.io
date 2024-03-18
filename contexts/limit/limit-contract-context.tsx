@@ -6,7 +6,7 @@ import { useChainContext } from '../chain-context'
 import { GAS_PROTECTION } from '../../constants/gas'
 import { useTransactionContext } from '../transaction-context'
 import { formatUnits } from '../../utils/bigint'
-import { Market } from '../../model/market'
+import { MarketV1 } from '../../model/market-v1'
 import { writeContract } from '../../utils/wallet'
 import { CHAIN_IDS } from '../../constants/chain'
 import { CONTRACT_ADDRESSES } from '../../constants/addresses'
@@ -21,7 +21,7 @@ import { useLimitCurrencyContext } from './limit-currency-context'
 
 type LimitContractContext = {
   limit: (
-    market: Market,
+    market: MarketV1,
     userAddress: `0x${string}`,
     priceIndex: number,
     rawAmount: bigint,
@@ -59,7 +59,7 @@ export const LimitContractProvider = ({
 
   const limit = useCallback(
     async (
-      market: Market,
+      market: MarketV1,
       userAddress: `0x${string}`,
       priceIndex: number,
       rawAmount: bigint,

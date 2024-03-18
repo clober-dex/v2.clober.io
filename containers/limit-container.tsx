@@ -19,7 +19,7 @@ import {
   calculatePriceInputString,
 } from '../utils/order-book'
 import { useLimitCurrencyContext } from '../contexts/limit/limit-currency-context'
-import { Market } from '../model/market'
+import { MarketV1 } from '../model/market-v1'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
 import { ActionButton } from '../components/button/action-button'
 import { OpenOrderCard } from '../components/card/open-order-card'
@@ -216,7 +216,11 @@ export const LimitContainer = () => {
   const [market, amount, price] = useMemo(
     () => [
       selectedMarket
-        ? Market.from(selectedMarket, selectedMarket.bids, selectedMarket.asks)
+        ? MarketV1.from(
+            selectedMarket,
+            selectedMarket.bids,
+            selectedMarket.asks,
+          )
         : undefined,
       parseUnits(inputCurrencyAmount, inputCurrency?.decimals ?? 18),
       parseUnits(priceInput, PRICE_DECIMAL),

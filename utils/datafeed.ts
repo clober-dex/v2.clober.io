@@ -16,7 +16,7 @@ import {
 } from '../public/static/charting_library'
 import { CHAIN_IDS } from '../constants/chain'
 import { fetchChartLogs, fetchLatestChartLog } from '../apis/chart-logs'
-import { Market } from '../model/market'
+import { MarketV1 } from '../model/market-v1'
 
 import { getPriceDecimals } from './prices'
 import { SUPPORTED_INTERVALS } from './chart'
@@ -49,8 +49,8 @@ const configurationData: Partial<DatafeedConfiguration> &
 
 export default class DataFeed implements IBasicDataFeed {
   private chainId: CHAIN_IDS
-  private market: Market
-  constructor(chainId: CHAIN_IDS, market: Market) {
+  private market: MarketV1
+  constructor(chainId: CHAIN_IDS, market: MarketV1) {
     this.chainId = chainId
     this.market = market
   }

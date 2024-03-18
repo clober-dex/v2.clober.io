@@ -2,20 +2,20 @@ import React, { useCallback, useEffect } from 'react'
 import { useQuery } from 'wagmi'
 import { getAddress, isAddressEqual } from 'viem'
 
-import { Market } from '../../model/market'
+import { MarketV1 } from '../../model/market-v1'
 import { fetchMarkets } from '../../apis/market'
 import { useChainContext } from '../chain-context'
 import { Chain } from '../../model/chain'
 
 type MarketContext = {
-  markets: Market[]
-  selectedMarket?: Market
-  setSelectedMarket: (market: Market) => void
+  markets: MarketV1[]
+  selectedMarket?: MarketV1
+  setSelectedMarket: (market: MarketV1) => void
 }
 
 const Context = React.createContext<MarketContext>({
   markets: [],
-  selectedMarket: {} as Market,
+  selectedMarket: {} as MarketV1,
   setSelectedMarket: (_) => _,
 })
 
@@ -38,11 +38,11 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
 
   const [selectedMarket, _setSelectedMarket] = React.useState<
-    Market | undefined
+    MarketV1 | undefined
   >(undefined)
 
   const setSelectedMarket = useCallback(
-    (market: Market) => {
+    (market: MarketV1) => {
       // if chain is changed, reset selected market
       market =
         markets.find((m) => isAddressEqual(m.address, market.address)) ||

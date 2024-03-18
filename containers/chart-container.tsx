@@ -3,7 +3,7 @@ import Script from 'next/script'
 import dynamic from 'next/dynamic'
 
 import { useChainContext } from '../contexts/chain-context'
-import { Market } from '../model/market'
+import { MarketV1 } from '../model/market-v1'
 
 const TVChartContainer = dynamic(
   () => import('./tv-chart-container').then((mod) => mod.TvChartContainer),
@@ -13,7 +13,7 @@ const TVChartContainer = dynamic(
 export const ChartContainer = ({
   selectedMarket,
 }: {
-  selectedMarket: Market
+  selectedMarket: MarketV1
 }) => {
   const { selectedChain } = useChainContext()
   const [isScriptReady, setIsScriptReady] = useState(false)

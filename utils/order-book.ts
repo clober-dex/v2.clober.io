@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { zeroAddress } from 'viem'
 
-import { Market } from '../model/market'
+import { MarketV1 } from '../model/market-v1'
 import { Decimals } from '../model/decimals'
 import { Currency } from '../model/currency'
 import { WrappedEthers } from '../constants/weths'
@@ -44,7 +44,7 @@ export function calculatePriceInputString(
 
 export function parseDepth(
   isBid: boolean,
-  market: Market,
+  market: MarketV1,
   decimalPlaces: Decimals,
 ): { price: string; size: string }[] {
   return Array.from(

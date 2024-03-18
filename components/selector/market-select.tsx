@@ -3,7 +3,7 @@ import { getAddress, isAddress, isAddressEqual } from 'viem'
 
 import { LeftBracketAngleSvg } from '../svg/left-bracket-angle-svg'
 import { SearchSvg } from '../svg/search-svg'
-import { Market } from '../../model/market'
+import { MarketV1 } from '../../model/market-v1'
 import { CurrencyIcon } from '../icon/currency-icon'
 import { formatUnits } from '../../utils/bigint'
 import { PRICE_DECIMAL } from '../../utils/prices'
@@ -14,9 +14,9 @@ const MarketSelect = ({
   onBack,
   onMarketSelect,
 }: {
-  markets: Market[]
+  markets: MarketV1[]
   onBack: () => void
-  onMarketSelect: (market: Market) => void
+  onMarketSelect: (market: MarketV1) => void
 } & React.HTMLAttributes<HTMLDivElement>) => {
   const [value, setValue] = React.useState('')
   return (

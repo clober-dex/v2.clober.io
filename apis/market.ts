@@ -1,7 +1,7 @@
 import { getAddress } from 'viem'
 
 import { getBuiltGraphSDK } from '../.graphclient'
-import { Market } from '../model/market'
+import { MarketV1 } from '../model/market-v1'
 import { Currency } from '../model/currency'
 import { CHAIN_IDS } from '../constants/chain'
 import { SUBGRAPH_URL } from '../constants/subgraph-url'
@@ -31,7 +31,7 @@ export type MarketDto = {
   baseToken: Currency
   depths: DepthDto[]
 }
-export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
+export async function fetchMarkets(chainId: CHAIN_IDS): Promise<MarketV1[]> {
   const { markets } = await getMarkets(
     {},
     {
@@ -39,7 +39,7 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
     },
   )
   return markets.map((market) =>
-    Market.fromDto({
+    MarketV1.fromDto({
       address: getAddress(market.id),
       orderToken: getAddress(market.orderToken),
       takerFee: market.takerFee,

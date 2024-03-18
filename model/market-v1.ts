@@ -16,7 +16,7 @@ type Depth = {
   isBid: boolean
 }
 
-export class Market {
+export class MarketV1 {
   readonly FEE_PRECISION = 1000000n
   readonly PRICE_PRECISION = 1000000000000000000n
 
@@ -88,8 +88,8 @@ export class Market {
     return this.priceBook.priceToIndex(price, roundingUp)
   }
 
-  static from(market: Market, bids: Depth[], asks: Depth[]): Market {
-    return new Market(
+  static from(market: MarketV1, bids: Depth[], asks: Depth[]): MarketV1 {
+    return new MarketV1(
       market.address,
       market.orderToken,
       market.takerFee,
@@ -110,8 +110,8 @@ export class Market {
     )
   }
 
-  static fromDto(dto: MarketDto): Market {
-    return new Market(
+  static fromDto(dto: MarketDto): MarketV1 {
+    return new MarketV1(
       getAddress(dto.address),
       getAddress(dto.orderToken),
       BigInt(dto.takerFee),
@@ -207,7 +207,7 @@ export class Market {
     )
   }
 
-  clone(): Market {
+  clone(): MarketV1 {
     return Object.create(
       Object.getPrototypeOf(this),
       Object.getOwnPropertyDescriptors(this),
@@ -218,7 +218,7 @@ export class Market {
     tokenIn: `0x${string}`,
     amountIn: bigint,
   ): {
-    market: Market
+    market: MarketV1
     amountOut: bigint
   } {
     const asks = [...this.asks.map((depth) => ({ ...depth }))]
@@ -256,7 +256,7 @@ export class Market {
     amountOut -= this.calculateTakerFeeAmount(amountOut, true)
     return {
       amountOut,
-      market: Market.from(this, bids, asks),
+      market: MarketV1.from(this, bids, asks),
     }
   }
 
@@ -264,7 +264,7 @@ export class Market {
     tokenIn: string,
     amountOut: bigint,
   ): {
-    market: Market
+    market: MarketV1
     amountIn: bigint
   } {
     amountOut = this.calculateTakeAmountBeforeFees(amountOut)
@@ -307,7 +307,7 @@ export class Market {
     }
     return {
       amountIn,
-      market: Market.from(this, bids, asks),
+      market: MarketV1.from(this, bids, asks),
     }
   }
 

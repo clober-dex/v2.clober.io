@@ -9,7 +9,7 @@ import {
 } from '../public/static/charting_library'
 import DataFeed from '../utils/datafeed'
 import { CHAIN_IDS } from '../constants/chain'
-import { Market } from '../model/market'
+import { MarketV1 } from '../model/market-v1'
 import { SUPPORTED_INTERVALS } from '../utils/chart'
 
 function getLanguageFromURL(): LanguageCode | null {
@@ -25,7 +25,7 @@ export const TvChartContainer = ({
   market,
 }: {
   chainId: CHAIN_IDS
-  market: Market
+  market: MarketV1
 }) => {
   const [mounted, setMounted] = useState(false)
   const [interval, setInterval] = useState('1D' as ResolutionString)
