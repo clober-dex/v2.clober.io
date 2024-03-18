@@ -15,10 +15,14 @@ type LimitContext = {
   setIsBid: (isBid: (prevState: boolean) => boolean) => void
   selectMode: 'none' | 'settings' | 'selectMarket'
   setSelectMode: (selectMode: 'none' | 'settings' | 'selectMarket') => void
+  showInputCurrencySelect: boolean
+  setShowInputCurrencySelect: (showInputCurrencySelect: boolean) => void
   inputCurrency: Currency | undefined
   setInputCurrency: (currency: Currency | undefined) => void
   inputCurrencyAmount: string
   setInputCurrencyAmount: (amount: string) => void
+  showOutputCurrencySelect: boolean
+  setShowOutputCurrencySelect: (showOutputCurrencySelect: boolean) => void
   outputCurrency: Currency | undefined
   setOutputCurrency: (currency: Currency | undefined) => void
   outputCurrencyAmount: string
@@ -41,10 +45,14 @@ const Context = React.createContext<LimitContext>({
   setIsBid: () => {},
   selectMode: 'none',
   setSelectMode: () => {},
+  showInputCurrencySelect: false,
+  setShowInputCurrencySelect: () => {},
   inputCurrency: undefined,
   setInputCurrency: () => {},
   inputCurrencyAmount: '',
   setInputCurrencyAmount: () => {},
+  showOutputCurrencySelect: false,
+  setShowOutputCurrencySelect: () => {},
   outputCurrency: undefined,
   setOutputCurrency: () => {},
   outputCurrencyAmount: '',
@@ -71,11 +79,14 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     'none' | 'settings' | 'selectMarket'
   >('none')
 
+  const [showInputCurrencySelect, setShowInputCurrencySelect] = useState(false)
   const [inputCurrency, setInputCurrency] = useState<Currency | undefined>(
     undefined,
   )
   const [inputCurrencyAmount, setInputCurrencyAmount] = useState('')
 
+  const [showOutputCurrencySelect, setShowOutputCurrencySelect] =
+    useState(false)
   const [outputCurrency, setOutputCurrency] = useState<Currency | undefined>(
     undefined,
   )
@@ -144,10 +155,14 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
         setIsBid,
         selectMode,
         setSelectMode,
+        showInputCurrencySelect,
+        setShowInputCurrencySelect,
         inputCurrency,
         setInputCurrency,
         inputCurrencyAmount,
         setInputCurrencyAmount,
+        showOutputCurrencySelect,
+        setShowOutputCurrencySelect,
         outputCurrency,
         setOutputCurrency,
         outputCurrencyAmount,

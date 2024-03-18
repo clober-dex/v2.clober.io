@@ -1,27 +1,32 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { isAddressEqual } from 'viem'
 
 import NumberInput from '../input/number-input'
 import CurrencyAmountInput from '../input/currency-amount-input'
 import { Currency } from '../../model/currency'
 import { ArrowDownSvg } from '../svg/arrow-down-svg'
 import { SettingSvg } from '../svg/setting-svg'
-import MarketSelect from '../selector/market-select'
-import { Market } from '../../model/market'
 import { ActionButton, ActionButtonProps } from '../button/action-button'
+import CurrencySelect from '../selector/currency-select'
+import { Balances } from '../../model/balances'
+import { Prices } from '../../model/prices'
 
 export const LimitForm = ({
+  currencies,
+  balances,
+  prices,
   priceInput,
   setPriceInput,
-  markets,
-  selectedMarket,
-  setSelectedMarket,
-  isBid,
   setSelectMode,
+  showInputCurrencySelect,
+  setShowInputCurrencySelect,
   inputCurrency,
   setInputCurrency,
   inputCurrencyAmount,
   setInputCurrencyAmount,
   availableInputCurrencyBalance,
+  showOutputCurrencySelect,
+  setShowOutputCurrencySelect,
   outputCurrency,
   setOutputCurrency,
   outputCurrencyAmount,
@@ -30,18 +35,21 @@ export const LimitForm = ({
   swapInputCurrencyAndOutputCurrency,
   actionButtonProps,
 }: {
+  currencies: Currency[]
+  balances: Balances
+  prices: Prices
   priceInput: string
   setPriceInput: (priceInput: string) => void
-  markets: Market[]
-  selectedMarket?: Market
-  setSelectedMarket: (market: Market) => void
-  isBid: boolean
   setSelectMode: (selectMode: 'none' | 'settings' | 'selectMarket') => void
+  showInputCurrencySelect: boolean
+  setShowInputCurrencySelect: (showInputCurrencySelect: boolean) => void
   inputCurrency: Currency | undefined
   setInputCurrency: (inputCurrency: Currency | undefined) => void
   inputCurrencyAmount: string
   setInputCurrencyAmount: (inputCurrencyAmount: string) => void
   availableInputCurrencyBalance: bigint
+  showOutputCurrencySelect: boolean
+  setShowOutputCurrencySelect: (showOutputCurrencySelect: boolean) => void
   outputCurrency: Currency | undefined
   setOutputCurrency: (outputCurrency: Currency | undefined) => void
   outputCurrencyAmount: string
@@ -50,17 +58,40 @@ export const LimitForm = ({
   swapInputCurrencyAndOutputCurrency: () => void
   actionButtonProps: ActionButtonProps
 }) => {
-  const [showMarketSelect, setShowMarketSelect] = useState(false)
-
-  return showMarketSelect ? (
-    <MarketSelect
-      markets={markets}
-      onBack={() => setShowMarketSelect(false)}
-      onMarketSelect={(market: Market) => {
-        setInputCurrency(market.quoteToken)
-        setOutputCurrency(market.baseToken)
-        setShowMarketSelect(false)
-        setSelectedMarket(market)
+  return showInputCurrencySelect ? (
+    <CurrencySelect
+      currencies={
+        outputCurrency
+          ? currencies.filter(
+              (currency) =>
+                !isAddressEqual(currency.address, outputCurrency.address),
+            )
+          : currencies
+      }
+      balances={balances}
+      prices={prices}
+      onBack={() => setShowInputCurrencySelect(false)}
+      onCurrencySelect={(currency) => {
+        setInputCurrency(currency)
+        setShowInputCurrencySelect(false)
+      }}
+    />
+  ) : showOutputCurrencySelect ? (
+    <CurrencySelect
+      currencies={
+        inputCurrency
+          ? currencies.filter(
+              (currency) =>
+                !isAddressEqual(currency.address, inputCurrency.address),
+            )
+          : currencies
+      }
+      balances={balances}
+      prices={prices}
+      onBack={() => setShowOutputCurrencySelect(false)}
+      onCurrencySelect={(currency) => {
+        setOutputCurrency(currency)
+        setShowOutputCurrencySelect(false)
       }}
     />
   ) : (
@@ -68,7 +99,7 @@ export const LimitForm = ({
       <div className="flex rounded-lg border-solid border-[1.5px] border-gray-700 p-4 mb-3 sm:mb-4 bg-gray-800">
         <div className="flex flex-col flex-1 gap-2">
           <div className="text-gray-500 text-xs sm:text-sm">
-            {isBid ? 'Buy' : 'Sell'} {selectedMarket?.baseToken.symbol} at rate
+            {'Buy'} {'TEST'} at rate
           </div>
           <NumberInput
             value={priceInput}
@@ -83,14 +114,16 @@ export const LimitForm = ({
           value={inputCurrencyAmount}
           onValueChange={setInputCurrencyAmount}
           availableAmount={availableInputCurrencyBalance}
-          onCurrencyClick={() => setShowMarketSelect(true)}
+          onCurrencyClick={() => setShowInputCurrencySelect(true)}
+          price={inputCurrency ? prices[inputCurrency.address] : undefined}
         />
         <CurrencyAmountInput
           currency={outputCurrency}
           value={outputCurrencyAmount}
           onValueChange={setOutputCurrencyAmount}
           availableAmount={availableOutputCurrencyBalance}
-          onCurrencyClick={() => setShowMarketSelect(true)}
+          onCurrencyClick={() => setShowOutputCurrencySelect(true)}
+          price={outputCurrency ? prices[outputCurrency.address] : undefined}
         />
         <div className="absolute flex items-center justify-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gray-900 p-1 sm:p-1.5">
           <button

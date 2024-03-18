@@ -30,7 +30,7 @@ import { ChartContainer } from './chart-container'
 
 export const LimitContainer = () => {
   const { selectedChain } = useChainContext()
-  const { markets, selectedMarket, setSelectedMarket } = useMarketContext()
+  const { markets, selectedMarket } = useMarketContext()
   const { openOrders } = useOpenOrderContext()
   const { address: userAddress } = useAccount()
   const {
@@ -38,10 +38,14 @@ export const LimitContainer = () => {
     setIsBid,
     selectMode,
     setSelectMode,
+    showInputCurrencySelect,
+    setShowInputCurrencySelect,
     inputCurrency,
     setInputCurrency,
     inputCurrencyAmount,
     setInputCurrencyAmount,
+    showOutputCurrencySelect,
+    setShowOutputCurrencySelect,
     outputCurrency,
     setOutputCurrency,
     outputCurrencyAmount,
@@ -286,13 +290,14 @@ export const LimitContainer = () => {
             />
           ) : (
             <LimitForm
+              prices={{}} // todo
+              balances={balances}
+              currencies={[]} // todo
               priceInput={priceInput}
               setPriceInput={setPriceInput}
-              markets={markets}
-              selectedMarket={selectedMarket}
-              setSelectedMarket={setSelectedMarket}
-              isBid={isBid}
               setSelectMode={setSelectMode}
+              showInputCurrencySelect={showInputCurrencySelect}
+              setShowInputCurrencySelect={setShowInputCurrencySelect}
               inputCurrency={inputCurrency}
               setInputCurrency={setInputCurrency}
               inputCurrencyAmount={inputCurrencyAmount}
@@ -305,6 +310,8 @@ export const LimitContainer = () => {
                     // (claimable[inputCurrency.address] ?? 0n)
                     0n
               }
+              showOutputCurrencySelect={showOutputCurrencySelect}
+              setShowOutputCurrencySelect={setShowOutputCurrencySelect}
               outputCurrency={outputCurrency}
               setOutputCurrency={setOutputCurrency}
               outputCurrencyAmount={outputCurrencyAmount}
