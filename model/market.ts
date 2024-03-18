@@ -5,6 +5,7 @@ import { Currency } from './currency'
 import { Depth } from './depth'
 
 export class Market {
+  id: `0x${string}/0x${string}`
   quote: Currency
   base: Currency
   latestTick: bigint
@@ -28,6 +29,7 @@ export class Market {
       throw new Error('Invalid token pair')
     }
     const _tokens = tokens.sort((a, b) => a.address.localeCompare(b.address))
+    this.id = `${_tokens[0].address}/${_tokens[1].address}`
     this.quote = _tokens[0]
     this.base = _tokens[1]
     this.latestTick = latestPriceIndex

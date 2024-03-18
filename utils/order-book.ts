@@ -1,11 +1,11 @@
 import BigNumber from 'bignumber.js'
 import { zeroAddress } from 'viem'
 
-import { MarketV1 } from '../model/market-v1'
 import { Decimals } from '../model/decimals'
 import { Currency } from '../model/currency'
 import { WrappedEthers } from '../constants/weths'
 import { Balances } from '../model/balances'
+import { Market } from '../model/market'
 
 import { toPlacesString } from './bignumber'
 import { PRICE_DECIMAL } from './prices'
@@ -44,22 +44,20 @@ export function calculatePriceInputString(
 
 export function parseDepth(
   isBid: boolean,
-  market: MarketV1,
+  market: Market,
   decimalPlaces: Decimals,
 ): { price: string; size: string }[] {
   return Array.from(
     [...(isBid ? market.bids : market.asks).map((depth) => ({ ...depth }))]
       .sort((a, b) =>
         isBid
-          ? Number(b.priceIndex) - Number(a.priceIndex)
-          : Number(a.priceIndex) - Number(b.priceIndex),
+          ? Number(b.tick) - Number(a.tick)
+          : Number(a.tick) - Number(b.tick),
       )
       .map((x) => {
         return {
           price: formatUnits(x.price, PRICE_DECIMAL),
-          size: new BigNumber(
-            formatUnits(x.baseAmount, market.baseToken.decimals),
-          ),
+          size: new BigNumber(formatUnits(x.baseAmount, market.base.decimals)),
         }
       })
       .reduce((prev, curr) => {
@@ -86,7 +84,7 @@ export function parseDepth(
   ).map((x) => {
     return {
       price: x.price,
-      size: toPlacesString(x.size, market.baseToken.decimals),
+      size: toPlacesString(x.size, market.base.decimals),
     }
   })
 }

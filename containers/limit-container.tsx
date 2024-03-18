@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { getAddress, parseUnits, zeroAddress } from 'viem'
+import { parseUnits, zeroAddress } from 'viem'
 import BigNumber from 'bignumber.js'
 import { useAccount } from 'wagmi'
 
@@ -19,18 +19,14 @@ import {
   calculatePriceInputString,
 } from '../utils/order-book'
 import { useLimitCurrencyContext } from '../contexts/limit/limit-currency-context'
-import { MarketV1 } from '../model/market-v1'
-import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
 import { ActionButton } from '../components/button/action-button'
 import { OpenOrderCard } from '../components/card/open-order-card'
-import { Currency } from '../model/currency'
-import { Balances } from '../model/balances'
 
 import { ChartContainer } from './chart-container'
 
 export const LimitContainer = () => {
   const { selectedChain } = useChainContext()
-  const { markets, selectedMarket } = useMarketContext()
+  const { selectedMarket } = useMarketContext()
   const { openOrders } = useOpenOrderContext()
   const { address: userAddress } = useAccount()
   const {
@@ -63,9 +59,6 @@ export const LimitContainer = () => {
     asks,
   } = useLimitContext()
   const { balances } = useLimitCurrencyContext()
-  const { limit, claim, cancel } = useLimitContractContext()
-  const { claimable, claimParamsListMap, cancelParamsList } =
-    useOpenOrderContext()
   const [showOrderBook, setShowOrderBook] = useState(true)
 
   const [depthClickedIndex, setDepthClickedIndex] = useState<
@@ -97,18 +90,14 @@ export const LimitContainer = () => {
 
   // When selectedMarket is changed
   useEffect(() => {
-    if (selectedMarket?.quoteToken && selectedMarket?.baseToken) {
-      setInputCurrency(
-        isBid ? selectedMarket.quoteToken : selectedMarket.baseToken,
-      )
-      setOutputCurrency(
-        isBid ? selectedMarket.baseToken : selectedMarket.quoteToken,
-      )
+    if (selectedMarket?.quote && selectedMarket?.base) {
+      setInputCurrency(isBid ? selectedMarket.quote : selectedMarket.base)
+      setOutputCurrency(isBid ? selectedMarket.base : selectedMarket.quote)
     }
   }, [
     isBid,
-    selectedMarket?.baseToken,
-    selectedMarket?.quoteToken,
+    selectedMarket?.base,
+    selectedMarket?.quote,
     setInputCurrency,
     setInputCurrencyAmount,
     setOutputCurrency,
@@ -215,39 +204,14 @@ export const LimitContainer = () => {
 
   const [market, amount, price] = useMemo(
     () => [
-      selectedMarket
-        ? MarketV1.from(
-            selectedMarket,
-            selectedMarket.bids,
-            selectedMarket.asks,
-          )
-        : undefined,
+      selectedMarket,
       parseUnits(inputCurrencyAmount, inputCurrency?.decimals ?? 18),
       parseUnits(priceInput, PRICE_DECIMAL),
     ],
     [inputCurrency?.decimals, inputCurrencyAmount, priceInput, selectedMarket],
   )
 
-  const [rawAmount, baseAmount, priceIndex] = useMemo(() => {
-    if (!market) {
-      return [0n, 0n, undefined]
-    }
-    const priceIndex = market.priceToIndex(price, !isBid).index
-    return isBid
-      ? [market.quoteToRaw(amount, true), 0n, priceIndex]
-      : [0n, amount, priceIndex]
-  }, [amount, isBid, market, price])
-
-  const currencyMaps = [
-    ...markets.map((market) => market.baseToken),
-    ...markets.map((market) => market.quoteToken),
-  ].reduce(
-    (acc, currency) => ({
-      ...acc,
-      [getAddress(currency.address)]: currency,
-    }),
-    {} as { [currencyAddress in `0x${string}`]: Currency },
-  )
+  console.log(amount, price)
 
   return (
     <div className="flex flex-col w-fit mb-4 sm:mb-6">
@@ -268,7 +232,7 @@ export const LimitContainer = () => {
         availableDecimalPlacesGroups &&
         selectedDecimalPlaces ? (
           <OrderBook
-            name={`${selectedMarket.baseToken.symbol}/${selectedMarket.quoteToken.symbol}`}
+            name={`${selectedMarket.base.symbol}/${selectedMarket.quote.symbol}`}
             bids={bids}
             asks={asks}
             availableDecimalPlacesGroups={availableDecimalPlacesGroups}
@@ -336,34 +300,9 @@ export const LimitContainer = () => {
                 setInputCurrencyAmount(outputCurrencyAmount)
               }}
               actionButtonProps={{
-                disabled:
-                  !inputCurrency ||
-                  !market ||
-                  !priceIndex ||
-                  !userAddress ||
-                  !amount,
+                disabled: !inputCurrency || !market || !userAddress || !amount,
                 onClick: async () => {
-                  if (
-                    !inputCurrency ||
-                    !market ||
-                    !priceIndex ||
-                    !userAddress
-                  ) {
-                    return
-                  }
-                  await limit(
-                    market,
-                    userAddress,
-                    priceIndex,
-                    rawAmount,
-                    baseAmount,
-                    parseUnits(
-                      claimBounty,
-                      selectedChain.nativeCurrency.decimals,
-                    ),
-                    isPostOnly,
-                    claimParamsListMap[inputCurrency.address],
-                  )
+                  console.log('limit order')
                 },
                 text: `Limit ${isBid ? 'Bid' : 'Ask'}`,
               }}
@@ -387,17 +326,7 @@ export const LimitContainer = () => {
                 .length === 0
             }
             onClick={async () => {
-              const [addresses, claimParamsList] = [
-                Object.keys(claimParamsListMap) as `0x${string}`[],
-                Object.values(claimParamsListMap).flat(),
-              ]
-              await claim(
-                addresses.map((address) => ({
-                  token: currencyMaps[address],
-                  amount: claimable[address] ?? 0n,
-                })),
-                claimParamsList,
-              )
+              console.log('claim all')
             }}
             text={`Claim (${
               openOrders.filter((openOrder) => openOrder.claimableAmount > 0n)
@@ -408,24 +337,7 @@ export const LimitContainer = () => {
             className="w-[64px] sm:w-[120px] flex flex-1 items-center justify-center rounded bg-gray-700 hover:bg-blue-600 text-white text-xs sm:text-sm disabled:bg-gray-800 disabled:text-gray-500 h-6 sm:h-7"
             disabled={openOrders.length === 0}
             onClick={async () => {
-              const openOrderBalances = openOrders.reduce(
-                (acc, openOrder) => ({
-                  ...acc,
-                  [getAddress(openOrder.inputToken.address)]:
-                    (acc[getAddress(openOrder.inputToken.address)] ?? 0n) +
-                    (openOrder.isBid
-                      ? openOrder.quoteAmount
-                      : openOrder.baseAmount),
-                }),
-                {} as Balances,
-              )
-              await cancel(
-                Object.entries(openOrderBalances).map(([address, amount]) => ({
-                  token: currencyMaps[getAddress(address)],
-                  amount,
-                })),
-                cancelParamsList,
-              )
+              console.log('cancel all')
             }}
             text={`Cancel (${openOrders.length})`}
           />
@@ -440,48 +352,14 @@ export const LimitContainer = () => {
               claimActionButtonProps={{
                 disabled: openOrder.claimableAmount === 0n,
                 onClick: async () => {
-                  await claim(
-                    [
-                      {
-                        amount: openOrder.claimableAmount,
-                        token: openOrder.outputToken,
-                      },
-                    ],
-                    [
-                      {
-                        market: openOrder.marketAddress,
-                        orderKeys: [
-                          {
-                            isBid: openOrder.isBid,
-                            priceIndex: openOrder.priceIndex,
-                            orderIndex: openOrder.orderIndex,
-                          },
-                        ],
-                      },
-                    ],
-                  )
+                  console.log('claim one')
                 },
                 text: 'Claim',
               }}
               cancelActionButtonProps={{
                 disabled: false,
                 onClick: async () => {
-                  await cancel(
-                    [
-                      {
-                        amount: openOrder.isBid
-                          ? openOrder.quoteAmount
-                          : openOrder.baseAmount,
-                        token: openOrder.inputToken,
-                      },
-                    ],
-                    [
-                      {
-                        market: openOrder.marketAddress,
-                        tokenIds: [openOrder.nftId],
-                      },
-                    ],
-                  )
+                  console.log('cancel one')
                 },
                 text: 'Cancel',
               }}

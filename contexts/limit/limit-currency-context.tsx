@@ -30,8 +30,8 @@ export const LimitCurrencyProvider = ({
         return {}
       }
       const uniqueCurrencies = [
-        ...markets.map((market) => market.quoteToken),
-        ...markets.map((market) => market.baseToken),
+        ...markets.map((market) => market.quote),
+        ...markets.map((market) => market.base),
       ].filter(
         (currency, index, self) =>
           self.findIndex((c) => c.address === currency.address) === index,

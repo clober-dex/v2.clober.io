@@ -9,8 +9,8 @@ import {
 } from '../public/static/charting_library'
 import DataFeed from '../utils/datafeed'
 import { CHAIN_IDS } from '../constants/chain'
-import { MarketV1 } from '../model/market-v1'
 import { SUPPORTED_INTERVALS } from '../utils/chart'
+import { Market } from '../model/market'
 
 function getLanguageFromURL(): LanguageCode | null {
   const regex = new RegExp('[\\?&]lang=([^&#]*)')
@@ -25,7 +25,7 @@ export const TvChartContainer = ({
   market,
 }: {
   chainId: CHAIN_IDS
-  market: MarketV1
+  market: Market
 }) => {
   const [mounted, setMounted] = useState(false)
   const [interval, setInterval] = useState('1D' as ResolutionString)
@@ -35,7 +35,7 @@ export const TvChartContainer = ({
   const refWidget = useRef<IChartingLibraryWidget>(null)
 
   const symbol = useMemo(
-    () => `${market.baseToken.symbol}/${market.quoteToken.symbol}`,
+    () => `${market.base.symbol}/${market.quote.symbol}`,
     [market],
   )
 
@@ -93,7 +93,7 @@ export const TvChartContainer = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chainId, market.address])
+  }, [chainId, market])
 
   useEffect(() => {
     if (mounted && refWidget.current && refWidget.current.activeChart) {
