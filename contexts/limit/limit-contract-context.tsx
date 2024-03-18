@@ -17,6 +17,7 @@ import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../../constants/fee'
 import { writeContract } from '../../utils/wallet'
 import { CONTROLLER_ABI } from '../../abis/core/controller-abi'
 import { WETH_ADDRESSES } from '../../constants/currency'
+import { fromPrice } from '../../model/tick'
 
 type LimitContractContext = {
   make: (
@@ -24,7 +25,7 @@ type LimitContractContext = {
     inputCurrency: Currency,
     outputCurrency: Currency,
     amount: bigint,
-    tick: bigint,
+    price: bigint,
   ) => Promise<void>
 }
 
@@ -48,12 +49,13 @@ export const LimitContractProvider = ({
       inputCurrency: Currency,
       outputCurrency: Currency,
       amount: bigint,
-      tick: bigint,
+      price: bigint,
     ) => {
       if (!walletClient || !selectedChain) {
         return
       }
 
+      const tick = fromPrice(price * 2n ** 128n)
       const isBid = isAddressEqual(inputCurrency.address, market.quote.address)
       try {
         const permitAmount = !isAddressEqual(inputCurrency.address, zeroAddress)

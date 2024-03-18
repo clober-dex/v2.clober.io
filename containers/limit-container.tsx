@@ -21,6 +21,8 @@ import {
 import { useLimitCurrencyContext } from '../contexts/limit/limit-currency-context'
 import { ActionButton } from '../components/button/action-button'
 import { OpenOrderCard } from '../components/card/open-order-card'
+import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
+import { fromPrice } from '../model/tick'
 
 import { ChartContainer } from './chart-container'
 
@@ -28,7 +30,7 @@ export const LimitContainer = () => {
   const { selectedChain } = useChainContext()
   const { selectedMarket } = useMarketContext()
   const { openOrders } = useOpenOrderContext()
-  const { address: userAddress } = useAccount()
+  const { make } = useLimitContractContext()
   const {
     isBid,
     setIsBid,
@@ -302,9 +304,22 @@ export const LimitContainer = () => {
                 setInputCurrencyAmount(outputCurrencyAmount)
               }}
               actionButtonProps={{
-                disabled: !inputCurrency || !market || !userAddress || !amount,
+                disabled:
+                  !selectedMarket ||
+                  !inputCurrency ||
+                  !outputCurrency ||
+                  !amount,
                 onClick: async () => {
-                  console.log('limit order')
+                  if (!selectedMarket || !inputCurrency || !outputCurrency) {
+                    return
+                  }
+                  await make(
+                    selectedMarket,
+                    inputCurrency,
+                    outputCurrency,
+                    amount,
+                    price,
+                  )
                 },
                 text: `Limit ${isBid ? 'Bid' : 'Ask'}`,
               }}
