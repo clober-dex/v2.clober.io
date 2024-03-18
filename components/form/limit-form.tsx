@@ -40,7 +40,7 @@ export const LimitForm = ({
   prices: Prices
   priceInput: string
   setPriceInput: (priceInput: string) => void
-  setSelectMode: (selectMode: 'none' | 'settings' | 'selectMarket') => void
+  setSelectMode: (selectMode: 'none' | 'settings') => void
   showInputCurrencySelect: boolean
   setShowInputCurrencySelect: (showInputCurrencySelect: boolean) => void
   inputCurrency: Currency | undefined

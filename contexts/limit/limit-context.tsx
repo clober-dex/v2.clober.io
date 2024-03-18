@@ -13,8 +13,8 @@ import { useMarketContext } from './market-context'
 type LimitContext = {
   isBid: boolean
   setIsBid: (isBid: (prevState: boolean) => boolean) => void
-  selectMode: 'none' | 'settings' | 'selectMarket'
-  setSelectMode: (selectMode: 'none' | 'settings' | 'selectMarket') => void
+  selectMode: 'none' | 'settings'
+  setSelectMode: (selectMode: 'none' | 'settings') => void
   showInputCurrencySelect: boolean
   setShowInputCurrencySelect: (showInputCurrencySelect: boolean) => void
   inputCurrency: Currency | undefined
@@ -75,9 +75,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { selectedChain } = useChainContext()
 
   const [isBid, setIsBid] = useState(true)
-  const [selectMode, setSelectMode] = useState<
-    'none' | 'settings' | 'selectMarket'
-  >('none')
+  const [selectMode, setSelectMode] = useState<'none' | 'settings'>('none')
 
   const [showInputCurrencySelect, setShowInputCurrencySelect] = useState(false)
   const [inputCurrency, setInputCurrency] = useState<Currency | undefined>(
