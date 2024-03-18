@@ -58,7 +58,7 @@ export const LimitContainer = () => {
     bids,
     asks,
   } = useLimitContext()
-  const { balances } = useLimitCurrencyContext()
+  const { balances, currencies } = useLimitCurrencyContext()
   const [showOrderBook, setShowOrderBook] = useState(true)
 
   const [depthClickedIndex, setDepthClickedIndex] = useState<
@@ -260,7 +260,7 @@ export const LimitContainer = () => {
             <LimitForm
               prices={{}} // todo
               balances={balances}
-              currencies={[]} // todo
+              currencies={currencies}
               priceInput={priceInput}
               setPriceInput={setPriceInput}
               setSelectMode={setSelectMode}
