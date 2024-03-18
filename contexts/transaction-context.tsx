@@ -2,11 +2,13 @@ import React, { useContext } from 'react'
 
 import ConfirmationModal from '../components/modal/confirmation-modal'
 import { Currency } from '../model/currency'
+import { sanitizeNumber } from '../utils/numbers'
 
 export type Confirmation = {
   title: string
   body: string
   fields: {
+    direction?: 'in' | 'out'
     currency?: Currency
     label: string
     value: string
@@ -25,7 +27,18 @@ const Context = React.createContext<TransactionContext>({
 export const TransactionProvider = ({
   children,
 }: React.PropsWithChildren<{}>) => {
-  const [confirmation, setConfirmation] = React.useState<Confirmation>()
+  const [confirmation, _setConfirmation] = React.useState<Confirmation>()
+  const setConfirmation = (confirmation?: Confirmation) => {
+    const refinedConfirmation = confirmation
+      ? {
+          ...confirmation,
+          fields: confirmation.fields.filter(
+            (field) => Number(sanitizeNumber(field.value)) > 0,
+          ),
+        }
+      : undefined
+    _setConfirmation(refinedConfirmation)
+  }
   return (
     <Context.Provider value={{ confirmation, setConfirmation }}>
       {children}
