@@ -1,0 +1,35 @@
+query getOpenOrder($marketAddress: String!, $isBid: Boolean!, $priceIndex: BigInt!, $orderIndex: BigInt!) {
+    openOrders(where: {
+        market: $marketAddress,
+        isBid: $isBid,
+        priceIndex: $priceIndex,
+        orderIndex: $orderIndex
+    }) {
+        nftId
+        market {
+            id
+            quoteUnit
+            quoteToken {
+                id
+                name
+                symbol
+                decimals
+            }
+            baseToken {
+                id
+                name
+                symbol
+                decimals
+            }
+        }
+        price
+        isBid
+        priceIndex
+        orderIndex
+        rawAmount
+        baseAmount
+        baseFilledAmount
+        claimableAmount
+        txHash
+    }
+}
