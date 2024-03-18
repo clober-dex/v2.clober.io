@@ -1,11 +1,5 @@
 import { Currency } from './currency'
-
-type Depth = {
-  price: bigint
-  priceIndex: bigint
-  rawAmount: bigint
-  baseAmount: bigint
-}
+import { Depth } from './depth'
 
 export class Book {
   base: Currency
