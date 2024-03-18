@@ -1,9 +1,7 @@
-import React, { useCallback, useEffect } from 'react'
+import React from 'react'
 import { useQuery } from 'wagmi'
-import { getAddress, isAddressEqual } from 'viem'
 
 import { useChainContext } from '../chain-context'
-import { Chain } from '../../model/chain'
 import { Market } from '../../model/market'
 import { fetchMarkets } from '../../apis/market'
 
@@ -18,9 +16,6 @@ const Context = React.createContext<MarketContext>({
   selectedMarket: {} as Market,
   setSelectedMarket: (_) => _,
 })
-
-const LOCAL_STORAGE_MARKET_KEY = (chain: Chain) => `${chain.id}-market`
-const QUERY_PARAM_MARKET_KEY = 'market'
 
 export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { selectedChain } = useChainContext()
@@ -37,43 +32,9 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     },
   )
 
-  const [selectedMarket, _setSelectedMarket] = React.useState<
+  const [selectedMarket, setSelectedMarket] = React.useState<
     Market | undefined
   >(undefined)
-
-  const setSelectedMarket = useCallback(
-    (market: Market) => {
-      // if chain is changed, reset selected market
-      market = markets.find((m) => m.id, market.id) || markets[0]
-      if (!market) {
-        return
-      }
-      localStorage.setItem(LOCAL_STORAGE_MARKET_KEY(selectedChain), market.id)
-      _setSelectedMarket(market)
-    },
-    [selectedChain, markets],
-  )
-
-  // useEffect(() => {
-  //   const params = new URLSearchParams(window.location.search)
-  //   const queryParamMarketAddress = params.get(QUERY_PARAM_MARKET_KEY)
-  //   const localStorageMarketAddress = localStorage.getItem(
-  //     LOCAL_STORAGE_MARKET_KEY(selectedChain),
-  //   )
-  //   const market =
-  //     markets.find(
-  //       (m) =>
-  //         queryParamMarketAddress !== null &&
-  //         isAddressEqual(m.address, getAddress(queryParamMarketAddress)),
-  //     ) ||
-  //     markets.find(
-  //       (m) =>
-  //         localStorageMarketAddress !== null &&
-  //         isAddressEqual(m.address, getAddress(localStorageMarketAddress)),
-  //     ) ||
-  //     markets[0]
-  //   setSelectedMarket(market)
-  // }, [selectedChain, markets, setSelectedMarket])
 
   return (
     <Context.Provider value={{ markets, selectedMarket, setSelectedMarket }}>

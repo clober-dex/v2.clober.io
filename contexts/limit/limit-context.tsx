@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import BigNumber from 'bignumber.js'
+import { getAddress, isAddressEqual } from 'viem'
 
 import { Currency } from '../../model/currency'
 import { formatUnits, min } from '../../utils/bigint'
@@ -7,8 +8,10 @@ import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
 import { getPriceDecimals, PRICE_DECIMAL } from '../../utils/prices'
 import { parseDepth } from '../../utils/order-book'
 import { useChainContext } from '../chain-context'
+import { Chain } from '../../model/chain'
 
 import { useMarketContext } from './market-context'
+import { useLimitCurrencyContext } from './limit-currency-context'
 
 type LimitContext = {
   isBid: boolean
@@ -70,22 +73,30 @@ const Context = React.createContext<LimitContext>({
   asks: [],
 })
 
+const LOCAL_STORAGE_INPUT_CURRENCY_KEY = (chain: Chain) =>
+  `${chain.id}-inputCurrency-limit`
+const LOCAL_STORAGE_OUTPUT_CURRENCY_KEY = (chain: Chain) =>
+  `${chain.id}-outputCurrency-limit`
+const QUERY_PARAM_INPUT_CURRENCY_KEY = 'inputCurrency'
+const QUERY_PARAM_OUTPUT_CURRENCY_KEY = 'outputCurrency'
+
 export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { selectedMarket } = useMarketContext()
+  const { currencies } = useLimitCurrencyContext()
   const { selectedChain } = useChainContext()
 
   const [isBid, setIsBid] = useState(true)
   const [selectMode, setSelectMode] = useState<'none' | 'settings'>('none')
 
   const [showInputCurrencySelect, setShowInputCurrencySelect] = useState(false)
-  const [inputCurrency, setInputCurrency] = useState<Currency | undefined>(
+  const [inputCurrency, _setInputCurrency] = useState<Currency | undefined>(
     undefined,
   )
   const [inputCurrencyAmount, setInputCurrencyAmount] = useState('')
 
   const [showOutputCurrencySelect, setShowOutputCurrencySelect] =
     useState(false)
-  const [outputCurrency, setOutputCurrency] = useState<Currency | undefined>(
+  const [outputCurrency, _setOutputCurrency] = useState<Currency | undefined>(
     undefined,
   )
   const [outputCurrencyAmount, setOutputCurrencyAmount] = useState('')
@@ -141,6 +152,71 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
         : [[], []],
     [selectedDecimalPlaces, selectedMarket],
   )
+
+  const setInputCurrency = useCallback(
+    (currency: Currency | undefined) => {
+      if (currency) {
+        localStorage.setItem(
+          LOCAL_STORAGE_INPUT_CURRENCY_KEY(selectedChain),
+          currency.address,
+        )
+      }
+      _setInputCurrency(currency)
+    },
+    [selectedChain],
+  )
+
+  const setOutputCurrency = useCallback(
+    (currency: Currency | undefined) => {
+      if (currency) {
+        localStorage.setItem(
+          LOCAL_STORAGE_OUTPUT_CURRENCY_KEY(selectedChain),
+          currency.address,
+        )
+      }
+      _setOutputCurrency(currency)
+    },
+    [selectedChain],
+  )
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const queryParamInputCurrencyAddress = params.get(
+      QUERY_PARAM_INPUT_CURRENCY_KEY,
+    )
+    const queryParamOutputCurrencyAddress = params.get(
+      QUERY_PARAM_OUTPUT_CURRENCY_KEY,
+    )
+    const localStorageInputCurrencyAddress = localStorage.getItem(
+      LOCAL_STORAGE_INPUT_CURRENCY_KEY(selectedChain),
+    )
+    const localStorageOutputCurrencyAddress = localStorage.getItem(
+      LOCAL_STORAGE_OUTPUT_CURRENCY_KEY(selectedChain),
+    )
+    const inputCurrencyAddress =
+      queryParamInputCurrencyAddress ||
+      localStorageInputCurrencyAddress ||
+      undefined
+    const outputCurrencyAddress =
+      queryParamOutputCurrencyAddress ||
+      localStorageOutputCurrencyAddress ||
+      undefined
+
+    setInputCurrency(
+      inputCurrencyAddress
+        ? currencies.find((currency) =>
+            isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
+          )
+        : undefined,
+    )
+    setOutputCurrency(
+      outputCurrencyAddress
+        ? currencies.find((currency) =>
+            isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
+          )
+        : undefined,
+    )
+  }, [currencies, selectedChain])
 
   return (
     <Context.Provider

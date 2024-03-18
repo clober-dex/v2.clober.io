@@ -30,9 +30,9 @@ const Context = React.createContext<SwapContext>({
 })
 
 const LOCAL_STORAGE_INPUT_CURRENCY_KEY = (chain: Chain) =>
-  `${chain.id}-inputCurrency`
+  `${chain.id}-inputCurrency-swap`
 const LOCAL_STORAGE_OUTPUT_CURRENCY_KEY = (chain: Chain) =>
-  `${chain.id}-outputCurrency`
+  `${chain.id}-outputCurrency-swap`
 const QUERY_PARAM_INPUT_CURRENCY_KEY = 'inputCurrency'
 const QUERY_PARAM_OUTPUT_CURRENCY_KEY = 'outputCurrency'
 
