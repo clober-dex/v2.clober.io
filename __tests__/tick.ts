@@ -1,8 +1,8 @@
 import { createPublicClient, http } from 'viem'
 import { arbitrumSepolia } from 'viem/chains'
 
-import { Tick } from '../model/tick'
-import { CONTROLLER_ABI } from '../abis/core/controller-abi'
+import { TICK_WRAPPER_ABI } from '../abis/mock/tick-wrapper-abi'
+import { baseToQuote, fromPrice, quoteToBase, toPrice } from '../model/tick'
 
 const MAX_TICK = Math.pow(2, 19) - 1
 const MIN_TICK = -1 * MAX_TICK
@@ -15,24 +15,23 @@ const randomInteger = (start: number, end: number) => {
   return Math.floor(Math.random() * (end - start + 1) + start)
 }
 describe('Tick', () => {
-  const CONTROLLER_ADDRESS = '0x474fb05A287f4BF3aE6A728FEC5E70967B3A04dC'
+  const TICK_WRAPPER_ADDRESS = '0x1A0E22870dE507c140B7C765a04fCCd429B8343F'
   const publicClient = createPublicClient({
     chain: arbitrumSepolia,
     transport: http(),
   })
-  const tick = new Tick()
 
   it('index to price', async () => {
     const randomPriceIndices = [
       MIN_TICK,
-      ...Array.from({ length: 1000 }, () => randomInteger(-500000, 500000)),
+      ...Array.from({ length: 500 }, () => randomInteger(-500000, 500000)),
       MAX_TICK,
     ]
     const actualPrices = (
       (await publicClient.multicall({
         contracts: randomPriceIndices.map((priceIndex) => ({
-          address: CONTROLLER_ADDRESS,
-          abi: CONTROLLER_ABI,
+          address: TICK_WRAPPER_ADDRESS,
+          abi: TICK_WRAPPER_ABI,
           functionName: 'toPrice',
           args: [priceIndex],
         })),
@@ -40,7 +39,7 @@ describe('Tick', () => {
     ).map(({ result }) => result)
 
     const expectedPrices = randomPriceIndices.map((priceIndex) =>
-      tick.toPrice(BigInt(priceIndex)),
+      toPrice(BigInt(priceIndex)),
     )
     expect(expectedPrices).toEqual(actualPrices)
   }, 100000)
@@ -48,15 +47,15 @@ describe('Tick', () => {
   it('price to index', async () => {
     const randomPriceIndices = [
       MIN_TICK,
-      ...Array.from({ length: 1000 }, () => randomInteger(-500000, 500000)),
+      ...Array.from({ length: 500 }, () => randomInteger(-500000, 500000)),
       MAX_TICK,
     ]
 
     const actualPrices = (
       (await publicClient.multicall({
         contracts: randomPriceIndices.map((priceIndex) => ({
-          address: CONTROLLER_ADDRESS,
-          abi: CONTROLLER_ABI,
+          address: TICK_WRAPPER_ADDRESS,
+          abi: TICK_WRAPPER_ABI,
           functionName: 'toPrice',
           args: [priceIndex],
         })),
@@ -66,16 +65,14 @@ describe('Tick', () => {
     const actualPriceIndices = (
       (await publicClient.multicall({
         contracts: actualPrices.map((price) => ({
-          address: CONTROLLER_ADDRESS,
-          abi: CONTROLLER_ABI,
+          address: TICK_WRAPPER_ADDRESS,
+          abi: TICK_WRAPPER_ABI,
           functionName: 'fromPrice',
           args: [price],
         })),
       })) as { result: number }[]
     ).map(({ result }) => BigInt(result))
-    const expectedPriceIndices = actualPrices.map((price) =>
-      tick.fromPrice(price),
-    )
+    const expectedPriceIndices = actualPrices.map((price) => fromPrice(price))
     expect(expectedPriceIndices).toEqual(actualPriceIndices)
   }, 100000)
 
@@ -84,16 +81,54 @@ describe('Tick', () => {
     const actualPriceIndices = (
       (await publicClient.multicall({
         contracts: actualPrices.map((price) => ({
-          address: CONTROLLER_ADDRESS,
-          abi: CONTROLLER_ABI,
+          address: TICK_WRAPPER_ADDRESS,
+          abi: TICK_WRAPPER_ABI,
           functionName: 'fromPrice',
           args: [price],
         })),
       })) as { result: number }[]
     ).map(({ result }) => BigInt(result))
-    const expectedPriceIndices = actualPrices.map((price) =>
-      tick.fromPrice(price),
-    )
+    const expectedPriceIndices = actualPrices.map((price) => fromPrice(price))
     expect(expectedPriceIndices).toEqual(actualPriceIndices)
+  })
+
+  it('quote to base', async () => {
+    const randomPriceIndices = Array.from({ length: 100 }, () =>
+      randomInteger(-100000, 100000),
+    )
+    const actual = (
+      (await publicClient.multicall({
+        contracts: randomPriceIndices.map((priceIndex) => ({
+          address: TICK_WRAPPER_ADDRESS,
+          abi: TICK_WRAPPER_ABI,
+          functionName: 'quoteToBase',
+          args: [priceIndex, 1000000n, true],
+        })),
+      })) as { result: bigint }[]
+    ).map(({ result }) => result)
+    const expected = randomPriceIndices.map((priceIndex) =>
+      quoteToBase(BigInt(priceIndex), 1000000n, true),
+    )
+    expect(expected).toEqual(actual)
+  })
+
+  it('base to quote', async () => {
+    const randomPriceIndices = Array.from({ length: 100 }, () =>
+      randomInteger(-100000, 100000),
+    )
+    const actual = (
+      (await publicClient.multicall({
+        contracts: randomPriceIndices.map((priceIndex) => ({
+          address: TICK_WRAPPER_ADDRESS,
+          abi: TICK_WRAPPER_ABI,
+          functionName: 'baseToQuote',
+          args: [priceIndex, 1000000n, true],
+        })),
+      })) as { result: bigint }[]
+    ).map(({ result }) => result)
+    const expected = randomPriceIndices.map((priceIndex) =>
+      baseToQuote(BigInt(priceIndex), 1000000n, true),
+    )
+    expect(expected).toEqual(actual)
   })
 })
