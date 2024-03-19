@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { parseUnits, zeroAddress } from 'viem'
 import BigNumber from 'bignumber.js'
-import { useAccount } from 'wagmi'
 
 import LimitSettingForm from '../components/form/limit-setting-form'
 import { LimitForm } from '../components/form/limit-form'
@@ -9,7 +8,7 @@ import OrderBook from '../components/order-book'
 import { useChainContext } from '../contexts/chain-context'
 import { useMarketContext } from '../contexts/limit/market-context'
 import { formatUnits } from '../utils/bigint'
-import { PRICE_DECIMAL } from '../utils/prices'
+import { parsePrice } from '../utils/prices'
 import { textStyles } from '../themes/text-styles'
 import { toPlacesString } from '../utils/bignumber'
 import { useOpenOrderContext } from '../contexts/limit/open-order-context'
@@ -22,7 +21,6 @@ import { useLimitCurrencyContext } from '../contexts/limit/limit-currency-contex
 import { ActionButton } from '../components/button/action-button'
 import { OpenOrderCard } from '../components/card/open-order-card'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
-import { fromPrice } from '../model/tick'
 
 import { ChartContainer } from './chart-container'
 
@@ -204,16 +202,23 @@ export const LimitContainer = () => {
     setPriceInput,
   ])
 
-  const [market, amount, price] = useMemo(
+  const [amount, price] = useMemo(
     () => [
-      selectedMarket,
       parseUnits(inputCurrencyAmount, inputCurrency?.decimals ?? 18),
-      parseUnits(priceInput, PRICE_DECIMAL),
+      isBid
+        ? parsePrice(
+            Number(priceInput),
+            selectedMarket?.quote.decimals ?? 18,
+            selectedMarket?.base.decimals ?? 18,
+          )
+        : parsePrice(
+            Number(priceInput),
+            selectedMarket?.base.decimals ?? 18,
+            selectedMarket?.quote.decimals ?? 18,
+          ),
     ],
-    [inputCurrency?.decimals, inputCurrencyAmount, priceInput, selectedMarket],
+    [inputCurrency, inputCurrencyAmount, isBid, priceInput, selectedMarket],
   )
-
-  console.log(amount, price)
 
   return (
     <div className="flex flex-col w-fit mb-4 sm:mb-6">

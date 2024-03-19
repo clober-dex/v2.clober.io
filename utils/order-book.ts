@@ -8,7 +8,7 @@ import { Balances } from '../model/balances'
 import { Market } from '../model/market'
 
 import { toPlacesString } from './bignumber'
-import { formatPrice, PRICE_DECIMAL } from './prices'
+import { formatPrice } from './prices'
 import { formatUnits } from './bigint'
 
 export function calculateOutputCurrencyAmountString(
@@ -39,7 +39,7 @@ export function calculatePriceInputString(
     : new BigNumber(inputCurrencyAmount).times(outputCurrencyAmount)
   return expectedPriceInput.isNaN() || !expectedPriceInput.isFinite()
     ? currentPriceInput
-    : toPlacesString(expectedPriceInput, PRICE_DECIMAL)
+    : toPlacesString(expectedPriceInput)
 }
 
 export function parseDepth(

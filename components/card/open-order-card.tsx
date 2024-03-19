@@ -5,7 +5,6 @@ import { OpenOrder } from '../../model/open-order'
 import { formatUnits } from '../../utils/bigint'
 import { ActionButton, ActionButtonProps } from '../button/action-button'
 import { toPlacesString } from '../../utils/bignumber'
-import { PRICE_DECIMAL } from '../../utils/prices'
 
 export const OpenOrderCard = ({
   openOrder,
@@ -48,7 +47,7 @@ export const OpenOrderCard = ({
           <div className="flex flex-row align-baseline justify-between">
             <label className="text-gray-200">Price</label>
             <p className="text-white">
-              {toPlacesString(formatUnits(openOrder.price, PRICE_DECIMAL))}
+              {toPlacesString(formatUnits(openOrder.price, 1)) /* TODO */}
             </p>
           </div>
           <div className="flex flex-row align-baseline justify-between">

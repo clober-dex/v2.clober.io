@@ -2,8 +2,6 @@ import BigNumber from 'bignumber.js'
 
 import { getDecimalPlaces } from './bignumber'
 
-export const PRICE_DECIMAL = 38
-
 export const getPriceDecimals = (
   price: bigint,
   inputCurrencyDecimals: number,
