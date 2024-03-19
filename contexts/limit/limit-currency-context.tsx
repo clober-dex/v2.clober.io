@@ -23,7 +23,7 @@ export const LimitCurrencyProvider = ({
   children,
 }: React.PropsWithChildren<{}>) => {
   const { address: userAddress } = useAccount()
-  const { data: balance } = useBalance({ address: userAddress })
+  const { data: balance } = useBalance({ address: userAddress, watch: true })
   const { markets } = useMarketContext()
 
   const { data: balances } = useQuery(
@@ -63,7 +63,7 @@ export const LimitCurrencyProvider = ({
       )
     },
     {
-      refetchInterval: 10 * 1000,
+      refetchInterval: 5 * 1000,
       refetchIntervalInBackground: true,
     },
   ) as { data: Balances }

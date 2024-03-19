@@ -29,7 +29,10 @@ export const SwapCurrencyProvider = ({
   children,
 }: React.PropsWithChildren<{}>) => {
   const { address: userAddress } = useAccount()
-  const { data: balance } = useBalance({ address: userAddress })
+  const { data: balance } = useBalance({
+    address: userAddress,
+    watch: true,
+  })
   const { selectedChain } = useChainContext()
 
   const { data: currencies } = useQuery(
