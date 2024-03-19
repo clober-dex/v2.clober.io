@@ -1,14 +1,9 @@
 import { Market } from '../../model/market'
 import { Book } from '../../model/book'
 import { Depth } from '../../model/depth'
-import { quoteToBase, toPrice } from '../../model/tick'
+import { fromPrice, quoteToBase, toPrice } from '../../model/tick'
 import { arbitrumSepolia } from 'viem/chains'
-
-const ticks = [
-  -524287, -325538, -98510, 479399, -68697, 425140, 35128, 329697, -217553,
-  477854, -292458, 405621, 417308, -289305, -484882, 85491, 123516, -71500,
-  22075, 61498, 399217, 524287,
-].map((x) => BigInt(x))
+import { parsePrice } from '../../utils/prices'
 
 export const dummyMarkets: Market[] = [
   new Market({
@@ -49,16 +44,19 @@ export const dummyMarkets: Market[] = [
         takerPolicy: 3000n,
         latestTick: 0n,
         latestPrice: 0n,
-        depths: ticks.map(
-          (tick) =>
-            ({
+        depths: [5000, 5000.0001, 5001, 5001.1, 5555, 6000, 6666, 6969].map(
+          (price) => {
+            const tick = fromPrice(parsePrice(price, 6, 18))
+            const rawAmount = 10000n * 10n ** 6n
+            return {
               boolId: '0x000000000000000000000000000000000000000a',
               tick,
-              price: toPrice(tick),
-              rawAmount: 100000000n,
-              quoteAmount: 100000000n,
-              baseAmount: quoteToBase(tick, 100000000n, false),
-            }) as Depth,
+              price: parsePrice(price, 6, 18),
+              rawAmount,
+              quoteAmount: rawAmount * 1n,
+              baseAmount: 10n ** 18n,
+            } as Depth
+          },
         ),
       }),
       new Book({
@@ -74,23 +72,26 @@ export const dummyMarkets: Market[] = [
           symbol: 'ETH',
           decimals: 18,
         },
-        unit: 1n,
+        unit: 12n,
         makerPolicy: 3000n,
         hooks: '0x0000000000000000000000000000000000000000',
         takerPolicy: 3000n,
         latestTick: 0n,
         latestPrice: 0n,
-        depths: ticks.map(
-          (tick) =>
-            ({
-              boolId: '0x000000000000000000000000000000000000000b',
-              tick,
-              price: toPrice(tick),
-              rawAmount: 100000000n,
-              quoteAmount: 100000000n,
-              baseAmount: quoteToBase(tick, 100000000n, false),
-            }) as Depth,
-        ),
+        depths: [
+          7000, 7000.01, 7000.02, 7001, 7003, 7777, 10000, 10000.00001, 100000,
+        ].map((price) => {
+          const tick = fromPrice(parsePrice(price, 18, 6))
+          const rawAmount = 10000n * 10n ** 12n
+          return {
+            boolId: '0x000000000000000000000000000000000000000b',
+            tick,
+            price: parsePrice(price, 18, 6),
+            rawAmount,
+            quoteAmount: rawAmount * 10n ** 12n,
+            baseAmount: 10n ** 18n,
+          } as Depth
+        }),
       }),
     ],
   }),

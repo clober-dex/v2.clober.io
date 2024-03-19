@@ -1,19 +1,43 @@
 import BigNumber from 'bignumber.js'
 
 import { getDecimalPlaces } from './bignumber'
-import { formatUnits } from './bigint'
 
-export const PRICE_DECIMAL = 18
+export const PRICE_DECIMAL = 38
 
 export const getPriceDecimals = (
   price: bigint,
-  r: bigint = 1001000000000000000n,
+  inputCurrencyDecimals: number,
+  outputCurrencyDecimals: number,
+  r: number = 1.001,
 ) => {
-  const priceNumber = new BigNumber(formatUnits(price, PRICE_DECIMAL))
+  const priceNumber = new BigNumber(
+    formatPrice(price, inputCurrencyDecimals, outputCurrencyDecimals),
+  )
   return getDecimalPlaces(
-    new BigNumber(formatUnits(r, PRICE_DECIMAL))
-      .multipliedBy(priceNumber)
-      .minus(priceNumber),
+    new BigNumber(r).multipliedBy(priceNumber).minus(priceNumber),
     1,
+  )
+}
+
+export const formatPrice = (
+  price: bigint,
+  inputCurrencyDecimals: number,
+  outputCurrencyDecimals: number,
+): number => {
+  return (
+    (Number(price) / Math.pow(2, 128)) *
+    10 ** (outputCurrencyDecimals - inputCurrencyDecimals)
+  )
+}
+
+export const parsePrice = (
+  price: number,
+  inputCurrencyDecimals: number,
+  outputCurrencyDecimals: number,
+): bigint => {
+  return BigInt(
+    price *
+      Math.pow(2, 128) *
+      Math.pow(10, inputCurrencyDecimals - outputCurrencyDecimals),
   )
 }

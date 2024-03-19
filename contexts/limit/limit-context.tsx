@@ -3,9 +3,9 @@ import BigNumber from 'bignumber.js'
 import { getAddress, isAddressEqual } from 'viem'
 
 import { Currency } from '../../model/currency'
-import { formatUnits, min } from '../../utils/bigint'
+import { formatUnits } from '../../utils/bigint'
 import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
-import { getPriceDecimals, PRICE_DECIMAL } from '../../utils/prices'
+import { formatPrice, getPriceDecimals } from '../../utils/prices'
 import { parseDepth } from '../../utils/order-book'
 import { useChainContext } from '../chain-context'
 import { Chain } from '../../model/chain'
@@ -117,19 +117,45 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     const availableDecimalPlacesGroups = selectedMarket
       ? (Array.from(Array(4).keys())
           .map((i) => {
-            const minPrice = min(
+            const bidSideMinPrice =
               selectedMarket.bids.sort(
-                (a, b) => Number(b.tick) - Number(a.tick),
-              )[0]?.price ?? 2n ** 256n - 1n,
+                (a, b) => Number(b.price) - Number(a.price),
+              )[0]?.price ?? 2n ** 256n - 1n
+            const askSideMinPrice =
               selectedMarket.asks.sort(
-                (a, b) => Number(a.tick) - Number(b.tick),
-              )[0]?.price ?? 2n ** 256n - 1n,
-            )
-            const decimalPlaces = getPriceDecimals(minPrice)
+                (a, b) => Number(a.price) - Number(b.price),
+              )[0]?.price ?? 2n ** 256n - 1n
+
+            const [minPrice, decimalPlaces] =
+              bidSideMinPrice <= askSideMinPrice
+                ? [
+                    formatPrice(
+                      bidSideMinPrice,
+                      selectedMarket.quote.decimals,
+                      selectedMarket.base.decimals,
+                    ),
+                    getPriceDecimals(
+                      bidSideMinPrice,
+                      selectedMarket.quote.decimals,
+                      selectedMarket.base.decimals,
+                    ),
+                  ]
+                : [
+                    formatPrice(
+                      askSideMinPrice,
+                      selectedMarket.base.decimals,
+                      selectedMarket.quote.decimals,
+                    ),
+                    getPriceDecimals(
+                      askSideMinPrice,
+                      selectedMarket.base.decimals,
+                      selectedMarket.quote.decimals,
+                    ),
+                  ]
             const label = (10 ** (i - decimalPlaces)).toFixed(
               Math.max(decimalPlaces - i, 0),
             )
-            if (new BigNumber(formatUnits(minPrice, PRICE_DECIMAL)).gt(label)) {
+            if (new BigNumber(minPrice).gt(label)) {
               return {
                 label,
                 value: decimalPlaces - i,
