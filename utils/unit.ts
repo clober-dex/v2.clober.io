@@ -6,7 +6,7 @@ import { CHAIN_IDS, supportChains } from '../constants/chain'
 
 export const calculateUnit = async (chainId: CHAIN_IDS, quote: Currency) => {
   if (isAddressEqual(quote.address, zeroAddress)) {
-    return 1n
+    return 12n
   }
   const publicClient = createPublicClient({
     chain: supportChains.find((chain) => chain.id === chainId),
