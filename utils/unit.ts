@@ -24,5 +24,7 @@ export const calculateUnit = async (chainId: CHAIN_IDS, quote: Currency) => {
   if (!totalSupply) {
     throw new Error('totalSupply is not found')
   }
-  return totalSupply <= 2n ** 64n ? 1n : 10n ** BigInt(quote.decimals - 6)
+  return totalSupply <= 2n ** 64n
+    ? 1n
+    : 10n ** BigInt(Math.max(quote.decimals - 6, 0))
 }
