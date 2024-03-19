@@ -107,20 +107,6 @@ export const LimitContractProvider = ({
               !WETH_ADDRESSES[selectedChain.id as CHAIN_IDS].includes(address),
           )
 
-        console.log(
-          'arg',
-          price,
-          [param],
-          tokensToSettle,
-          [
-            {
-              token: inputCurrency.address,
-              permitAmount,
-              signature: { deadline, v, r, s },
-            },
-          ],
-          getDeadlineTimestampInSeconds(),
-        )
         await writeContract(publicClient, walletClient, {
           address: CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
           abi: CONTROLLER_ABI,
