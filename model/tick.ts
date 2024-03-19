@@ -20,11 +20,11 @@ const R16 = 0x5d6af8dedb81196699c329225ee604n
 const R17 = 0x2216e584f5fa1ea926041bedfe97n
 const R18 = 0x48a170391f7dc42444e8fa2n
 
-const mostSignificantBit = (x: bigint): bigint => {
+export const mostSignificantBit = (x: bigint): bigint => {
   return BigInt(Math.floor(Math.log2(Number(x))))
 }
 
-const log2 = (x: bigint): bigint => {
+export const log2 = (x: bigint): bigint => {
   const msb = mostSignificantBit(x)
 
   if (msb > 128n) {

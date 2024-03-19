@@ -56,7 +56,7 @@ export const LimitContractProvider = ({
         return
       }
 
-      const tick = fromPrice(price * 2n ** 128n)
+      const tick = fromPrice(price)
       const isBid = isAddressEqual(inputCurrency.address, market.quote.address)
       try {
         const permitAmount = !isAddressEqual(inputCurrency.address, zeroAddress)
@@ -107,6 +107,20 @@ export const LimitContractProvider = ({
               !WETH_ADDRESSES[selectedChain.id as CHAIN_IDS].includes(address),
           )
 
+        console.log(
+          'arg',
+          price,
+          [param],
+          tokensToSettle,
+          [
+            {
+              token: inputCurrency.address,
+              permitAmount,
+              signature: { deadline, v, r, s },
+            },
+          ],
+          getDeadlineTimestampInSeconds(),
+        )
         await writeContract(publicClient, walletClient, {
           address: CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
           abi: CONTROLLER_ABI,
