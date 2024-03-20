@@ -11,6 +11,9 @@ export class Market {
   id: string
   quote: Currency
   base: Currency
+  makerPolicy: bigint
+  hooks: `0x${string}`
+  takerPolicy: bigint
   latestTick: bigint
   latestPrice: bigint
   bids: Depth[]
@@ -20,13 +23,19 @@ export class Market {
   constructor({
     chainId,
     tokens,
-    latestPriceIndex,
+    makerPolicy,
+    hooks,
+    takerPolicy,
+    latestTick,
     latestPrice,
     books,
   }: {
     chainId: CHAIN_IDS
     tokens: [Currency, Currency]
-    latestPriceIndex: bigint
+    makerPolicy: bigint
+    hooks: `0x${string}`
+    takerPolicy: bigint
+    latestTick: bigint
     latestPrice: bigint
     books: Book[]
   }) {
@@ -37,7 +46,10 @@ export class Market {
     this.id = marketId
     this.quote = tokens.find((token) => isAddressEqual(token.address, quote))!
     this.base = tokens.find((token) => isAddressEqual(token.address, base))!
-    this.latestTick = latestPriceIndex
+    this.makerPolicy = makerPolicy
+    this.hooks = hooks
+    this.takerPolicy = takerPolicy
+    this.latestTick = latestTick
     this.latestPrice = latestPrice
     this.bids = books
       .filter((book) => isAddressEqual(book.quote.address, this.quote.address))

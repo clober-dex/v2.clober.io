@@ -4,6 +4,9 @@ import { Depth } from '../../model/depth'
 import { fromPrice, quoteToBase, toPrice } from '../../utils/tick'
 import { arbitrumSepolia } from 'viem/chains'
 import { parsePrice } from '../../utils/prices'
+import { zeroAddress } from 'viem'
+import { encodeToFeePolicy } from '../../utils/fee'
+import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../../constants/fee'
 
 export const dummyMarkets: Market[] = [
   new Market({
@@ -22,7 +25,10 @@ export const dummyMarkets: Market[] = [
         decimals: 6,
       },
     ],
-    latestPriceIndex: 0n,
+    makerPolicy: encodeToFeePolicy(true, MAKER_DEFAULT_POLICY),
+    hooks: zeroAddress,
+    takerPolicy: encodeToFeePolicy(true, TAKER_DEFAULT_POLICY),
+    latestTick: 0n,
     latestPrice: 0n,
     books: [
       new Book({
