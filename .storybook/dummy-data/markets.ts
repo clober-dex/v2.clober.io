@@ -49,7 +49,7 @@ export const dummyMarkets: Market[] = [
             const tick = fromPrice(parsePrice(price, 6, 18))
             const rawAmount = 10000n * 10n ** 6n
             return {
-              boolId: '0x000000000000000000000000000000000000000a',
+              bookId: '0x000000000000000000000000000000000000000a',
               tick,
               price: parsePrice(price, 6, 18),
               rawAmount,
@@ -85,7 +85,7 @@ export const dummyMarkets: Market[] = [
           const tick = fromPrice(parsePrice(price, 18, 6))
           const rawAmount = 10000n * 10n ** 12n
           return {
-            boolId: '0x000000000000000000000000000000000000000b',
+            bookId: '0x000000000000000000000000000000000000000b',
             tick,
             price: parsePrice(price, 18, 6),
             rawAmount,
