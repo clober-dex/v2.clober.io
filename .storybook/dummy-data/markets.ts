@@ -1,7 +1,7 @@
 import { Market } from '../../model/market'
 import { Book } from '../../model/book'
 import { Depth } from '../../model/depth'
-import { fromPrice, quoteToBase, toPrice } from '../../model/tick'
+import { fromPrice, quoteToBase, toPrice } from '../../utils/tick'
 import { arbitrumSepolia } from 'viem/chains'
 import { parsePrice } from '../../utils/prices'
 

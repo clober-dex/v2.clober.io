@@ -2,7 +2,7 @@ import { createPublicClient, http } from 'viem'
 import { arbitrumSepolia } from 'viem/chains'
 
 import { TICK_WRAPPER_ABI } from '../abis/mock/tick-wrapper-abi'
-import { baseToQuote, fromPrice, quoteToBase, toPrice } from '../model/tick'
+import { baseToQuote, fromPrice, quoteToBase, toPrice } from '../utils/tick'
 
 const MAX_TICK = Math.pow(2, 19) - 1
 const MIN_TICK = -1 * MAX_TICK

@@ -2,7 +2,7 @@ import { createPublicClient, http } from 'viem'
 import { arbitrumSepolia } from 'viem/chains'
 
 import { LOG_WRAPPER_ABI } from '../abis/mock/log-wrapper-abi'
-import { log2, mostSignificantBit } from '../model/tick'
+import { log2, mostSignificantBit } from '../utils/tick'
 
 describe('Math', () => {
   const LOG_WRAPPER_ADDRESS = '0x9C6C405cbB2c1DC7aAAa65156744fC00efc7EC82'
