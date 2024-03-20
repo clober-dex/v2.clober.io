@@ -1,12 +1,12 @@
 import { Market } from '../../model/market'
 import { Book } from '../../model/book'
 import { Depth } from '../../model/depth'
-import { fromPrice, quoteToBase, toPrice } from '../../utils/tick'
+import { fromPrice } from '../../utils/tick'
 import { arbitrumSepolia } from 'viem/chains'
 import { parsePrice } from '../../utils/prices'
 import { zeroAddress } from 'viem'
-import { encodeToFeePolicy } from '../../utils/fee'
 import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../../constants/fee'
+import { FeePolicy } from '../../model/fee-policy'
 
 export const dummyMarkets: Market[] = [
   new Market({
@@ -25,9 +25,9 @@ export const dummyMarkets: Market[] = [
         decimals: 6,
       },
     ],
-    makerPolicy: encodeToFeePolicy(true, MAKER_DEFAULT_POLICY),
+    makerPolicy: new FeePolicy(true, MAKER_DEFAULT_POLICY),
     hooks: zeroAddress,
-    takerPolicy: encodeToFeePolicy(true, TAKER_DEFAULT_POLICY),
+    takerPolicy: new FeePolicy(true, TAKER_DEFAULT_POLICY),
     latestTick: 0n,
     latestPrice: 0n,
     books: [
@@ -45,9 +45,9 @@ export const dummyMarkets: Market[] = [
           decimals: 6,
         },
         unit: 1n,
-        makerPolicy: 3000n,
+        makerPolicy: new FeePolicy(true, MAKER_DEFAULT_POLICY),
         hooks: '0x0000000000000000000000000000000000000000',
-        takerPolicy: 3000n,
+        takerPolicy: new FeePolicy(true, TAKER_DEFAULT_POLICY),
         latestTick: 0n,
         latestPrice: 0n,
         depths: [5000, 5000.0001, 5001, 5001.1, 5555, 6000, 6666, 6969].map(
@@ -79,9 +79,9 @@ export const dummyMarkets: Market[] = [
           decimals: 18,
         },
         unit: 12n,
-        makerPolicy: 3000n,
+        makerPolicy: new FeePolicy(true, MAKER_DEFAULT_POLICY),
         hooks: '0x0000000000000000000000000000000000000000',
-        takerPolicy: 3000n,
+        takerPolicy: new FeePolicy(true, TAKER_DEFAULT_POLICY),
         latestTick: 0n,
         latestPrice: 0n,
         depths: [

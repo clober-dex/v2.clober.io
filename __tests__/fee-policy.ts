@@ -2,13 +2,8 @@ import { createPublicClient, http } from 'viem'
 import { arbitrumSepolia } from 'viem/chains'
 
 import { FEE_POLICY_WRAPPER_ABI } from '../abis/mock/fee-policy-wrapper-abi'
-import {
-  calculateFee,
-  calculateOriginalAmount,
-  encodeToFeePolicy,
-  getUsesQuote,
-} from '../utils/fee'
 import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
+import { FeePolicy } from '../model/fee-policy'
 
 const FEE_POLICY_WRAPPER_ADDRESS = '0xDCFA7E8Ad03D50EdF29e49bEBA7e5ae118B49A62'
 const publicClient = createPublicClient({
@@ -18,13 +13,14 @@ const publicClient = createPublicClient({
 
 describe('FeePolicy', () => {
   const encode = async (usesQuote: boolean, rate: number) => {
+    const mockPolicy = new FeePolicy(usesQuote, BigInt(rate))
     const policy = await publicClient.readContract({
       address: FEE_POLICY_WRAPPER_ADDRESS,
       abi: FEE_POLICY_WRAPPER_ABI,
       functionName: 'encode',
       args: [usesQuote, rate],
     })
-    expect(policy).toEqual(Number(encodeToFeePolicy(usesQuote, BigInt(rate))))
+    expect(policy).toEqual(Number(mockPolicy.value))
     expect(
       await publicClient.readContract({
         address: FEE_POLICY_WRAPPER_ADDRESS,
@@ -32,11 +28,11 @@ describe('FeePolicy', () => {
         functionName: 'usesQuote',
         args: [policy],
       }),
-    ).toEqual(getUsesQuote(BigInt(policy)))
+    ).toEqual(mockPolicy.usesQuote)
   }
 
   const checkCalculateFee = async (
-    policy: bigint,
+    policy: FeePolicy,
     amount: bigint,
     reverseRounding: boolean,
   ) => {
@@ -45,13 +41,13 @@ describe('FeePolicy', () => {
         address: FEE_POLICY_WRAPPER_ADDRESS,
         abi: FEE_POLICY_WRAPPER_ABI,
         functionName: 'calculateFee',
-        args: [Number(policy), amount, reverseRounding],
+        args: [Number(policy.value), amount, reverseRounding],
       }),
-    ).toEqual(calculateFee(policy, amount, reverseRounding))
+    ).toEqual(policy.calculateFee(amount, reverseRounding))
   }
 
   const checkCalculateOriginalAmount = async (
-    policy: bigint,
+    policy: FeePolicy,
     amount: bigint,
     reverseFee: boolean,
   ) => {
@@ -60,9 +56,9 @@ describe('FeePolicy', () => {
         address: FEE_POLICY_WRAPPER_ADDRESS,
         abi: FEE_POLICY_WRAPPER_ABI,
         functionName: 'calculateOriginalAmount',
-        args: [Number(policy), amount, reverseFee],
+        args: [Number(policy.value), amount, reverseFee],
       }),
-    ).toEqual(calculateOriginalAmount(BigInt(policy), amount, reverseFee))
+    ).toEqual(policy.calculateOriginalAmount(amount, reverseFee))
   }
 
   it('encode', async () => {
@@ -81,50 +77,42 @@ describe('FeePolicy', () => {
   }, 100000)
 
   it('calculate fee', async () => {
-    await checkCalculateFee(encodeToFeePolicy(true, 0n), 1000000n, false)
-    await checkCalculateFee(encodeToFeePolicy(true, 1n), 1000000n, false)
+    await checkCalculateFee(new FeePolicy(true, 0n), 1000000n, false)
+    await checkCalculateFee(new FeePolicy(true, 1n), 1000000n, false)
     await checkCalculateFee(
-      encodeToFeePolicy(true, MAKER_DEFAULT_POLICY),
+      new FeePolicy(true, MAKER_DEFAULT_POLICY),
       1000000n,
       false,
     )
     await checkCalculateFee(
-      encodeToFeePolicy(true, TAKER_DEFAULT_POLICY),
+      new FeePolicy(true, TAKER_DEFAULT_POLICY),
       1000000n,
       false,
     )
-    await checkCalculateFee(encodeToFeePolicy(true, 500000n), 1000000n, false)
-    await checkCalculateFee(encodeToFeePolicy(true, -500000n), 1000000n, false)
+    await checkCalculateFee(new FeePolicy(true, 500000n), 1000000n, false)
+    await checkCalculateFee(new FeePolicy(true, -500000n), 1000000n, false)
   }, 100000)
 
   it('calculate original amount', async () => {
+    await checkCalculateOriginalAmount(new FeePolicy(true, 0n), 1000000n, false)
+    await checkCalculateOriginalAmount(new FeePolicy(true, 1n), 1000000n, false)
     await checkCalculateOriginalAmount(
-      encodeToFeePolicy(true, 0n),
+      new FeePolicy(true, MAKER_DEFAULT_POLICY),
       1000000n,
       false,
     )
     await checkCalculateOriginalAmount(
-      encodeToFeePolicy(true, 1n),
+      new FeePolicy(true, TAKER_DEFAULT_POLICY),
       1000000n,
       false,
     )
     await checkCalculateOriginalAmount(
-      encodeToFeePolicy(true, MAKER_DEFAULT_POLICY),
+      new FeePolicy(true, 500000n),
       1000000n,
       false,
     )
     await checkCalculateOriginalAmount(
-      encodeToFeePolicy(true, TAKER_DEFAULT_POLICY),
-      1000000n,
-      false,
-    )
-    await checkCalculateOriginalAmount(
-      encodeToFeePolicy(true, 500000n),
-      1000000n,
-      false,
-    )
-    await checkCalculateOriginalAmount(
-      encodeToFeePolicy(true, -500000n),
+      new FeePolicy(true, -500000n),
       1000000n,
       false,
     )

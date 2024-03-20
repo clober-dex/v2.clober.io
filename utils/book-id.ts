@@ -17,9 +17,9 @@ export const toId = (key: BookKey) => {
         key.base,
         key.unit,
         key.quote,
-        Number(key.makerPolicy),
+        Number(key.makerPolicy.value),
         key.hooks,
-        Number(key.takerPolicy),
+        Number(key.takerPolicy.value),
       ],
     ),
   )

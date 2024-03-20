@@ -5,11 +5,11 @@ import { Contract } from '@ethersproject/contracts'
 import { BOOK_VIEWER_ABI } from '../abis/core/book-viewer'
 import { toId } from '../utils/book-id'
 import { BookKey } from '../model/book-key'
-import { encodeToFeePolicy } from '../utils/fee'
 import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
 import { MAX_TICK, quoteToBase, toPrice } from '../utils/tick'
 import { Book } from '../model/book'
 import { Depth } from '../model/depth'
+import { FeePolicy } from '../model/fee-policy'
 
 describe('Take Logic', () => {
   const setUp = async ({ blockNumber }: { blockNumber: number }) => {
@@ -58,9 +58,9 @@ describe('Take Logic', () => {
       base: { address: key.base, name: 'mock', symbol: 'mock', decimals: 18 },
       unit: key.unit,
       quote: { address: key.quote, name: 'mock', symbol: 'mock', decimals: 18 },
-      makerPolicy: BigInt(key.makerPolicy),
+      makerPolicy: key.makerPolicy,
       hooks: key.hooks,
-      takerPolicy: BigInt(key.takerPolicy),
+      takerPolicy: key.takerPolicy,
       latestTick: 0n,
       latestPrice: 0n,
       depths: liquidities
@@ -99,9 +99,9 @@ describe('Take Logic', () => {
       base: zeroAddress,
       unit: 1n,
       quote: '0x00bfd44e79fb7f6dd5887a9426c8ef85a0cd23e0',
-      makerPolicy: encodeToFeePolicy(true, MAKER_DEFAULT_POLICY),
+      makerPolicy: new FeePolicy(true, MAKER_DEFAULT_POLICY),
       hooks: zeroAddress,
-      takerPolicy: encodeToFeePolicy(true, TAKER_DEFAULT_POLICY),
+      takerPolicy: new FeePolicy(true, TAKER_DEFAULT_POLICY),
     }
 
     await checkTakeLogic({
@@ -137,9 +137,9 @@ describe('Take Logic', () => {
       quote: zeroAddress,
       unit: 10n ** 12n,
       base: '0x00bfd44e79fb7f6dd5887a9426c8ef85a0cd23e0',
-      makerPolicy: encodeToFeePolicy(true, MAKER_DEFAULT_POLICY),
+      makerPolicy: new FeePolicy(true, MAKER_DEFAULT_POLICY),
       hooks: zeroAddress,
-      takerPolicy: encodeToFeePolicy(true, TAKER_DEFAULT_POLICY),
+      takerPolicy: new FeePolicy(true, TAKER_DEFAULT_POLICY),
     }
 
     await checkTakeLogic({

@@ -6,14 +6,15 @@ import { CHAIN_IDS } from '../constants/chain'
 import { Book } from './book'
 import { Currency } from './currency'
 import { Depth } from './depth'
+import { FeePolicy } from './fee-policy'
 
 export class Market {
   id: string
   quote: Currency
   base: Currency
-  makerPolicy: bigint
+  makerPolicy: FeePolicy
   hooks: `0x${string}`
-  takerPolicy: bigint
+  takerPolicy: FeePolicy
   latestTick: bigint
   latestPrice: bigint
   bids: Depth[]
@@ -32,9 +33,9 @@ export class Market {
   }: {
     chainId: CHAIN_IDS
     tokens: [Currency, Currency]
-    makerPolicy: bigint
+    makerPolicy: FeePolicy
     hooks: `0x${string}`
-    takerPolicy: bigint
+    takerPolicy: FeePolicy
     latestTick: bigint
     latestPrice: bigint
     books: Book[]

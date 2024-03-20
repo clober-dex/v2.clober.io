@@ -1,20 +1,16 @@
 import { baseToQuote, divide, quoteToBase, toPrice } from '../utils/tick'
-import {
-  calculateFee,
-  calculateOriginalAmount,
-  getUsesQuote,
-} from '../utils/fee'
 
 import { Currency } from './currency'
 import { Depth } from './depth'
+import { FeePolicy } from './fee-policy'
 
 export class Book {
   base: Currency
   unit: bigint
   quote: Currency
-  makerPolicy: bigint
+  makerPolicy: FeePolicy
   hooks: `0x${string}`
-  takerPolicy: bigint
+  takerPolicy: FeePolicy
   latestTick: bigint
   latestPrice: bigint
   depths: Depth[]
@@ -33,9 +29,9 @@ export class Book {
     base: Currency
     unit: bigint
     quote: Currency
-    makerPolicy: bigint
+    makerPolicy: FeePolicy
     hooks: `0x${string}`
-    takerPolicy: bigint
+    takerPolicy: FeePolicy
     latestTick: bigint
     latestPrice: bigint
     depths: Depth[]
@@ -76,9 +72,8 @@ export class Book {
       if (limitPrice > toPrice(tick)) {
         break
       }
-      let maxAmount = getUsesQuote(this.takerPolicy)
-        ? calculateOriginalAmount(
-            this.takerPolicy,
+      let maxAmount = this.takerPolicy.usesQuote
+        ? this.takerPolicy.calculateOriginalAmount(
             amountIn - takenQuoteAmount,
             true,
           )
@@ -94,12 +89,12 @@ export class Book {
           ? maxAmount
           : currentDepth.rawAmount) * this.unit
       let baseAmount = quoteToBase(tick, quoteAmount, true)
-      if (getUsesQuote(this.takerPolicy)) {
+      if (this.takerPolicy.usesQuote) {
         quoteAmount =
-          quoteAmount - calculateFee(this.takerPolicy, quoteAmount, false)
+          quoteAmount - this.takerPolicy.calculateFee(quoteAmount, false)
       } else {
         baseAmount =
-          baseAmount + calculateFee(this.takerPolicy, baseAmount, false)
+          baseAmount + this.takerPolicy.calculateFee(baseAmount, false)
       }
       if (quoteAmount === 0n) {
         break
@@ -144,10 +139,9 @@ export class Book {
       if (limitPrice > toPrice(tick)) {
         break
       }
-      let maxAmount = getUsesQuote(this.takerPolicy)
+      let maxAmount = this.takerPolicy.usesQuote
         ? amountIn - spendBaseAmount
-        : calculateOriginalAmount(
-            this.takerPolicy,
+        : this.takerPolicy.calculateOriginalAmount(
             amountIn - spendBaseAmount,
             false,
           )
@@ -162,12 +156,12 @@ export class Book {
           ? maxAmount
           : currentDepth.rawAmount) * this.unit
       let baseAmount = quoteToBase(tick, quoteAmount, true)
-      if (getUsesQuote(this.takerPolicy)) {
+      if (this.takerPolicy.usesQuote) {
         quoteAmount =
-          quoteAmount - calculateFee(this.takerPolicy, quoteAmount, false)
+          quoteAmount - this.takerPolicy.calculateFee(quoteAmount, false)
       } else {
         baseAmount =
-          baseAmount + calculateFee(this.takerPolicy, baseAmount, false)
+          baseAmount + this.takerPolicy.calculateFee(baseAmount, false)
       }
       if (baseAmount === 0n) {
         break
