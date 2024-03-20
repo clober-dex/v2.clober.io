@@ -7,14 +7,12 @@ import { encodeToFeePolicy } from '../utils/fee'
 describe('FeePolicy', () => {
   const encode = async (usesQuote: boolean, rate: number) => {
     expect(
-      BigInt(
-        await publicClient.readContract({
-          address: FEE_POLICY_WRAPPER_ADDRESS,
-          abi: FEE_POLICY_WRAPPER_ABI,
-          functionName: 'encode',
-          args: [usesQuote, rate],
-        }),
-      ),
+      await publicClient.readContract({
+        address: FEE_POLICY_WRAPPER_ADDRESS,
+        abi: FEE_POLICY_WRAPPER_ABI,
+        functionName: 'encode',
+        args: [usesQuote, rate],
+      }),
     ).toEqual(encodeToFeePolicy(usesQuote, BigInt(rate)))
   }
 

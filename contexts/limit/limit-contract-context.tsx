@@ -21,6 +21,7 @@ import { fromPrice } from '../../utils/tick'
 import { calculateUnit } from '../../utils/unit'
 import { isOpen } from '../../utils/book'
 import { BookKey } from '../../model/book-key'
+import { encodeToFeePolicy } from '../../utils/fee'
 
 type LimitContractContext = {
   make: (
@@ -66,9 +67,9 @@ export const LimitContractProvider = ({
           base: outputCurrency.address,
           unit,
           quote: inputCurrency.address,
-          makerPolicy: MAKER_DEFAULT_POLICY,
+          makerPolicy: encodeToFeePolicy(true, MAKER_DEFAULT_POLICY),
           hooks: zeroAddress,
-          takerPolicy: TAKER_DEFAULT_POLICY,
+          takerPolicy: encodeToFeePolicy(true, TAKER_DEFAULT_POLICY),
         }
         const param = {
           id: toId(key),
