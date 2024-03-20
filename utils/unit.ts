@@ -6,7 +6,7 @@ import { CHAIN_IDS, supportChains } from '../constants/chain'
 
 export const calculateUnit = async (chainId: CHAIN_IDS, quote: Currency) => {
   if (isAddressEqual(quote.address, zeroAddress)) {
-    return 12n
+    return 10n ** 12n
   }
   const publicClient = createPublicClient({
     chain: supportChains.find((chain) => chain.id === chainId),
@@ -19,6 +19,6 @@ export const calculateUnit = async (chainId: CHAIN_IDS, quote: Currency) => {
   })
   return (
     10n **
-    (totalSupply <= 2n ** 64n ? 1n : BigInt(Math.max(quote.decimals - 6, 0)))
+    BigInt(totalSupply <= 2n ** 64n ? 0n : Math.max(quote.decimals - 6, 0))
   )
 }
