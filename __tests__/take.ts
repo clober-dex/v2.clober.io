@@ -1,9 +1,6 @@
 import hre from 'hardhat'
-import { createPublicClient, http, zeroAddress, zeroHash } from 'viem'
-import { arbitrumSepolia } from 'viem/chains'
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
+import { zeroAddress, zeroHash } from 'viem'
 import { Contract } from '@ethersproject/contracts'
-import { ethers } from 'ethers'
 
 import { BOOK_VIEWER_ABI } from '../abis/core/book-viewer'
 import { toId } from '../utils/book-id'
