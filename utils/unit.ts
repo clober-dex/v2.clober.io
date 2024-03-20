@@ -17,7 +17,10 @@ export const calculateUnit = async (chainId: CHAIN_IDS, quote: Currency) => {
     abi: ERC20_PERMIT_ABI,
     functionName: 'totalSupply',
   })
-  return totalSupply <= 2n ** 64n
-    ? 1n
-    : 10n ** BigInt(Math.max(quote.decimals - 6, 0))
+  return (
+    10n **
+    (totalSupply <= 2n ** 64n
+      ? 1n
+      : 10n ** BigInt(Math.max(quote.decimals - 6, 0)))
+  )
 }
