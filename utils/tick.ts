@@ -1,3 +1,5 @@
+export const MAX_TICK = 2n ** 19n - 1n
+export const MIN_TICK = -MAX_TICK
 const MAX_UINT256 = 2n ** 256n - 1n
 
 const R0 = 0xfff97272373d413259a46990580e2139n // 2^128 / r^(2^0)
