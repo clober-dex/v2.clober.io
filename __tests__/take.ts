@@ -134,8 +134,8 @@ describe('Take Logic', () => {
     })
   }, 100000)
 
-  it('take bid side', async () => {
-    const { BookViewer } = await setUp({ blockNumber: 25020165 })
+  it('take ask side', async () => {
+    const { BookViewer } = await setUp({ blockNumber: 25036851 })
     const key: BookKey = {
       quote: zeroAddress,
       unit: 10n ** 12n,
