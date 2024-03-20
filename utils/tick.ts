@@ -51,7 +51,7 @@ export const log2 = (x: bigint): bigint => {
   return result
 }
 
-const divide = (x: bigint, y: bigint, roundUp: boolean): bigint => {
+export const divide = (x: bigint, y: bigint, roundUp: boolean): bigint => {
   if (roundUp) {
     if (x === 0n) {
       return 0n
