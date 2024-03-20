@@ -110,7 +110,7 @@ describe('Tick', () => {
       quoteToBase(BigInt(priceIndex), 1000000n, true),
     )
     expect(expected).toEqual(actual)
-  })
+  }, 100000)
 
   it('base to quote', async () => {
     const randomPriceIndices = Array.from({ length: 100 }, () =>
@@ -130,5 +130,5 @@ describe('Tick', () => {
       baseToQuote(BigInt(priceIndex), 1000000n, true),
     )
     expect(expected).toEqual(actual)
-  })
+  }, 100000)
 })

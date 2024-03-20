@@ -3,6 +3,7 @@ import { arbitrumSepolia } from 'viem/chains'
 
 import { BOOK_ID_WRAPPER_ABI } from '../abis/mock/book-id-wrapper-abi'
 import { toId } from '../utils/book-id'
+import { FeePolicy } from '../model/fee-policy'
 
 describe('BookID', () => {
   const BOOK_ID_WRAPPER_ADDRESS = '0x5C91A02B8B5D10597fc6cA23faF56F9718D1feD0'
@@ -26,7 +27,11 @@ describe('BookID', () => {
       functionName: 'toId',
       args: [bookKey],
     })
-    const expected = toId(bookKey)
+    const expected = toId({
+      ...bookKey,
+      makerPolicy: new FeePolicy(true, BigInt(bookKey.makerPolicy)),
+      takerPolicy: new FeePolicy(true, BigInt(bookKey.takerPolicy)),
+    })
     expect(actual).toBe(expected)
   }, 100000)
 })
