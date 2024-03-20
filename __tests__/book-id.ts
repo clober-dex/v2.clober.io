@@ -13,13 +13,15 @@ describe('BookID', () => {
   })
 
   it('check toId function', async () => {
+    const makerPolicy = new FeePolicy(true, 100n)
+    const takerPolicy = new FeePolicy(true, 1000n)
     const bookKey = {
       base: '0x0000000000000000000000000000000000000001' as `0x${string}`,
       unit: 100n,
       quote: '0x0000000000000000000000000000000000000002' as `0x${string}`,
-      makerPolicy: 100,
+      makerPolicy: Number(makerPolicy.value),
       hooks: '0x0000000000000000000000000000000000000003' as `0x${string}`,
-      takerPolicy: 1000,
+      takerPolicy: Number(takerPolicy.value),
     }
     const actual = await publicClient.readContract({
       address: BOOK_ID_WRAPPER_ADDRESS,
@@ -29,8 +31,8 @@ describe('BookID', () => {
     })
     const expected = toId({
       ...bookKey,
-      makerPolicy: new FeePolicy(true, BigInt(bookKey.makerPolicy)),
-      takerPolicy: new FeePolicy(true, BigInt(bookKey.takerPolicy)),
+      makerPolicy,
+      takerPolicy,
     })
     expect(actual).toBe(expected)
   }, 100000)
