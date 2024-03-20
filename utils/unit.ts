@@ -19,8 +19,6 @@ export const calculateUnit = async (chainId: CHAIN_IDS, quote: Currency) => {
   })
   return (
     10n **
-    (totalSupply <= 2n ** 64n
-      ? 1n
-      : 10n ** BigInt(Math.max(quote.decimals - 6, 0)))
+    (totalSupply <= 2n ** 64n ? 1n : BigInt(Math.max(quote.decimals - 6, 0)))
   )
 }
