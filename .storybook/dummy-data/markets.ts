@@ -79,7 +79,8 @@ export const dummyMarkets: Market[] = [
         latestTick: 0n,
         latestPrice: 0n,
         depths: [
-          7000, 7000.01, 7000.02, 7001, 7003, 7777, 10000, 10000.00001, 100000,
+          4000, 5000, 5555, 7000, 7000.01, 7000.02, 7001, 7003, 7777, 10000,
+          10000.00001, 100000,
         ].map((price) => {
           const tick = fromPrice(parsePrice(price, 18, 6))
           const rawAmount = 10000n * 10n ** 12n

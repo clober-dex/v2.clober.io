@@ -19,6 +19,8 @@ import { CONTROLLER_ABI } from '../../abis/core/controller-abi'
 import { WETH_ADDRESSES } from '../../constants/currency'
 import { fromPrice } from '../../model/tick'
 import { calculateUnit } from '../../utils/unit'
+import { isOpen } from '../../utils/book'
+import { BookKey } from '../../model/book-key'
 
 type LimitContractContext = {
   make: (
@@ -59,6 +61,42 @@ export const LimitContractProvider = ({
       const tick = fromPrice(price)
       const isBid = isAddressEqual(inputCurrency.address, market.quote.address)
       try {
+        const unit = await calculateUnit(selectedChain.id, inputCurrency)
+        const key: BookKey = {
+          base: outputCurrency.address,
+          unit,
+          quote: inputCurrency.address,
+          makerPolicy: MAKER_DEFAULT_POLICY,
+          hooks: zeroAddress,
+          takerPolicy: TAKER_DEFAULT_POLICY,
+        }
+        const param = {
+          id: toId(key),
+          tick,
+          quoteAmount: amount,
+          hookData: zeroHash,
+        }
+
+        const open = await isOpen(selectedChain.id, key)
+        if (!open) {
+          setConfirmation({
+            title: `Open Book`,
+            body: 'Please confirm in your wallet.',
+            fields: [],
+          })
+
+          await writeContract(publicClient, walletClient, {
+            address:
+              CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
+            abi: CONTROLLER_ABI,
+            functionName: 'open',
+            args: [
+              [{ key, hookData: param.hookData }],
+              getDeadlineTimestampInSeconds(),
+            ],
+          })
+        }
+
         const permitAmount = !isAddressEqual(inputCurrency.address, zeroAddress)
           ? amount
           : 0n
@@ -86,20 +124,6 @@ export const LimitContractProvider = ({
           ],
         })
 
-        const unit = await calculateUnit(selectedChain.id, inputCurrency)
-        const param = {
-          id: toId({
-            base: outputCurrency.address,
-            unit,
-            quote: inputCurrency.address,
-            makerPolicy: MAKER_DEFAULT_POLICY,
-            hooks: zeroAddress,
-            takerPolicy: TAKER_DEFAULT_POLICY,
-          }),
-          tick,
-          quoteAmount: amount,
-          hookData: zeroHash,
-        }
         const tokensToSettle = [inputCurrency.address, outputCurrency.address]
           .filter((address) => !isAddressEqual(address, zeroAddress))
           .filter(
