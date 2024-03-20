@@ -4,12 +4,12 @@ const MAX_FEE_RATE = 500000n
 const MIN_FEE_RATE = -500000n
 const RATE_PRECISION = 10n ** 6n
 
-export const encodeToFeePolicy = (usesQuote: boolean, rate: bigint): number => {
+export const encodeToFeePolicy = (usesQuote: boolean, rate: bigint): bigint => {
   if (rate > MAX_FEE_RATE || rate < MIN_FEE_RATE) {
     throw new Error('InvalidFeePolicy')
   }
   const mask = usesQuote ? 1n << 23n : 0n
-  return Number((rate + MAX_FEE_RATE) | mask)
+  return (rate + MAX_FEE_RATE) | mask
 }
 
 export const getUsesQuote = (feePolicy: bigint): boolean => {
@@ -24,7 +24,7 @@ export const calculateFee = (
   feePolicy: bigint,
   amount: bigint,
   reverseRounding: boolean,
-) => {
+): bigint => {
   const r = rate(feePolicy)
 
   const positive = r > 0n
@@ -41,7 +41,7 @@ export const calculateOriginalAmount = (
   feePolicy: bigint,
   amount: bigint,
   reverseFee: boolean,
-) => {
+): bigint => {
   const r = rate(feePolicy)
 
   const positive = r > 0

@@ -24,7 +24,7 @@ describe('FeePolicy', () => {
       functionName: 'encode',
       args: [usesQuote, rate],
     })
-    expect(policy).toEqual(encodeToFeePolicy(usesQuote, BigInt(rate)))
+    expect(policy).toEqual(Number(encodeToFeePolicy(usesQuote, BigInt(rate))))
     expect(
       await publicClient.readContract({
         address: FEE_POLICY_WRAPPER_ADDRESS,
@@ -36,7 +36,7 @@ describe('FeePolicy', () => {
   }
 
   const checkCalculateFee = async (
-    policy: number,
+    policy: bigint,
     amount: bigint,
     reverseRounding: boolean,
   ) => {
@@ -45,13 +45,13 @@ describe('FeePolicy', () => {
         address: FEE_POLICY_WRAPPER_ADDRESS,
         abi: FEE_POLICY_WRAPPER_ABI,
         functionName: 'calculateFee',
-        args: [policy, amount, reverseRounding],
+        args: [Number(policy), amount, reverseRounding],
       }),
-    ).toEqual(calculateFee(BigInt(policy), amount, reverseRounding))
+    ).toEqual(calculateFee(policy, amount, reverseRounding))
   }
 
   const checkCalculateOriginalAmount = async (
-    policy: number,
+    policy: bigint,
     amount: bigint,
     reverseFee: boolean,
   ) => {
@@ -60,7 +60,7 @@ describe('FeePolicy', () => {
         address: FEE_POLICY_WRAPPER_ADDRESS,
         abi: FEE_POLICY_WRAPPER_ABI,
         functionName: 'calculateOriginalAmount',
-        args: [policy, amount, reverseFee],
+        args: [Number(policy), amount, reverseFee],
       }),
     ).toEqual(calculateOriginalAmount(BigInt(policy), amount, reverseFee))
   }
