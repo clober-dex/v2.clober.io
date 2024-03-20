@@ -133,4 +133,42 @@ describe('Take Logic', () => {
       quoteAmount: 1000000000000n * 10n ** 6n,
     })
   }, 100000)
+
+  it('take bid side', async () => {
+    const { BookViewer } = await setUp({ blockNumber: 25020165 })
+    const key: BookKey = {
+      quote: zeroAddress,
+      unit: 10n ** 12n,
+      base: '0x00bfd44e79fb7f6dd5887a9426c8ef85a0cd23e0',
+      makerPolicy: encodeToFeePolicy(true, MAKER_DEFAULT_POLICY),
+      hooks: zeroAddress,
+      takerPolicy: encodeToFeePolicy(true, TAKER_DEFAULT_POLICY),
+    }
+
+    await checkTakeLogic({
+      BookViewer,
+      key,
+      quoteAmount: 10000n * 10n ** 6n,
+    })
+    await checkTakeLogic({
+      BookViewer,
+      key,
+      quoteAmount: 10000000n * 10n ** 6n,
+    })
+    await checkTakeLogic({
+      BookViewer,
+      key,
+      quoteAmount: 0n * 10n ** 6n,
+    })
+    await checkTakeLogic({
+      BookViewer,
+      key,
+      quoteAmount: 1n * 10n ** 6n,
+    })
+    await checkTakeLogic({
+      BookViewer,
+      key,
+      quoteAmount: 1000000000000n * 10n ** 6n,
+    })
+  }, 100000)
 })
