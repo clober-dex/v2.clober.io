@@ -7,3 +7,7 @@ export const encodeToFeePolicy = (usesQuote: boolean, rate: bigint): number => {
   const mask = usesQuote ? 1n << 23n : 0n
   return Number((rate + MAX_FEE_RATE) | mask)
 }
+
+export const getUsesQuote = (feePolicy: number): boolean => {
+  return BigInt(feePolicy) >> 23n > 0n
+}

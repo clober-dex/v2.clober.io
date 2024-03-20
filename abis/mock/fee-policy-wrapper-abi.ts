@@ -28,4 +28,23 @@ export const FEE_POLICY_WRAPPER_ABI = [
     stateMutability: 'pure',
     type: 'function',
   },
+  {
+    inputs: [
+      {
+        internalType: 'FeePolicy',
+        name: 'self',
+        type: 'uint24',
+      },
+    ],
+    name: 'usesQuote',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: 'f',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'pure',
+    type: 'function',
+  },
 ] as const
