@@ -61,6 +61,12 @@ describe('FeePolicy', () => {
     ).toEqual(policy.calculateOriginalAmount(amount, reverseFee))
   }
 
+  const checkFrom = async (policy: FeePolicy) => {
+    const _feePolicy = FeePolicy.from(policy.value)
+    expect(policy.usesQuote).toEqual(_feePolicy.usesQuote)
+    expect(policy.value).toEqual(_feePolicy.value)
+  }
+
   it('encode', async () => {
     await encode(true, 0)
     await encode(true, 1)
@@ -116,5 +122,17 @@ describe('FeePolicy', () => {
       1000000n,
       false,
     )
+  }, 100000)
+
+  it('from value', async () => {
+    checkFrom(new FeePolicy(true, 0n))
+    checkFrom(new FeePolicy(true, 1n))
+    checkFrom(new FeePolicy(true, MAKER_DEFAULT_POLICY))
+    checkFrom(new FeePolicy(true, TAKER_DEFAULT_POLICY))
+
+    checkFrom(new FeePolicy(false, 0n))
+    checkFrom(new FeePolicy(false, 1n))
+    checkFrom(new FeePolicy(false, MAKER_DEFAULT_POLICY))
+    checkFrom(new FeePolicy(false, TAKER_DEFAULT_POLICY))
   }, 100000)
 })
