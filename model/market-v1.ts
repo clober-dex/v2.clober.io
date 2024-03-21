@@ -1,6 +1,4 @@
-import { getAddress, isAddressEqual } from 'viem'
-
-import { MarketDto } from '../apis/market-v1'
+import { isAddressEqual } from 'viem'
 
 import { Currency } from './currency'
 import { ArithmeticPriceBook } from './price-book/arithmetic-price-book'
@@ -80,14 +78,6 @@ export class MarketV1 {
       r === 0n ? new ArithmeticPriceBook(a, d) : new GeometricPriceBook(a, r)
   }
 
-  indexToPrice(priceIndex: number): CloberPrice {
-    return this.priceBook.indexToPrice(priceIndex)
-  }
-
-  priceToIndex(price: bigint, roundingUp: boolean): CloberPrice {
-    return this.priceBook.priceToIndex(price, roundingUp)
-  }
-
   static from(market: MarketV1, bids: Depth[], asks: Depth[]): MarketV1 {
     return new MarketV1(
       market.address,
@@ -110,60 +100,12 @@ export class MarketV1 {
     )
   }
 
-  static fromDto(dto: MarketDto): MarketV1 {
-    return new MarketV1(
-      getAddress(dto.address),
-      getAddress(dto.orderToken),
-      BigInt(dto.takerFee),
-      BigInt(dto.quoteUnit),
-      BigInt(dto.a),
-      BigInt(dto.d),
-      BigInt(dto.r),
-      BigInt(dto.latestPriceIndex),
-      BigInt(dto.latestPrice),
-      BigInt(dto.maxPriceIndex),
-      BigInt(dto.priceUpperBound),
-      dto.quoteToken,
-      dto.baseToken,
-      10n ** (18n - BigInt(dto.quoteToken.decimals)),
-      10n ** (18n - BigInt(dto.baseToken.decimals)),
-      dto.depths
-        .filter((depth) => depth.isBid)
-        .sort((a, b) => {
-          return Number(b.price) - Number(a.price)
-        })
-        .map((depth) => ({
-          price: BigInt(depth.price),
-          priceIndex: BigInt(depth.priceIndex),
-          rawAmount: BigInt(depth.rawAmount),
-          baseAmount: BigInt(depth.baseAmount),
-          isBid: depth.isBid,
-        })),
-      dto.depths
-        .filter((depth) => !depth.isBid)
-        .sort((a, b) => {
-          return Number(a.price) - Number(b.price)
-        })
-        .map((depth) => ({
-          price: BigInt(depth.price),
-          priceIndex: BigInt(depth.priceIndex),
-          rawAmount: BigInt(depth.rawAmount),
-          baseAmount: BigInt(depth.baseAmount),
-          isBid: depth.isBid,
-        })),
-    )
+  indexToPrice(priceIndex: number): CloberPrice {
+    return this.priceBook.indexToPrice(priceIndex)
   }
 
-  private divide(x: bigint, y: bigint, roundUp: boolean): bigint {
-    if (roundUp) {
-      if (x === 0n) {
-        return 0n
-      } else {
-        return (x - 1n) / y + 1n
-      }
-    } else {
-      return x / y
-    }
+  priceToIndex(price: bigint, roundingUp: boolean): CloberPrice {
+    return this.priceBook.priceToIndex(price, roundingUp)
   }
 
   quoteToRaw(amount: bigint, roundUp: boolean): bigint {
@@ -189,21 +131,6 @@ export class MarketV1 {
         this.quotePrecisionComplement,
       price * this.basePrecisionComplement,
       roundUp,
-    )
-  }
-
-  private calculateTakerFeeAmount(
-    takeAmount: bigint,
-    roundUp: boolean,
-  ): bigint {
-    return this.divide(takeAmount * this.takerFee, this.FEE_PRECISION, roundUp)
-  }
-
-  private calculateTakeAmountBeforeFees(amountAfterFees: bigint): bigint {
-    return this.divide(
-      amountAfterFees * this.FEE_PRECISION,
-      this.FEE_PRECISION - this.takerFee,
-      true,
     )
   }
 
@@ -332,6 +259,33 @@ export class MarketV1 {
       totalAsksInBase * (this.FEE_PRECISION - this.takerFee),
       this.FEE_PRECISION,
       false,
+    )
+  }
+
+  private divide(x: bigint, y: bigint, roundUp: boolean): bigint {
+    if (roundUp) {
+      if (x === 0n) {
+        return 0n
+      } else {
+        return (x - 1n) / y + 1n
+      }
+    } else {
+      return x / y
+    }
+  }
+
+  private calculateTakerFeeAmount(
+    takeAmount: bigint,
+    roundUp: boolean,
+  ): bigint {
+    return this.divide(takeAmount * this.takerFee, this.FEE_PRECISION, roundUp)
+  }
+
+  private calculateTakeAmountBeforeFees(amountAfterFees: bigint): bigint {
+    return this.divide(
+      amountAfterFees * this.FEE_PRECISION,
+      this.FEE_PRECISION - this.takerFee,
+      true,
     )
   }
 }

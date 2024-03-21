@@ -1,35 +1,47 @@
-query getOpenOrder($marketAddress: String!, $isBid: Boolean!, $priceIndex: BigInt!, $orderIndex: BigInt!) {
-    openOrders(where: {
-        market: $marketAddress,
-        isBid: $isBid,
-        priceIndex: $priceIndex,
-        orderIndex: $orderIndex
-    }) {
-        nftId
-        market {
+query getOpenOrder($orderId: ID!) {
+    openOrder(id: $orderId) {
+        id
+        book {
             id
-            quoteUnit
-            quoteToken {
+            base {
                 id
                 name
                 symbol
                 decimals
             }
-            baseToken {
+            quote {
                 id
                 name
                 symbol
                 decimals
             }
+            unit
         }
-        price
-        isBid
-        priceIndex
+        tick
         orderIndex
+        price
+        user
+        txHash
+        createdAt
+
         rawAmount
         baseAmount
+        quoteAmount
+
+        rawFilledAmount
         baseFilledAmount
-        claimableAmount
-        txHash
+        quoteFilledAmount
+
+        rawClaimedAmount
+        baseClaimedAmount
+        quoteClaimedAmount
+
+        rawClaimableAmount
+        baseClaimableAmount
+        quoteClaimableAmount
+
+        rawOpenAmount
+        baseOpenAmount
+        quoteOpenAmount
     }
 }

@@ -1,4 +1,8 @@
+import { isAddressEqual } from 'viem'
+
 import { baseToQuote, divide, quoteToBase, toPrice } from '../utils/tick'
+import { getMarketId } from '../utils/market'
+import { CHAIN_IDS } from '../constants/chain'
 
 import { Currency } from './currency'
 import { Depth } from './depth'
@@ -16,9 +20,9 @@ export class Book {
   depths: Depth[]
 
   constructor({
-    base,
+    chainId,
+    tokens,
     unit,
-    quote,
     makerPolicy,
     hooks,
     takerPolicy,
@@ -26,9 +30,9 @@ export class Book {
     latestPrice,
     depths,
   }: {
-    base: Currency
+    chainId: CHAIN_IDS
+    tokens: [Currency, Currency]
     unit: bigint
-    quote: Currency
     makerPolicy: FeePolicy
     hooks: `0x${string}`
     takerPolicy: FeePolicy
@@ -36,9 +40,14 @@ export class Book {
     latestPrice: bigint
     depths: Depth[]
   }) {
-    this.base = base
+    const { quote, base } = getMarketId(
+      chainId,
+      tokens.map((token) => token.address),
+    )
+
+    this.base = tokens.find((token) => isAddressEqual(token.address, base))!
     this.unit = unit
-    this.quote = quote
+    this.quote = tokens.find((token) => isAddressEqual(token.address, quote))!
     this.makerPolicy = makerPolicy
     this.hooks = hooks
     this.takerPolicy = takerPolicy

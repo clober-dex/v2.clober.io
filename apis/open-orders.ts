@@ -22,15 +22,11 @@ export async function fetchOpenOrders(
   )
   const chain = findSupportChain(chainId) as Chain
   return openOrders.map((openOrder) => {
-    const inputToken = openOrder.isBid
-      ? openOrder.market.quoteToken
-      : openOrder.market.baseToken
-    const outputToken = openOrder.isBid
-      ? openOrder.market.baseToken
-      : openOrder.market.quoteToken
+    const inputToken = openOrder.book.quote
+    const outputToken = openOrder.book.base
     return {
-      nftId: BigInt(openOrder.nftId),
-      marketAddress: getAddress(openOrder.market.id),
+      id: BigInt(openOrder.id),
+      bookId: BigInt(openOrder.book.id),
       inputToken: {
         address: getAddress(inputToken.id),
         name: inputToken.name,
@@ -43,8 +39,7 @@ export async function fetchOpenOrders(
         symbol: outputToken.symbol,
         decimals: Number(outputToken.decimals),
       },
-      isBid: openOrder.isBid,
-      priceIndex: Number(openOrder.priceIndex),
+      tick: Number(openOrder.tick),
       orderIndex: BigInt(openOrder.orderIndex),
       txHash: openOrder.txHash as `0x${string}`,
       txUrl: chain.blockExplorers
@@ -52,46 +47,34 @@ export async function fetchOpenOrders(
         : '',
       price: BigInt(openOrder.price),
       baseFilledAmount: BigInt(openOrder.baseFilledAmount),
-      quoteAmount:
-        BigInt(openOrder.rawAmount) * BigInt(openOrder.market.quoteUnit),
+      quoteAmount: BigInt(openOrder.quoteAmount),
       baseAmount: BigInt(openOrder.baseAmount),
-      claimableAmount: BigInt(openOrder.claimableAmount),
+      claimableAmount: BigInt(openOrder.baseClaimableAmount),
     }
   })
 }
 
 export async function fetchOpenOrder(
   chainId: CHAIN_IDS,
-  marketAddress: `0x${string}`,
-  isBid: boolean,
-  priceIndex: number,
-  orderIndex: bigint,
+  orderId: string,
 ): Promise<OpenOrder | null> {
-  const { openOrders } = await getOpenOrder(
+  const { openOrder } = await getOpenOrder(
     {
-      marketAddress: marketAddress.toLowerCase(),
-      isBid,
-      priceIndex,
-      orderIndex: orderIndex.toString(),
+      orderId: orderId,
     },
     {
       url: SUBGRAPH_URL[chainId],
     },
   )
-  if (openOrders.length === 0) {
+  if (!openOrder) {
     return null
   }
-  const openOrder = openOrders[0]
   const chain = findSupportChain(chainId) as Chain
-  const inputToken = openOrder.isBid
-    ? openOrder.market.quoteToken
-    : openOrder.market.baseToken
-  const outputToken = openOrder.isBid
-    ? openOrder.market.baseToken
-    : openOrder.market.quoteToken
+  const inputToken = openOrder.book.quote
+  const outputToken = openOrder.book.base
   return {
-    nftId: BigInt(openOrder.nftId),
-    marketAddress: getAddress(openOrder.market.id),
+    id: BigInt(openOrder.id),
+    bookId: BigInt(openOrder.book.id),
     inputToken: {
       address: getAddress(inputToken.id),
       name: inputToken.name,
@@ -104,8 +87,7 @@ export async function fetchOpenOrder(
       symbol: outputToken.symbol,
       decimals: Number(outputToken.decimals),
     },
-    isBid: openOrder.isBid,
-    priceIndex: Number(openOrder.priceIndex),
+    tick: Number(openOrder.tick),
     orderIndex: BigInt(openOrder.orderIndex),
     txHash: openOrder.txHash as `0x${string}`,
     txUrl: chain.blockExplorers
@@ -113,9 +95,8 @@ export async function fetchOpenOrder(
       : '',
     price: BigInt(openOrder.price),
     baseFilledAmount: BigInt(openOrder.baseFilledAmount),
-    quoteAmount:
-      BigInt(openOrder.rawAmount) * BigInt(openOrder.market.quoteUnit),
+    quoteAmount: BigInt(openOrder.quoteAmount),
     baseAmount: BigInt(openOrder.baseAmount),
-    claimableAmount: BigInt(openOrder.claimableAmount),
+    claimableAmount: BigInt(openOrder.baseClaimableAmount),
   }
 }

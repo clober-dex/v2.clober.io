@@ -17,6 +17,7 @@ export class Market {
   takerPolicy: FeePolicy
   latestTick: bigint
   latestPrice: bigint
+  latestTimestamp: number
   bids: Depth[]
   asks: Depth[]
   books: Book[]
@@ -29,6 +30,7 @@ export class Market {
     takerPolicy,
     latestTick,
     latestPrice,
+    latestTimestamp,
     books,
   }: {
     chainId: CHAIN_IDS
@@ -38,6 +40,7 @@ export class Market {
     takerPolicy: FeePolicy
     latestTick: bigint
     latestPrice: bigint
+    latestTimestamp: number
     books: Book[]
   }) {
     const { marketId, quote, base } = getMarketId(
@@ -52,6 +55,7 @@ export class Market {
     this.takerPolicy = takerPolicy
     this.latestTick = latestTick
     this.latestPrice = latestPrice
+    this.latestTimestamp = latestTimestamp
     this.bids = books
       .filter((book) => isAddressEqual(book.quote.address, this.quote.address))
       .flatMap((book) => book.depths)
