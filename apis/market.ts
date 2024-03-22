@@ -1,4 +1,4 @@
-import { zeroAddress } from 'viem'
+import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 
 import { CHAIN_IDS } from '../constants/chain'
 import { Market } from '../model/market'
@@ -8,7 +8,7 @@ import { Currency } from '../model/currency'
 import { FeePolicy } from '../model/fee-policy'
 import { Book } from '../model/book'
 import { Depth } from '../model/depth'
-import { TAKER_DEFAULT_POLICY } from '../constants/fee'
+import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
 
 const { getBooks } = getBuiltGraphSDK()
 
@@ -21,13 +21,13 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
   )
   const markets = books.map((book) => {
     const baseToken = {
-      address: book.base.id as `0x${string}`,
+      address: getAddress(book.base.id),
       name: String(book.base.name),
       symbol: String(book.base.symbol),
       decimals: Number(book.base.decimals),
     } as Currency
     const quoteToken = {
-      address: book.quote.id as `0x${string}`,
+      address: getAddress(book.quote.id),
       name: String(book.quote.name),
       symbol: String(book.quote.symbol),
       decimals: Number(book.quote.decimals),
@@ -36,7 +36,7 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
       chainId: chainId,
       tokens: [baseToken, quoteToken],
       makerPolicy: FeePolicy.from(BigInt(book.makerPolicy)),
-      hooks: String(book.hooks) as `0x${string}`,
+      hooks: getAddress(book.hooks),
       takerPolicy: FeePolicy.from(BigInt(book.takerPolicy)),
       latestTick: BigInt(book.latestTick),
       latestPrice: BigInt(book.latestPrice),
@@ -47,13 +47,13 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
           tokens: [baseToken, quoteToken],
           unit: BigInt(book.unit),
           makerPolicy: FeePolicy.from(BigInt(book.makerPolicy)),
-          hooks: String(book.hooks) as `0x${string}`,
+          hooks: getAddress(book.hooks),
           takerPolicy: FeePolicy.from(BigInt(book.takerPolicy)),
           latestTick: BigInt(book.latestTick),
           latestPrice: BigInt(book.latestPrice),
           depths: book.depths.map((depth) => {
             return {
-              bookId: book.id,
+              bookId: String(book.id),
               tick: BigInt(depth.tick),
               price: BigInt(depth.price),
               rawAmount: BigInt(depth.rawAmount),
@@ -74,7 +74,7 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
       return (
         m.id === market.id &&
         m.makerPolicy.value === market.makerPolicy.value &&
-        m.hooks === market.hooks &&
+        isAddressEqual(m.hooks, market.hooks) &&
         m.takerPolicy.value === market.takerPolicy.value
       )
     })
@@ -123,10 +123,10 @@ function mergeDepths(depths: Depth[], isBid: boolean): Depth[] {
 
 function isWhiteListedMarket(market: Market): boolean {
   return (
-    market.hooks === zeroAddress &&
+    isAddressEqual(market.hooks, zeroAddress) &&
     market.makerPolicy.usesQuote &&
     market.takerPolicy.usesQuote &&
     market.takerPolicy.rate === TAKER_DEFAULT_POLICY &&
-    market.makerPolicy.rate === TAKER_DEFAULT_POLICY
+    market.makerPolicy.rate === MAKER_DEFAULT_POLICY
   )
 }

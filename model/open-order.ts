@@ -23,7 +23,7 @@ export type OpenOrder = {
   bookId: bigint
   inputToken: Currency
   outputToken: Currency
-  tick: number
+  tick: bigint
   orderIndex: bigint
   txHash: `0x${string}`
   txUrl: string

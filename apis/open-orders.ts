@@ -39,7 +39,7 @@ export async function fetchOpenOrders(
         symbol: outputToken.symbol,
         decimals: Number(outputToken.decimals),
       },
-      tick: Number(openOrder.tick),
+      tick: BigInt(openOrder.tick),
       orderIndex: BigInt(openOrder.orderIndex),
       txHash: openOrder.txHash as `0x${string}`,
       txUrl: chain.blockExplorers
@@ -87,7 +87,7 @@ export async function fetchOpenOrder(
       symbol: outputToken.symbol,
       decimals: Number(outputToken.decimals),
     },
-    tick: Number(openOrder.tick),
+    tick: BigInt(openOrder.tick),
     orderIndex: BigInt(openOrder.orderIndex),
     txHash: openOrder.txHash as `0x${string}`,
     txUrl: chain.blockExplorers

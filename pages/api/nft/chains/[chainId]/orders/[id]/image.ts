@@ -43,7 +43,7 @@ export default async function handler(
     const quoteToken = openOrder.inputToken
 
     const price = formatPrice(
-      toPrice(BigInt(openOrder.tick)),
+      toPrice(openOrder.tick),
       openOrder.inputToken.decimals,
       openOrder.outputToken.decimals,
     )
