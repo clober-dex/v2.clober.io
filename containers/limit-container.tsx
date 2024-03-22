@@ -30,7 +30,7 @@ export const LimitContainer = () => {
   const { selectedChain } = useChainContext()
   const { selectedMarket } = useMarketContext()
   const { openOrders } = useOpenOrderContext()
-  const { make } = useLimitContractContext()
+  const { make, cancels } = useLimitContractContext()
   const {
     isBid,
     setIsBid,
@@ -356,7 +356,7 @@ export const LimitContainer = () => {
             className="w-[64px] sm:w-[120px] flex flex-1 items-center justify-center rounded bg-gray-700 hover:bg-blue-600 text-white text-xs sm:text-sm disabled:bg-gray-800 disabled:text-gray-500 h-6 sm:h-7"
             disabled={openOrders.length === 0}
             onClick={async () => {
-              console.log('cancel all')
+              await cancels(openOrders)
             }}
             text={`Cancel (${openOrders.length})`}
           />
@@ -378,7 +378,7 @@ export const LimitContainer = () => {
               cancelActionButtonProps={{
                 disabled: false,
                 onClick: async () => {
-                  console.log('cancel one')
+                  await cancels([openOrder])
                 },
                 text: 'Cancel',
               }}

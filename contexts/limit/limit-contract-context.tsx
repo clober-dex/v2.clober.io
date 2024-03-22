@@ -20,8 +20,9 @@ import { fromPrice } from '../../utils/tick'
 import { calculateUnit } from '../../utils/unit'
 import { isOpen } from '../../utils/book'
 import { BookKey } from '../../model/book-key'
-import { FeePolicy } from '../../model/fee-policy'
 import { getMarketId } from '../../utils/market'
+import { OpenOrder } from '../../model/open-order'
+import { permit721 } from '../../utils/permit721'
 
 type LimitContractContext = {
   make: (
@@ -30,10 +31,12 @@ type LimitContractContext = {
     amount: bigint,
     price: bigint,
   ) => Promise<void>
+  cancels: (openOrders: OpenOrder[]) => Promise<void>
 }
 
 const Context = React.createContext<LimitContractContext>({
   make: () => Promise.resolve(),
+  cancels: () => Promise.resolve(),
 })
 
 export const LimitContractProvider = ({
@@ -180,7 +183,117 @@ export const LimitContractProvider = ({
     [publicClient, queryClient, selectedChain, setConfirmation, walletClient],
   )
 
-  return <Context.Provider value={{ make }}>{children}</Context.Provider>
+  const cancels = useCallback(
+    async (openOrders: OpenOrder[]) => {
+      if (!walletClient || !selectedChain) {
+        return
+      }
+
+      const refundCurrencyMaps: {
+        [currency: `0x${string}`]: { currency: Currency; amount: bigint }
+      } = openOrders.reduce(
+        (acc, order) => {
+          const refundCurrency = order.inputToken
+          if (!acc[refundCurrency.address]) {
+            acc[refundCurrency.address] = {
+              currency: refundCurrency,
+              amount: 0n,
+            }
+          }
+          acc[refundCurrency.address].amount += order.quoteAmount
+          return acc
+        },
+        {} as {
+          [currency: `0x${string}`]: { currency: Currency; amount: bigint }
+        },
+      )
+
+      try {
+        const permitParamsList: {
+          tokenId: bigint
+          signature: {
+            deadline: bigint
+            r: `0x${string}`
+            s: `0x${string}`
+            v: number
+          }
+        }[] = []
+        for (const openOrder of openOrders) {
+          const { deadline, r, s, v } = await permit721(
+            selectedChain.id,
+            walletClient,
+            CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].BookManager,
+            openOrder.id,
+            walletClient.account.address,
+            CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
+            getDeadlineTimestampInSeconds(),
+          )
+          permitParamsList.push({
+            tokenId: openOrder.id,
+            signature: { deadline, v, r, s },
+          })
+        }
+
+        setConfirmation({
+          title: `Cancel Order`,
+          body: 'Please confirm in your wallet.',
+          fields: Object.values(refundCurrencyMaps).map(
+            ({ currency, amount }) => ({
+              currency,
+              direction: 'in',
+              label: currency.symbol,
+              value: toPlacesString(formatUnits(amount, currency.decimals)),
+            }),
+          ),
+        })
+
+        //   function cancel(
+        //       CancelOrderParams[] calldata orderParamsList,
+        //       address[] calldata tokensToSettle,
+        //       ERC721PermitParams[] calldata permitParamsList,
+        //       uint64 deadline
+        // ) external;
+
+        const tokensToSettle = Object.values(refundCurrencyMaps)
+          .map(({ currency }) => currency.address)
+          .filter((address) => !isAddressEqual(address, zeroAddress))
+          .filter(
+            (address) =>
+              !WETH_ADDRESSES[selectedChain.id as CHAIN_IDS].includes(address),
+          )
+
+        await writeContract(publicClient, walletClient, {
+          address: CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
+          abi: CONTROLLER_ABI,
+          functionName: 'cancel',
+          args: [
+            openOrders.map((order) => ({
+              id: order.id,
+              leftQuoteAmount: 0n,
+              hookData: zeroHash,
+            })),
+            tokensToSettle,
+            permitParamsList,
+            getDeadlineTimestampInSeconds(),
+          ],
+        })
+      } catch (e) {
+        console.error(e)
+      } finally {
+        await Promise.all([
+          queryClient.invalidateQueries(['limit-balances']),
+          queryClient.invalidateQueries(['open-orders']),
+          queryClient.invalidateQueries(['markets']),
+        ])
+        setConfirmation(undefined)
+      }
+    },
+    [publicClient, queryClient, selectedChain, setConfirmation, walletClient],
+  )
+
+  return (
+    <Context.Provider value={{ make, cancels }}>{children}</Context.Provider>
+  )
 }
 
 export const useLimitContractContext = () =>
