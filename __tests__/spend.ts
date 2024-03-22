@@ -10,6 +10,7 @@ import { MAX_TICK, quoteToBase, toPrice } from '../utils/tick'
 import { Book } from '../model/book'
 import { Depth } from '../model/depth'
 import { FeePolicy } from '../model/fee-policy'
+import { CHAIN_IDS } from '../constants/chain'
 
 describe('Spend Logic', () => {
   const setUp = async ({ blockNumber }: { blockNumber: number }) => {
@@ -55,9 +56,12 @@ describe('Spend Logic', () => {
     })
     const liquidities = await BookViewer.getLiquidity(toId(key), MAX_TICK, 10n)
     const mockBook = new Book({
-      base: { address: key.base, name: 'mock', symbol: 'mock', decimals: 18 },
+      chainId: CHAIN_IDS.ARBITRUM_SEPOLIA,
+      tokens: [
+        { address: key.base, name: 'mock', symbol: 'mock', decimals: 18 },
+        { address: key.quote, name: 'mock', symbol: 'mock', decimals: 18 },
+      ],
       unit: key.unit,
-      quote: { address: key.quote, name: 'mock', symbol: 'mock', decimals: 18 },
       makerPolicy: key.makerPolicy,
       hooks: key.hooks,
       takerPolicy: key.takerPolicy,

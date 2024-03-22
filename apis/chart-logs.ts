@@ -41,11 +41,11 @@ const PAGE_SIZE = 1000
 
 export async function fetchLatestChartLog(
   chainId: CHAIN_IDS,
-  marketAddress: `0x${string}`,
+  marketCode: string,
 ): Promise<ChartLog> {
   const { chartLogs } = await getLatestChartLog(
     {
-      marketAddress: marketAddress.toLowerCase(),
+      marketCode: marketCode.toLowerCase(),
     },
     {
       url: SUBGRAPH_URL[chainId],
@@ -72,7 +72,7 @@ export async function fetchLatestChartLog(
 
 export async function fetchChartLogs(
   chainId: CHAIN_IDS,
-  marketAddress: `0x${string}`,
+  marketCode: string,
   intervalType: CHART_LOG_INTERVALS,
   from: number,
   to: number,
@@ -85,7 +85,7 @@ export async function fetchChartLogs(
       {
         first: PAGE_SIZE,
         skip,
-        marketAddress: marketAddress.toLowerCase(),
+        marketCode: marketCode.toLowerCase(),
         intervalType,
         from,
         to,
@@ -118,7 +118,7 @@ export async function fetchChartLogs(
     {
       first: 1,
       skip: 0,
-      marketAddress: marketAddress.toLowerCase(),
+      marketCode: marketCode.toLowerCase(),
       intervalType,
       from: 0,
       to: from - 1,

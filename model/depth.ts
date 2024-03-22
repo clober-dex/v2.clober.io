@@ -1,5 +1,5 @@
 export type Depth = {
-  bookId: `0x${string}`
+  bookId: string
   tick: bigint
   price: bigint
   rawAmount: bigint

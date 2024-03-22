@@ -2,8 +2,7 @@ import React, { useMemo } from 'react'
 import { useAccount, useQuery } from 'wagmi'
 import { getAddress } from 'viem'
 
-import { OpenOrder } from '../../model/open-order'
-import { fetchOpenOrders } from '../../apis/open-orders'
+import { OpenOrderV1 } from '../../model/open-order'
 import { useChainContext } from '../chain-context'
 import { Balances } from '../../model/balances'
 import {
@@ -14,7 +13,7 @@ import {
 } from '../../model/order-key'
 
 type OpenOrderContext = {
-  openOrders: OpenOrder[]
+  openOrders: OpenOrderV1[]
   claimable: Balances
   claimParamsListMap: ClaimParamsListMap
   cancelParamsList: CancelParamsList
@@ -35,7 +34,8 @@ export const OpenOrderProvider = ({
 
   const { data: openOrders } = useQuery(
     ['open-orders', selectedChain, userAddress],
-    () => (userAddress ? fetchOpenOrders(selectedChain.id, userAddress) : []),
+    // TODO: connect to subgraph
+    () => [] as OpenOrderV1[],
     {
       refetchIntervalInBackground: true,
       refetchInterval: 10 * 1000,

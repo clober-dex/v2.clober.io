@@ -1,11 +1,11 @@
-query getChartLogs($first: Int!, $skip: Int!, $marketAddress: String!, $intervalType: String!, $from: BigInt!, $to: BigInt!) {
+query getChartLogs($first: Int!, $skip: Int!, $marketCode: String!, $intervalType: String!, $from: BigInt!, $to: BigInt!) {
   chartLogs(
     first: $first,
     skip: $skip,
     orderBy: timestamp,
     orderDirection: desc
     where: {
-      market: $marketAddress,
+      marketCode: $marketCode,
       intervalType: $intervalType,
       timestamp_gte: $from,
       timestamp_lte: $to,
@@ -19,13 +19,13 @@ query getChartLogs($first: Int!, $skip: Int!, $marketAddress: String!, $interval
   }
 }
 
-query getLatestChartLog($marketAddress: String!) {
+query getLatestChartLog($marketCode: String!) {
   chartLogs(
     first: 1,
     orderBy: timestamp,
     orderDirection: desc
     where: {
-      market: $marketAddress,
+      marketCode: $marketCode,
     }) {
     timestamp
     open
