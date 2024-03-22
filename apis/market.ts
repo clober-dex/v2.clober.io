@@ -43,8 +43,8 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
       latestTimestamp: Number(book.latestTimestamp),
       books: [
         new Book({
-          chainId: chainId,
-          tokens: [baseToken, quoteToken],
+          base: baseToken,
+          quote: quoteToken,
           unit: BigInt(book.unit),
           makerPolicy: FeePolicy.from(BigInt(book.makerPolicy)),
           hooks: getAddress(book.hooks),
