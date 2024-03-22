@@ -59,7 +59,6 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
               tick,
               price: BigInt(depth.price),
               rawAmount,
-              quoteAmount,
               baseAmount: isBid
                 ? quoteToBase(tick, quoteAmount, false)
                 : quoteAmount,
@@ -110,7 +109,6 @@ function mergeDepths(depths: Depth[], isBid: boolean): Depth[] {
     const existingDepth = mergedDepths.find((d) => d.tick === depth.tick)
     if (existingDepth) {
       existingDepth.rawAmount += depth.rawAmount
-      existingDepth.quoteAmount += depth.quoteAmount
       existingDepth.baseAmount += depth.baseAmount
     } else {
       mergedDepths.push(depth)

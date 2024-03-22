@@ -25,11 +25,11 @@ describe('Take Logic', () => {
     })
     hre.network.provider.emit('hardhatNetworkReset')
 
-    const [admin] = await hre.ethers.getSigners()
+    const [admin] = await (hre as any).ethers.getSigners()
 
     return {
       admin,
-      BookViewer: await hre.ethers.getContractAt(
+      BookViewer: await (hre as any).ethers.getContractAt(
         BOOK_VIEWER_ABI as any,
         '0x56319f390C3B85Fb8eb18B03b8E14440F3a8c66b',
         admin,
@@ -71,7 +71,6 @@ describe('Take Logic', () => {
               tick: BigInt(liquidity.tick),
               price: toPrice(BigInt(liquidity.tick)),
               rawAmount: BigInt(liquidity.depth),
-              quoteAmount: BigInt(liquidity.depth) * key.unit,
               baseAmount: quoteToBase(
                 BigInt(liquidity.tick),
                 BigInt(liquidity.depth) * key.unit,

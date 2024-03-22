@@ -60,7 +60,6 @@ export const dummyMarkets: Market[] = [
               tick,
               price: parsePrice(price, 6, 18),
               rawAmount,
-              quoteAmount: rawAmount * 1n,
               baseAmount: 10n ** 18n,
             } as Depth
           },
@@ -96,7 +95,6 @@ export const dummyMarkets: Market[] = [
             tick,
             price: parsePrice(price, 18, 6),
             rawAmount,
-            quoteAmount: rawAmount * 10n ** 12n,
             baseAmount: 10n ** 18n,
           } as Depth
         }),

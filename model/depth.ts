@@ -3,6 +3,5 @@ export type Depth = {
   tick: bigint
   price: bigint
   rawAmount: bigint
-  quoteAmount: bigint
   baseAmount: bigint
 }
