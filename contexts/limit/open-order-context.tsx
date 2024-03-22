@@ -2,18 +2,14 @@ import React, { useMemo } from 'react'
 import { useAccount, useQuery } from 'wagmi'
 import { getAddress } from 'viem'
 
-import { OpenOrderV1 } from '../../model/open-order'
 import { useChainContext } from '../chain-context'
 import { Balances } from '../../model/balances'
-import {
-  CancelParamsList,
-  ClaimOrderParamsStruct,
-  ClaimParamsListMap,
-  OrderKeyStruct,
-} from '../../model/order-key'
+import { CancelParamsList, ClaimParamsListMap } from '../../model/order-key'
+import { fetchOpenOrders } from '../../apis/open-orders'
+import { OpenOrder } from '../../model/open-order'
 
 type OpenOrderContext = {
-  openOrders: OpenOrderV1[]
+  openOrders: OpenOrder[]
   claimable: Balances
   claimParamsListMap: ClaimParamsListMap
   cancelParamsList: CancelParamsList
@@ -34,14 +30,14 @@ export const OpenOrderProvider = ({
 
   const { data: openOrders } = useQuery(
     ['open-orders', selectedChain, userAddress],
-    // TODO: connect to subgraph
-    () => [] as OpenOrderV1[],
+    () => (userAddress ? fetchOpenOrders(selectedChain.id, userAddress) : []),
     {
       refetchIntervalInBackground: true,
       refetchInterval: 10 * 1000,
       initialData: [],
     },
   )
+
   const claimable = useMemo(
     () =>
       openOrders.reduce((acc, openOrder) => {
@@ -53,83 +49,83 @@ export const OpenOrderProvider = ({
     [openOrders],
   )
 
-  const claimParamsListMap = useMemo(
-    () =>
-      (
-        Object.entries(
-          openOrders
-            .filter((openOrder) => openOrder.claimableAmount > 0n)
-            .reduce(
-              (acc, openOrder) => {
-                acc[openOrder.outputToken.address] =
-                  acc[openOrder.outputToken.address] ?? {}
-                acc[openOrder.outputToken.address][openOrder.marketAddress] = [
-                  ...(acc[openOrder.outputToken.address][
-                    openOrder.marketAddress
-                  ] ?? []),
-                  {
-                    isBid: openOrder.isBid,
-                    priceIndex: openOrder.priceIndex,
-                    orderIndex: openOrder.orderIndex,
-                  },
-                ] as OrderKeyStruct[]
-                return acc
-              },
-              {} as {
-                [currencyAddress in `0x${string}`]: {
-                  [marketAddress in `0x${string}`]: OrderKeyStruct[]
-                }
-              },
-            ),
-        ).map(([currencyAddress, marketMap]) => [
-          currencyAddress,
-          Object.entries(marketMap).map(
-            ([marketAddress, orderKeys]) =>
-              ({
-                market: getAddress(marketAddress),
-                orderKeys,
-              }) as ClaimOrderParamsStruct,
-          ),
-        ]) as [`0x${string}`, ClaimOrderParamsStruct[]][]
-      ).reduce(
-        (acc, [currencyAddress, claimOrderParamsList]) => ({
-          ...acc,
-          [getAddress(currencyAddress)]: claimOrderParamsList,
-        }),
-        {} as ClaimParamsListMap,
-      ),
-    [openOrders],
-  )
+  // const claimParamsListMap = useMemo(
+  //   () =>
+  //     (
+  //       Object.entries(
+  //         openOrders
+  //           .filter((openOrder) => openOrder.claimableAmount > 0n)
+  //           .reduce(
+  //             (acc, openOrder) => {
+  //               acc[openOrder.outputToken.address] =
+  //                 acc[openOrder.outputToken.address] ?? {}
+  //               acc[openOrder.outputToken.address][openOrder.marketAddress] = [
+  //                 ...(acc[openOrder.outputToken.address][
+  //                   openOrder.marketAddress
+  //                 ] ?? []),
+  //                 {
+  //                   isBid: openOrder.isBid,
+  //                   priceIndex: openOrder.priceIndex,
+  //                   orderIndex: openOrder.orderIndex,
+  //                 },
+  //               ] as OrderKeyStruct[]
+  //               return acc
+  //             },
+  //             {} as {
+  //               [currencyAddress in `0x${string}`]: {
+  //                 [marketAddress in `0x${string}`]: OrderKeyStruct[]
+  //               }
+  //             },
+  //           ),
+  //       ).map(([currencyAddress, marketMap]) => [
+  //         currencyAddress,
+  //         Object.entries(marketMap).map(
+  //           ([marketAddress, orderKeys]) =>
+  //             ({
+  //               market: getAddress(marketAddress),
+  //               orderKeys,
+  //             }) as ClaimOrderParamsStruct,
+  //         ),
+  //       ]) as [`0x${string}`, ClaimOrderParamsStruct[]][]
+  //     ).reduce(
+  //       (acc, [currencyAddress, claimOrderParamsList]) => ({
+  //         ...acc,
+  //         [getAddress(currencyAddress)]: claimOrderParamsList,
+  //       }),
+  //       {} as ClaimParamsListMap,
+  //     ),
+  //   [openOrders],
+  // )
 
-  const cancelParamsList = useMemo(
-    () =>
-      Object.entries(
-        openOrders.reduce(
-          (acc, openOrder) => {
-            acc[openOrder.marketAddress] = [
-              ...(acc[openOrder.marketAddress] ?? []),
-              openOrder.nftId,
-            ]
-            return acc
-          },
-          {} as {
-            [marketAddress in `0x${string}`]: bigint[]
-          },
-        ),
-      ).map(([marketAddress, nftIds]) => ({
-        market: getAddress(marketAddress),
-        tokenIds: nftIds,
-      })) as CancelParamsList,
-    [openOrders],
-  )
+  // const cancelParamsList = useMemo(
+  //   () =>
+  //     Object.entries(
+  //       openOrders.reduce(
+  //         (acc, openOrder) => {
+  //           acc[openOrder.marketAddress] = [
+  //             ...(acc[openOrder.marketAddress] ?? []),
+  //             openOrder.nftId,
+  //           ]
+  //           return acc
+  //         },
+  //         {} as {
+  //           [marketAddress in `0x${string}`]: bigint[]
+  //         },
+  //       ),
+  //     ).map(([marketAddress, nftIds]) => ({
+  //       market: getAddress(marketAddress),
+  //       tokenIds: nftIds,
+  //     })) as CancelParamsList,
+  //   [openOrders],
+  // )
 
   return (
     <Context.Provider
       value={{
-        openOrders,
+        openOrders: openOrders ?? [],
         claimable,
-        claimParamsListMap,
-        cancelParamsList,
+        claimParamsListMap: {},
+        cancelParamsList: [],
       }}
     >
       {children}

@@ -10,9 +10,9 @@ import { parseDepth } from '../../utils/order-book'
 import { useChainContext } from '../chain-context'
 import { Chain } from '../../model/chain'
 import { getMarketId } from '../../utils/market'
+import { WHITELISTED_TOKENS } from '../../constants/currency'
 
 import { useMarketContext } from './market-context'
-import { useLimitCurrencyContext } from './limit-currency-context'
 
 type LimitContext = {
   isBid: boolean
@@ -83,7 +83,6 @@ const QUERY_PARAM_OUTPUT_CURRENCY_KEY = 'outputCurrency'
 
 export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { markets, selectedMarket, setSelectedMarket } = useMarketContext()
-  const { currencies } = useLimitCurrencyContext()
   const { selectedChain } = useChainContext()
 
   const [isBid, setIsBid] = useState(true)
@@ -158,7 +157,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
             if (new BigNumber(minPrice).gt(label)) {
               return {
                 label,
-                value: decimalPlaces - i,
+                value: Math.max(decimalPlaces - i, 0),
               }
             }
           })
@@ -230,12 +229,12 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       undefined
 
     const inputCurrency = inputCurrencyAddress
-      ? currencies.find((currency) =>
+      ? WHITELISTED_TOKENS[selectedChain.id].find((currency) =>
           isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
         )
       : undefined
     const outputCurrency = outputCurrencyAddress
-      ? currencies.find((currency) =>
+      ? WHITELISTED_TOKENS[selectedChain.id].find((currency) =>
           isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
         )
       : undefined
@@ -260,7 +259,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       }
     }
   }, [
-    currencies,
     markets,
     selectedChain,
     setInputCurrency,
