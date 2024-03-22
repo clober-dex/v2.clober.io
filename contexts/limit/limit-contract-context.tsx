@@ -94,7 +94,19 @@ export const LimitContractProvider = ({
             abi: CONTROLLER_ABI,
             functionName: 'open',
             args: [
-              [{ key, hookData: param.hookData }],
+              [
+                {
+                  key: {
+                    base: key.base,
+                    unit: Number(key.unit),
+                    quote: key.quote,
+                    makerPolicy: Number(key.makerPolicy.value),
+                    hooks: key.hooks,
+                    takerPolicy: Number(key.takerPolicy.value),
+                  },
+                  hookData: param.hookData,
+                },
+              ],
               getDeadlineTimestampInSeconds(),
             ],
           })
