@@ -1,23 +1,20 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { useAccount, useBalance, useQuery } from 'wagmi'
 import { readContracts } from '@wagmi/core'
 import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 
 import { Balances } from '../../model/balances'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
-import { Currency } from '../../model/currency'
 import { WHITELISTED_TOKENS } from '../../constants/currency'
 import { useChainContext } from '../chain-context'
 
 import { useMarketContext } from './market-context'
 
 type LimitCurrencyContext = {
-  currencies: Currency[]
   balances: Balances
 }
 
 const Context = React.createContext<LimitCurrencyContext>({
-  currencies: [],
   balances: {},
 })
 
@@ -72,18 +69,9 @@ export const LimitCurrencyProvider = ({
     },
   ) as { data: Balances }
 
-  const currencies = useMemo(() => {
-    return [
-      ...WHITELISTED_TOKENS[selectedChain.id],
-      ...markets.map((market) => market.quote),
-      ...markets.map((market) => market.base),
-    ]
-  }, [markets])
-
   return (
     <Context.Provider
       value={{
-        currencies,
         balances: balances ?? {},
       }}
     >
