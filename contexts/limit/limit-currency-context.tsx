@@ -6,6 +6,8 @@ import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 import { Balances } from '../../model/balances'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 import { Currency } from '../../model/currency'
+import { WHITELISTED_TOKENS } from '../../constants/currency'
+import { useChainContext } from '../chain-context'
 
 import { useMarketContext } from './market-context'
 
@@ -22,17 +24,19 @@ const Context = React.createContext<LimitCurrencyContext>({
 export const LimitCurrencyProvider = ({
   children,
 }: React.PropsWithChildren<{}>) => {
+  const { selectedChain } = useChainContext()
   const { address: userAddress } = useAccount()
   const { data: balance } = useBalance({ address: userAddress, watch: true })
   const { markets } = useMarketContext()
 
   const { data: balances } = useQuery(
-    ['limit-balances', userAddress, balance, markets],
+    ['limit-balances', userAddress, balance, markets, selectedChain],
     async () => {
       if (!userAddress) {
         return {}
       }
       const uniqueCurrencies = [
+        ...WHITELISTED_TOKENS[selectedChain.id],
         ...markets.map((market) => market.quote),
         ...markets.map((market) => market.base),
       ]
@@ -70,6 +74,7 @@ export const LimitCurrencyProvider = ({
 
   const currencies = useMemo(() => {
     return [
+      ...WHITELISTED_TOKENS[selectedChain.id],
       ...markets.map((market) => market.quote),
       ...markets.map((market) => market.base),
     ]
