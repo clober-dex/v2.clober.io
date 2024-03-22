@@ -4,11 +4,12 @@ import { CHAIN_IDS } from '../constants/chain'
 import { Market } from '../model/market'
 import { SUBGRAPH_URL } from '../constants/subgraph-url'
 import { getBuiltGraphSDK } from '../.graphclient'
-import { Currency } from '../model/currency'
 import { FeePolicy } from '../model/fee-policy'
 import { Book } from '../model/book'
 import { Depth } from '../model/depth'
 import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
+
+import { toCurrency } from './utils'
 
 const { getBooks } = getBuiltGraphSDK()
 
@@ -20,18 +21,8 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
     },
   )
   const markets = books.map((book) => {
-    const baseToken = {
-      address: getAddress(book.base.id),
-      name: String(book.base.name),
-      symbol: String(book.base.symbol),
-      decimals: Number(book.base.decimals),
-    } as Currency
-    const quoteToken = {
-      address: getAddress(book.quote.id),
-      name: String(book.quote.name),
-      symbol: String(book.quote.symbol),
-      decimals: Number(book.quote.decimals),
-    } as Currency
+    const baseToken = toCurrency(chainId, book.base)
+    const quoteToken = toCurrency(chainId, book.quote)
     return new Market({
       chainId: chainId,
       tokens: [baseToken, quoteToken],

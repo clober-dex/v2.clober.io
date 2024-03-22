@@ -1,4 +1,4 @@
-import { getAddress, isAddressEqual } from 'viem'
+import { isAddressEqual } from 'viem'
 
 import { getBuiltGraphSDK } from '../.graphclient'
 import { CHAIN_IDS, findSupportChain } from '../constants/chain'
@@ -6,7 +6,8 @@ import { SUBGRAPH_URL } from '../constants/subgraph-url'
 import { OpenOrder } from '../model/open-order'
 import { Chain } from '../model/chain'
 import { getMarketId } from '../utils/market'
-import { Currency } from '../model/currency'
+
+import { toCurrency } from './utils'
 
 const { getOpenOrders, getOpenOrder } = getBuiltGraphSDK()
 
@@ -24,18 +25,8 @@ export async function fetchOpenOrders(
   )
   const chain = findSupportChain(chainId) as Chain
   return openOrders.map((openOrder) => {
-    const inputToken = {
-      address: getAddress(openOrder.book.quote.id),
-      name: openOrder.book.quote.name,
-      symbol: openOrder.book.quote.symbol,
-      decimals: Number(openOrder.book.quote.decimals),
-    } as Currency
-    const outputToken = {
-      address: getAddress(openOrder.book.base.id),
-      name: openOrder.book.base.name,
-      symbol: openOrder.book.base.symbol,
-      decimals: Number(openOrder.book.base.decimals),
-    } as Currency
+    const inputToken = toCurrency(chainId, openOrder.book.quote)
+    const outputToken = toCurrency(chainId, openOrder.book.base)
     const { quote } = getMarketId(chainId, [
       inputToken.address,
       outputToken.address,
@@ -77,18 +68,8 @@ export async function fetchOpenOrder(
     return null
   }
   const chain = findSupportChain(chainId) as Chain
-  const inputToken = {
-    address: getAddress(openOrder.book.quote.id),
-    name: openOrder.book.quote.name,
-    symbol: openOrder.book.quote.symbol,
-    decimals: Number(openOrder.book.quote.decimals),
-  } as Currency
-  const outputToken = {
-    address: getAddress(openOrder.book.base.id),
-    name: openOrder.book.base.name,
-    symbol: openOrder.book.base.symbol,
-    decimals: Number(openOrder.book.base.decimals),
-  } as Currency
+  const inputToken = toCurrency(chainId, openOrder.book.quote)
+  const outputToken = toCurrency(chainId, openOrder.book.base)
   const { quote } = getMarketId(chainId, [
     inputToken.address,
     outputToken.address,
