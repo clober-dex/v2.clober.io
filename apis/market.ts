@@ -8,6 +8,8 @@ import { FeePolicy } from '../model/fee-policy'
 import { Book } from '../model/book'
 import { Depth } from '../model/depth'
 import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
+import { quoteToBase } from '../utils/tick'
+import { getMarketId } from '../utils/market'
 
 import { toCurrency } from './utils'
 
@@ -23,6 +25,7 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
   const markets = books.map((book) => {
     const baseToken = toCurrency(chainId, book.base)
     const quoteToken = toCurrency(chainId, book.quote)
+    const unit = BigInt(book.unit)
     return new Market({
       chainId: chainId,
       tokens: [baseToken, quoteToken],
@@ -36,20 +39,30 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
         new Book({
           base: baseToken,
           quote: quoteToken,
-          unit: BigInt(book.unit),
+          unit,
           makerPolicy: FeePolicy.from(BigInt(book.makerPolicy)),
           hooks: getAddress(book.hooks),
           takerPolicy: FeePolicy.from(BigInt(book.takerPolicy)),
           latestTick: BigInt(book.latestTick),
           latestPrice: BigInt(book.latestPrice),
           depths: book.depths.map((depth) => {
+            const rawAmount = BigInt(depth.rawAmount)
+            const quoteAmount = unit * rawAmount
+            const tick = BigInt(depth.tick)
+            const { quote } = getMarketId(chainId, [
+              baseToken.address,
+              quoteToken.address,
+            ])
+            const isBid = isAddressEqual(quoteToken.address, quote)
             return {
               bookId: String(book.id),
-              tick: BigInt(depth.tick),
+              tick,
               price: BigInt(depth.price),
-              rawAmount: BigInt(depth.rawAmount),
-              quoteAmount: BigInt(depth.quoteAmount),
-              baseAmount: BigInt(depth.baseAmount),
+              rawAmount,
+              quoteAmount,
+              baseAmount: isBid
+                ? quoteToBase(tick, quoteAmount, false)
+                : quoteAmount,
             } as Depth
           }),
         }),

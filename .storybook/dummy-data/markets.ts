@@ -33,21 +33,18 @@ export const dummyMarkets: Market[] = [
     latestTimestamp: 0,
     books: [
       new Book({
-        chainId: arbitrumSepolia.id,
-        tokens: [
-          {
-            address: '0x00BFD44e79FB7f6dd5887A9426c8EF85A0CD23e0',
-            name: 'USDC',
-            symbol: 'USDC',
-            decimals: 6,
-          },
-          {
-            address: '0x0000000000000000000000000000000000000000',
-            name: 'ETH',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        ],
+        quote: {
+          address: '0x00BFD44e79FB7f6dd5887A9426c8EF85A0CD23e0',
+          name: 'USDC',
+          symbol: 'USDC',
+          decimals: 6,
+        },
+        base: {
+          address: '0x0000000000000000000000000000000000000000',
+          name: 'ETH',
+          symbol: 'ETH',
+          decimals: 18,
+        },
         unit: 1n,
         makerPolicy: MAKER_DEFAULT_POLICY,
         hooks: '0x0000000000000000000000000000000000000000',
@@ -70,21 +67,18 @@ export const dummyMarkets: Market[] = [
         ),
       }),
       new Book({
-        chainId: arbitrumSepolia.id,
-        tokens: [
-          {
-            address: '0x00BFD44e79FB7f6dd5887A9426c8EF85A0CD23e0',
-            name: 'USDC',
-            symbol: 'USDC',
-            decimals: 6,
-          },
-          {
-            address: '0x0000000000000000000000000000000000000000',
-            name: 'ETH',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        ],
+        quote: {
+          address: '0x00BFD44e79FB7f6dd5887A9426c8EF85A0CD23e0',
+          name: 'USDC',
+          symbol: 'USDC',
+          decimals: 6,
+        },
+        base: {
+          address: '0x0000000000000000000000000000000000000000',
+          name: 'ETH',
+          symbol: 'ETH',
+          decimals: 18,
+        },
         unit: 12n,
         makerPolicy: MAKER_DEFAULT_POLICY,
         hooks: '0x0000000000000000000000000000000000000000',
