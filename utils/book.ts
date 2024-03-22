@@ -16,8 +16,8 @@ export const isOpen = async (chainId: CHAIN_IDS, key: BookKey) => {
   const result = await publicClient.readContract({
     address: CONTRACT_ADDRESSES[chainId].BookManager,
     abi: BOOK_MANAGER_ABI,
-    functionName: 'getBookKey',
+    functionName: 'isOpened',
     args: [bookId],
   })
-  return result.unit > 0n
+  return result
 }
