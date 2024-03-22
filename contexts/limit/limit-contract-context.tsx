@@ -9,7 +9,6 @@ import { CHAIN_IDS } from '../../constants/chain'
 import { CONTRACT_ADDRESSES } from '../../constants/addresses'
 import { permit20 } from '../../utils/permit20'
 import { getDeadlineTimestampInSeconds } from '../../utils/date'
-import { Market } from '../../model/market'
 import { toPlacesString } from '../../utils/bignumber'
 import { formatUnits } from '../../utils/bigint'
 import { toId } from '../../utils/book-id'
@@ -22,10 +21,10 @@ import { calculateUnit } from '../../utils/unit'
 import { isOpen } from '../../utils/book'
 import { BookKey } from '../../model/book-key'
 import { FeePolicy } from '../../model/fee-policy'
+import { getMarketId } from '../../utils/market'
 
 type LimitContractContext = {
   make: (
-    market: Market,
     inputCurrency: Currency,
     outputCurrency: Currency,
     amount: bigint,
@@ -49,7 +48,6 @@ export const LimitContractProvider = ({
 
   const make = useCallback(
     async (
-      market: Market,
       inputCurrency: Currency,
       outputCurrency: Currency,
       amount: bigint,
@@ -60,7 +58,11 @@ export const LimitContractProvider = ({
       }
 
       const tick = fromPrice(price)
-      const isBid = isAddressEqual(inputCurrency.address, market.quote.address)
+      const { quote } = getMarketId(selectedChain.id, [
+        inputCurrency.address,
+        outputCurrency.address,
+      ])
+      const isBid = isAddressEqual(inputCurrency.address, quote)
       try {
         const unit = await calculateUnit(selectedChain.id, inputCurrency)
         const key: BookKey = {

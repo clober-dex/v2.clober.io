@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { parseUnits, zeroAddress } from 'viem'
+import { isAddressEqual, parseUnits, zeroAddress } from 'viem'
 import BigNumber from 'bignumber.js'
 
 import LimitSettingForm from '../components/form/limit-setting-form'
@@ -21,6 +21,7 @@ import { useLimitCurrencyContext } from '../contexts/limit/limit-currency-contex
 import { ActionButton } from '../components/button/action-button'
 import { OpenOrderCard } from '../components/card/open-order-card'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
+import { getMarketId } from '../utils/market'
 
 import { ChartContainer } from './chart-container'
 
@@ -202,6 +203,20 @@ export const LimitContainer = () => {
     setPriceInput,
   ])
 
+  const [quoteCurrency, baseCurrency] = useMemo(() => {
+    if (inputCurrency && outputCurrency) {
+      const { quote } = getMarketId(selectedChain.id, [
+        inputCurrency.address,
+        outputCurrency.address,
+      ])
+      return isAddressEqual(quote, inputCurrency.address)
+        ? [inputCurrency, outputCurrency]
+        : [outputCurrency, inputCurrency]
+    } else {
+      return [undefined, undefined]
+    }
+  }, [inputCurrency, outputCurrency, selectedChain.id])
+
   const [amount, price] = useMemo(
     () => [
       parseUnits(inputCurrencyAmount, inputCurrency?.decimals ?? 18),
@@ -235,11 +250,12 @@ export const LimitContainer = () => {
           <></>
         )}
         {showOrderBook &&
-        selectedMarket &&
+        quoteCurrency &&
+        baseCurrency &&
         availableDecimalPlacesGroups &&
         selectedDecimalPlaces ? (
           <OrderBook
-            name={`${selectedMarket.base.symbol}/${selectedMarket.quote.symbol}`}
+            name={`${baseCurrency.symbol}/${quoteCurrency.symbol}`}
             bids={bids}
             asks={asks}
             availableDecimalPlacesGroups={availableDecimalPlacesGroups}
@@ -299,22 +315,12 @@ export const LimitContainer = () => {
                 setInputCurrencyAmount(outputCurrencyAmount)
               }}
               actionButtonProps={{
-                disabled:
-                  !selectedMarket ||
-                  !inputCurrency ||
-                  !outputCurrency ||
-                  !amount,
+                disabled: !inputCurrency || !outputCurrency || !amount,
                 onClick: async () => {
-                  if (!selectedMarket || !inputCurrency || !outputCurrency) {
+                  if (!inputCurrency || !outputCurrency) {
                     return
                   }
-                  await make(
-                    selectedMarket,
-                    inputCurrency,
-                    outputCurrency,
-                    amount,
-                    price,
-                  )
+                  await make(inputCurrency, outputCurrency, amount, price)
                 },
                 text: `Limit ${isBid ? 'Bid' : 'Ask'}`,
               }}
