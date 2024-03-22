@@ -422,6 +422,12 @@ export const BOOK_MANAGER_ABI = [
       },
       {
         indexed: true,
+        internalType: 'address',
+        name: 'recipient',
+        type: 'address',
+      },
+      {
+        indexed: true,
         internalType: 'Currency',
         name: 'currency',
         type: 'address',
@@ -487,6 +493,12 @@ export const BOOK_MANAGER_ABI = [
         internalType: 'uint64',
         name: 'amount',
         type: 'uint64',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'provider',
+        type: 'address',
       },
     ],
     name: 'Make',
@@ -582,12 +594,6 @@ export const BOOK_MANAGER_ABI = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'oldDefaultProvider',
-        type: 'address',
-      },
       {
         indexed: true,
         internalType: 'address',
@@ -837,7 +843,7 @@ export const BOOK_MANAGER_ABI = [
     inputs: [
       {
         internalType: 'address',
-        name: 'provider',
+        name: 'recipient',
         type: 'address',
       },
       {
@@ -847,7 +853,13 @@ export const BOOK_MANAGER_ABI = [
       },
     ],
     name: 'collect',
-    outputs: [],
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'nonpayable',
     type: 'function',
   },
@@ -1054,6 +1066,25 @@ export const BOOK_MANAGER_ABI = [
   {
     inputs: [
       {
+        internalType: 'BookId',
+        name: 'id',
+        type: 'uint192',
+      },
+    ],
+    name: 'getHighest',
+    outputs: [
+      {
+        internalType: 'Tick',
+        name: '',
+        type: 'int24',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
         internalType: 'uint256',
         name: 'i',
         type: 'uint256',
@@ -1088,25 +1119,6 @@ export const BOOK_MANAGER_ABI = [
         internalType: 'uint128',
         name: '',
         type: 'uint128',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'BookId',
-        name: 'id',
-        type: 'uint192',
-      },
-    ],
-    name: 'getLowest',
-    outputs: [
-      {
-        internalType: 'Tick',
-        name: '',
-        type: 'int24',
       },
     ],
     stateMutability: 'view',
@@ -1181,6 +1193,25 @@ export const BOOK_MANAGER_ABI = [
       },
     ],
     name: 'isEmpty',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'BookId',
+        name: 'id',
+        type: 'uint192',
+      },
+    ],
+    name: 'isOpened',
     outputs: [
       {
         internalType: 'bool',
@@ -1373,7 +1404,7 @@ export const BOOK_MANAGER_ABI = [
         type: 'int24',
       },
     ],
-    name: 'minGreaterThan',
+    name: 'maxLessThan',
     outputs: [
       {
         internalType: 'Tick',
