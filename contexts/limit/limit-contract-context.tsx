@@ -247,13 +247,6 @@ export const LimitContractProvider = ({
           ),
         })
 
-        //   function cancel(
-        //       CancelOrderParams[] calldata orderParamsList,
-        //       address[] calldata tokensToSettle,
-        //       ERC721PermitParams[] calldata permitParamsList,
-        //       uint64 deadline
-        // ) external;
-
         const tokensToSettle = Object.values(refundCurrencyMaps)
           .map(({ currency }) => currency.address)
           .filter((address) => !isAddressEqual(address, zeroAddress))
