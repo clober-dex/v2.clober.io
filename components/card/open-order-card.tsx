@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { OutlinkSvg } from '../svg/outlink-svg'
-import { OpenOrderV1 } from '../../model/open-order'
+import { OpenOrder } from '../../model/open-order'
 import { formatUnits } from '../../utils/bigint'
 import { ActionButton, ActionButtonProps } from '../button/action-button'
 import { toPlacesString } from '../../utils/bignumber'
@@ -12,7 +12,7 @@ export const OpenOrderCard = ({
   cancelActionButtonProps,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
-  openOrder: OpenOrderV1
+  openOrder: OpenOrder
   claimActionButtonProps: ActionButtonProps
   cancelActionButtonProps: ActionButtonProps
 }) => {
