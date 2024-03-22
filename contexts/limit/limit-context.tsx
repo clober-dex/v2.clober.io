@@ -157,7 +157,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
             if (new BigNumber(minPrice).gt(label)) {
               return {
                 label,
-                value: decimalPlaces - i,
+                value: Math.max(decimalPlaces - i, 0),
               }
             }
           })
