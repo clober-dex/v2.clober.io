@@ -9,8 +9,6 @@ import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
 import { MAX_TICK, quoteToBase, toPrice } from '../utils/tick'
 import { Book } from '../model/book'
 import { Depth } from '../model/depth'
-import { FeePolicy } from '../model/fee-policy'
-import { CHAIN_IDS } from '../constants/chain'
 
 describe('Spend Logic', () => {
   const setUp = async ({ blockNumber }: { blockNumber: number }) => {
@@ -56,11 +54,8 @@ describe('Spend Logic', () => {
     })
     const liquidities = await BookViewer.getLiquidity(toId(key), MAX_TICK, 10n)
     const mockBook = new Book({
-      chainId: CHAIN_IDS.ARBITRUM_SEPOLIA,
-      tokens: [
-        { address: key.base, name: 'mock', symbol: 'mock', decimals: 18 },
-        { address: key.quote, name: 'mock', symbol: 'mock', decimals: 18 },
-      ],
+      base: { address: key.base, name: 'mock', symbol: 'mock', decimals: 18 },
+      quote: { address: key.quote, name: 'mock', symbol: 'mock', decimals: 18 },
       unit: key.unit,
       makerPolicy: key.makerPolicy,
       hooks: key.hooks,
@@ -103,9 +98,9 @@ describe('Spend Logic', () => {
       base: zeroAddress,
       unit: 1n,
       quote: '0x00bfd44e79fb7f6dd5887a9426c8ef85a0cd23e0',
-      makerPolicy: new FeePolicy(true, MAKER_DEFAULT_POLICY),
+      makerPolicy: MAKER_DEFAULT_POLICY,
       hooks: zeroAddress,
-      takerPolicy: new FeePolicy(true, TAKER_DEFAULT_POLICY),
+      takerPolicy: TAKER_DEFAULT_POLICY,
     }
 
     await checkSpendLogic({
@@ -146,9 +141,9 @@ describe('Spend Logic', () => {
       quote: zeroAddress,
       unit: 10n ** 12n,
       base: '0x00bfd44e79fb7f6dd5887a9426c8ef85a0cd23e0',
-      makerPolicy: new FeePolicy(true, MAKER_DEFAULT_POLICY),
+      makerPolicy: MAKER_DEFAULT_POLICY,
       hooks: zeroAddress,
-      takerPolicy: new FeePolicy(true, TAKER_DEFAULT_POLICY),
+      takerPolicy: TAKER_DEFAULT_POLICY,
     }
 
     await checkSpendLogic({
