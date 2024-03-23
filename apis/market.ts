@@ -117,7 +117,7 @@ function isWhiteListedMarket(market: Market): boolean {
     isAddressEqual(market.hooks, zeroAddress) &&
     market.makerPolicy.usesQuote &&
     market.takerPolicy.usesQuote &&
-    market.takerPolicy.rate === TAKER_DEFAULT_POLICY &&
-    market.makerPolicy.rate === MAKER_DEFAULT_POLICY
+    market.takerPolicy.rate === TAKER_DEFAULT_POLICY.rate &&
+    market.makerPolicy.rate === MAKER_DEFAULT_POLICY.rate
   )
 }

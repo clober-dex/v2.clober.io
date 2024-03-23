@@ -70,31 +70,23 @@ describe('FeePolicy', () => {
   it('encode', async () => {
     await encode(true, 0)
     await encode(true, 1)
-    await encode(true, Number(MAKER_DEFAULT_POLICY))
-    await encode(true, Number(TAKER_DEFAULT_POLICY))
+    await encode(true, Number(MAKER_DEFAULT_POLICY.rate))
+    await encode(true, Number(TAKER_DEFAULT_POLICY.rate))
     await encode(true, 500000)
     await encode(true, -500000)
     await encode(false, 0)
     await encode(false, 1)
     await encode(false, 500000)
     await encode(false, -500000)
-    await encode(false, Number(MAKER_DEFAULT_POLICY))
-    await encode(false, Number(TAKER_DEFAULT_POLICY))
+    await encode(false, Number(MAKER_DEFAULT_POLICY.rate))
+    await encode(false, Number(TAKER_DEFAULT_POLICY.rate))
   }, 100000)
 
   it('calculate fee', async () => {
     await checkCalculateFee(new FeePolicy(true, 0n), 1000000n, false)
     await checkCalculateFee(new FeePolicy(true, 1n), 1000000n, false)
-    await checkCalculateFee(
-      new FeePolicy(true, MAKER_DEFAULT_POLICY),
-      1000000n,
-      false,
-    )
-    await checkCalculateFee(
-      new FeePolicy(true, TAKER_DEFAULT_POLICY),
-      1000000n,
-      false,
-    )
+    await checkCalculateFee(MAKER_DEFAULT_POLICY, 1000000n, false)
+    await checkCalculateFee(TAKER_DEFAULT_POLICY, 1000000n, false)
     await checkCalculateFee(new FeePolicy(true, 500000n), 1000000n, false)
     await checkCalculateFee(new FeePolicy(true, -500000n), 1000000n, false)
   }, 100000)
@@ -102,16 +94,8 @@ describe('FeePolicy', () => {
   it('calculate original amount', async () => {
     await checkCalculateOriginalAmount(new FeePolicy(true, 0n), 1000000n, false)
     await checkCalculateOriginalAmount(new FeePolicy(true, 1n), 1000000n, false)
-    await checkCalculateOriginalAmount(
-      new FeePolicy(true, MAKER_DEFAULT_POLICY),
-      1000000n,
-      false,
-    )
-    await checkCalculateOriginalAmount(
-      new FeePolicy(true, TAKER_DEFAULT_POLICY),
-      1000000n,
-      false,
-    )
+    await checkCalculateOriginalAmount(MAKER_DEFAULT_POLICY, 1000000n, false)
+    await checkCalculateOriginalAmount(TAKER_DEFAULT_POLICY, 1000000n, false)
     await checkCalculateOriginalAmount(
       new FeePolicy(true, 500000n),
       1000000n,
@@ -127,12 +111,12 @@ describe('FeePolicy', () => {
   it('from value', async () => {
     checkFrom(new FeePolicy(true, 0n))
     checkFrom(new FeePolicy(true, 1n))
-    checkFrom(new FeePolicy(true, MAKER_DEFAULT_POLICY))
-    checkFrom(new FeePolicy(true, TAKER_DEFAULT_POLICY))
+    checkFrom(MAKER_DEFAULT_POLICY)
+    checkFrom(TAKER_DEFAULT_POLICY)
 
     checkFrom(new FeePolicy(false, 0n))
     checkFrom(new FeePolicy(false, 1n))
-    checkFrom(new FeePolicy(false, MAKER_DEFAULT_POLICY))
-    checkFrom(new FeePolicy(false, TAKER_DEFAULT_POLICY))
+    checkFrom(MAKER_DEFAULT_POLICY)
+    checkFrom(TAKER_DEFAULT_POLICY)
   }, 100000)
 })

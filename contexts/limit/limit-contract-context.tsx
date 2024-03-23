@@ -69,9 +69,9 @@ export const LimitContractProvider = ({
           base: outputCurrency.address,
           unit,
           quote: inputCurrency.address,
-          makerPolicy: new FeePolicy(true, MAKER_DEFAULT_POLICY),
+          makerPolicy: MAKER_DEFAULT_POLICY,
           hooks: zeroAddress,
-          takerPolicy: new FeePolicy(true, TAKER_DEFAULT_POLICY),
+          takerPolicy: TAKER_DEFAULT_POLICY,
         }
         const param = {
           id: toId(key),
