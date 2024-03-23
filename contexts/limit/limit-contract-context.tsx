@@ -22,7 +22,8 @@ import { isOpen } from '../../utils/book'
 import { BookKey } from '../../model/book-key'
 import { getMarketId } from '../../utils/market'
 import { OpenOrder } from '../../model/open-order'
-import { permit721 } from '../../utils/permit721'
+import { fetchIsApprovedForAll } from '../../utils/approval'
+import { ERC721_ABI } from '../../abis/@openzeppelin/erc721-abi'
 
 type LimitContractContext = {
   make: (
@@ -209,28 +210,22 @@ export const LimitContractProvider = ({
       )
 
       try {
-        const permitParamsList: {
-          tokenId: bigint
-          signature: {
-            deadline: bigint
-            r: `0x${string}`
-            s: `0x${string}`
-            v: number
-          }
-        }[] = []
-        for (const openOrder of openOrders) {
-          const { deadline, r, s, v } = await permit721(
-            selectedChain.id,
-            walletClient,
-            CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].BookManager,
-            openOrder.id,
-            walletClient.account.address,
-            CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
-            getDeadlineTimestampInSeconds(),
-          )
-          permitParamsList.push({
-            tokenId: openOrder.id,
-            signature: { deadline, v, r, s },
+        const isApprovedForAll = await fetchIsApprovedForAll(
+          selectedChain.id,
+          CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].BookManager,
+          walletClient.account.address,
+          CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
+        )
+        if (!isApprovedForAll) {
+          await writeContract(publicClient, walletClient, {
+            address:
+              CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].BookManager,
+            abi: ERC721_ABI,
+            functionName: 'setApprovalForAll',
+            args: [
+              CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
+              true,
+            ],
           })
         }
 
@@ -266,7 +261,7 @@ export const LimitContractProvider = ({
               hookData: zeroHash,
             })),
             tokensToSettle,
-            permitParamsList,
+            [],
             getDeadlineTimestampInSeconds(),
           ],
         })
