@@ -22,7 +22,6 @@ import { ActionButton } from '../components/button/action-button'
 import { OpenOrderCard } from '../components/card/open-order-card'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
 import { getMarketId } from '../utils/market'
-import { WHITELISTED_TOKENS } from '../constants/currency'
 
 import { ChartContainer } from './chart-container'
 
@@ -60,7 +59,7 @@ export const LimitContainer = () => {
     bids,
     asks,
   } = useLimitContext()
-  const { balances } = useLimitCurrencyContext()
+  const { balances, currencies } = useLimitCurrencyContext()
   const [showOrderBook, setShowOrderBook] = useState(true)
 
   const [depthClickedIndex, setDepthClickedIndex] = useState<
@@ -284,7 +283,7 @@ export const LimitContainer = () => {
             <LimitForm
               prices={{}} // todo
               balances={balances}
-              currencies={WHITELISTED_TOKENS[selectedChain.id]}
+              currencies={currencies}
               priceInput={priceInput}
               setPriceInput={setPriceInput}
               selectedMarket={selectedMarket}

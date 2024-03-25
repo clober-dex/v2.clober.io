@@ -5,17 +5,19 @@ import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 
 import { Balances } from '../../model/balances'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
-import { WHITELISTED_TOKENS } from '../../constants/currency'
 import { useChainContext } from '../chain-context'
+import { Currency } from '../../model/currency'
 
 import { useMarketContext } from './market-context'
 
 type LimitCurrencyContext = {
   balances: Balances
+  currencies: Currency[]
 }
 
 const Context = React.createContext<LimitCurrencyContext>({
   balances: {},
+  currencies: [],
 })
 
 export const LimitCurrencyProvider = ({
@@ -33,7 +35,6 @@ export const LimitCurrencyProvider = ({
         return {}
       }
       const uniqueCurrencies = [
-        ...WHITELISTED_TOKENS[selectedChain.id],
         ...markets.map((market) => market.quote),
         ...markets.map((market) => market.base),
       ]
@@ -73,6 +74,7 @@ export const LimitCurrencyProvider = ({
     <Context.Provider
       value={{
         balances: balances ?? {},
+        currencies: [],
       }}
     >
       {children}
