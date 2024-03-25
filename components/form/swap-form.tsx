@@ -16,7 +16,6 @@ import { Balances } from '../../model/balances'
 import { ArrowDownSvg } from '../svg/arrow-down-svg'
 
 export const SwapForm = ({
-  chainId,
   currencies,
   balances,
   prices,
@@ -37,7 +36,6 @@ export const SwapForm = ({
   gasEstimateValue,
   actionButtonProps,
 }: {
-  chainId: number
   currencies: Currency[]
   balances: Balances
   prices: Prices
@@ -78,7 +76,6 @@ export const SwapForm = ({
 
   return showInputCurrencySelect ? (
     <CurrencySelect
-      chainId={chainId}
       currencies={
         outputCurrency
           ? currencies.filter(
@@ -97,7 +94,6 @@ export const SwapForm = ({
     />
   ) : showOutputCurrencySelect ? (
     <CurrencySelect
-      chainId={chainId}
       currencies={
         inputCurrency
           ? currencies.filter(

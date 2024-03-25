@@ -10,14 +10,12 @@ import { Balances } from '../../model/balances'
 import { Prices } from '../../model/prices'
 
 const CurrencySelect = ({
-  chainId,
   currencies,
   balances,
   prices,
   onBack,
   onCurrencySelect,
 }: {
-  chainId: number
   currencies: Currency[]
   balances: Balances
   prices: Prices

@@ -282,7 +282,6 @@ export const LimitContainer = () => {
             />
           ) : (
             <LimitForm
-              chainId={selectedChain.id}
               prices={{}} // todo
               balances={balances}
               currencies={WHITELISTED_TOKENS[selectedChain.id]}
