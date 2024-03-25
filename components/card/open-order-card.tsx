@@ -19,6 +19,9 @@ export const OpenOrderCard = ({
 }) => {
   const filledRatio =
     (Number(openOrder.baseFilledAmount) / Number(openOrder.baseAmount)) * 100
+  const quoteCurrencyDecimals = openOrder.isBid
+    ? openOrder.inputToken.decimals
+    : openOrder.outputToken.decimals
   const baseCurrencyDecimals = openOrder.isBid
     ? openOrder.outputToken.decimals
     : openOrder.inputToken.decimals
@@ -51,8 +54,8 @@ export const OpenOrderCard = ({
               {toPlacesString(
                 formatPrice(
                   openOrder.price,
-                  openOrder.inputToken.decimals,
-                  openOrder.outputToken.decimals,
+                  quoteCurrencyDecimals,
+                  baseCurrencyDecimals,
                 ),
               )}
             </p>

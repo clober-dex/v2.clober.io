@@ -56,9 +56,11 @@ export function parseDepth(
       )
       .map((x) => {
         return {
-          price: isBid
-            ? formatPrice(x.price, market.quote.decimals, market.base.decimals)
-            : formatPrice(x.price, market.base.decimals, market.quote.decimals),
+          price: formatPrice(
+            x.price,
+            market.quote.decimals,
+            market.base.decimals,
+          ),
           size: new BigNumber(formatUnits(x.baseAmount, market.base.decimals)),
         }
       })

@@ -108,20 +108,6 @@ export default `<svg class='tone-mono mode-POSITION' xmlns='http://www.w3.org/20
 \t\tTOKEN_PAIR_TEXT
 \t</text>
 
-\t<text x='359.5' y='329.203' fill='var(--color-text-address)' font-family='Verdana' font-size='24' font-weight='600' letter-spacing='0em' alignment-baseline='central' text-anchor='middle'>
-\t\tMARKET_ADDRESS_TEXT
-\t</text>
-\t
-\t<g transform='translate(78,754)'>
-\t\t<rect x='0' y='0' width='559' height='71' rx='34' fill='var(--color-group)' />
-\t\t<text x='40' y='35.5' fill='var(--color-text-label)' font-family='Verdana' font-size='32' font-weight='500' letter-spacing='0em' alignment-baseline='central' text-anchor='start'>
-\t\t\tOrder Index
-\t\t</text>
-\t\t<text x='519' y='35.5' fill='var(--color-text-value)' font-family='Verdana' font-size='32' font-weight='600' letter-spacing='-0.02em' alignment-baseline='central' text-anchor='end'>
-\t\t\tORDER_INDEX_TEXT
-\t\t</text>
-\t</g>
-
 \t<g transform='translate(78,849)'>
 \t\t<rect x='0' y='0' width='559' height='71' rx='34' fill='var(--color-group)' />
 \t\t<text x='40' y='35.5' fill='var(--color-text-label)' font-family='Verdana' font-size='32' font-weight='500' letter-spacing='0em' alignment-baseline='central' text-anchor='start'>
