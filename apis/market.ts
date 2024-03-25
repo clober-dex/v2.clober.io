@@ -24,22 +24,22 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
     },
   )
   const markets = books.map((book) => {
-    const baseToken = toCurrency(chainId, book.base)
-    const quoteToken = toCurrency(chainId, book.quote)
+    const inputToken = toCurrency(chainId, book.quote)
+    const outputToken = toCurrency(chainId, book.base)
     const unit = BigInt(book.unit)
     const { quote, base } = getMarketId(chainId, [
-      baseToken.address,
-      quoteToken.address,
+      outputToken.address,
+      inputToken.address,
     ])
-    const quoteDecimals = isAddressEqual(quoteToken.address, quote)
-      ? quoteToken.decimals
-      : baseToken.decimals
-    const baseDecimals = isAddressEqual(baseToken.address, base)
-      ? baseToken.decimals
-      : quoteToken.decimals
+    const quoteDecimals = isAddressEqual(inputToken.address, quote)
+      ? inputToken.decimals
+      : outputToken.decimals
+    const baseDecimals = isAddressEqual(outputToken.address, base)
+      ? outputToken.decimals
+      : inputToken.decimals
     return new Market({
       chainId: chainId,
-      tokens: [baseToken, quoteToken],
+      tokens: [outputToken, inputToken],
       makerPolicy: FeePolicy.from(BigInt(book.makerPolicy)),
       hooks: getAddress(book.hooks),
       takerPolicy: FeePolicy.from(BigInt(book.takerPolicy)),
@@ -48,8 +48,8 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
       books: [
         new Book({
           id: BigInt(book.id),
-          base: baseToken,
-          quote: quoteToken,
+          quote: inputToken,
+          base: outputToken,
           unit,
           makerPolicy: FeePolicy.from(BigInt(book.makerPolicy)),
           hooks: getAddress(book.hooks),
@@ -61,10 +61,10 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
             const quoteAmount = unit * rawAmount
             const tick = BigInt(depth.tick)
             const { quote } = getMarketId(chainId, [
-              baseToken.address,
-              quoteToken.address,
+              inputToken.address,
+              outputToken.address,
             ])
-            const isBid = isAddressEqual(quoteToken.address, quote)
+            const isBid = isAddressEqual(inputToken.address, quote)
             return {
               bookId: String(book.id),
               tick,
