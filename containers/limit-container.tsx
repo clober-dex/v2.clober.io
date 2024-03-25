@@ -90,22 +90,6 @@ export const LimitContainer = () => {
     setClaimBounty,
   ])
 
-  // When selectedMarket is changed
-  useEffect(() => {
-    if (selectedMarket?.quote && selectedMarket?.base) {
-      setInputCurrency(isBid ? selectedMarket.quote : selectedMarket.base)
-      setOutputCurrency(isBid ? selectedMarket.base : selectedMarket.quote)
-    }
-  }, [
-    isBid,
-    selectedMarket?.base,
-    selectedMarket?.quote,
-    setInputCurrency,
-    setInputCurrencyAmount,
-    setOutputCurrency,
-    setOutputCurrencyAmount,
-  ])
-
   // When depth is changed
   const highestBidPrice = bids[0]?.price
   const lowestAskPrice = asks[0]?.price
@@ -316,6 +300,11 @@ export const LimitContainer = () => {
                 )
                 setDepthClickedIndex(undefined)
                 setInputCurrencyAmount(outputCurrencyAmount)
+
+                // swap currencies
+                const _inputCurrency = inputCurrency
+                setInputCurrency(outputCurrency)
+                setOutputCurrency(_inputCurrency)
               }}
               actionButtonProps={{
                 disabled: !inputCurrency || !outputCurrency || !amount,
