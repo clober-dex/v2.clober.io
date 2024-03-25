@@ -6,6 +6,7 @@ import { formatUnits } from '../../utils/bigint'
 import { ActionButton, ActionButtonProps } from '../button/action-button'
 import { toPlacesString } from '../../utils/bignumber'
 import { formatPrice } from '../../utils/prices'
+import { invertPrice } from '../../utils/tick'
 
 export const OpenOrderCard = ({
   openOrder,
@@ -53,7 +54,9 @@ export const OpenOrderCard = ({
             <p className="text-white">
               {toPlacesString(
                 formatPrice(
-                  openOrder.price,
+                  openOrder.isBid
+                    ? openOrder.price
+                    : invertPrice(openOrder.price),
                   quoteCurrencyDecimals,
                   baseCurrencyDecimals,
                 ),
