@@ -15,12 +15,14 @@ import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 
 type SwapCurrencyContext = {
   currencies: Currency[]
+  setCurrencies: (currencies: Currency[]) => void
   prices: Prices
   balances: Balances
 }
 
 const Context = React.createContext<SwapCurrencyContext>({
   currencies: [],
+  setCurrencies: () => {},
   prices: {},
   balances: {},
 })
@@ -35,9 +37,12 @@ export const SwapCurrencyProvider = ({
   })
   const { selectedChain } = useChainContext()
 
-  const { data: currencies } = useQuery(
+  const { data: _currencies } = useQuery(
     ['swap-currencies', selectedChain],
     async () => fetchCurrencies(AGGREGATORS[selectedChain.id as CHAIN_IDS]),
+  )
+  const [currencies, setCurrencies] = React.useState<Currency[] | undefined>(
+    _currencies,
   )
 
   const { data: prices } = useQuery(
@@ -94,6 +99,7 @@ export const SwapCurrencyProvider = ({
     <Context.Provider
       value={{
         currencies: currencies ?? [],
+        setCurrencies,
         prices: prices ?? {},
         balances: balances ?? {},
       }}

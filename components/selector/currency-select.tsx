@@ -11,17 +11,20 @@ import { Prices } from '../../model/prices'
 
 const CurrencySelect = ({
   currencies,
+  setCurrencies,
   balances,
   prices,
   onBack,
   onCurrencySelect,
 }: {
   currencies: Currency[]
+  setCurrencies: (currencies: Currency[]) => void
   balances: Balances
   prices: Prices
   onBack: () => void
   onCurrencySelect: (currency: Currency) => void
 } & React.HTMLAttributes<HTMLDivElement>) => {
+  console.log('CurrencySelect', setCurrencies)
   const [value, setValue] = React.useState('')
   return (
     <div className="flex flex-col gap-4">

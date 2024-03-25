@@ -24,7 +24,8 @@ export const SwapContainer = () => {
     slippageInput,
     setSlippageInput,
   } = useSwapContext()
-  const { balances, currencies, prices } = useSwapCurrencyContext()
+  const { balances, currencies, setCurrencies, prices } =
+    useSwapCurrencyContext()
   const { swap } = useSwapContractContext()
   const { data: feeData } = useFeeData()
   const { address: userAddress } = useAccount()
@@ -75,6 +76,7 @@ export const SwapContainer = () => {
         <div className="flex flex-col rounded-2xl bg-gray-900 p-6 sm:w-[528px] lg:w-[480px]">
           <SwapForm
             currencies={currencies}
+            setCurrencies={setCurrencies}
             balances={balances}
             prices={prices}
             showInputCurrencySelect={showInputCurrencySelect}

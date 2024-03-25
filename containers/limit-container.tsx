@@ -59,6 +59,7 @@ export const LimitContainer = () => {
     asks,
     balances,
     currencies,
+    setCurrencies,
   } = useLimitContext()
   const [showOrderBook, setShowOrderBook] = useState(true)
 
@@ -284,6 +285,7 @@ export const LimitContainer = () => {
               prices={{}} // todo
               balances={balances}
               currencies={currencies}
+              setCurrencies={setCurrencies}
               priceInput={priceInput}
               setPriceInput={setPriceInput}
               selectedMarket={selectedMarket}

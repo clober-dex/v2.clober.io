@@ -17,6 +17,7 @@ import { ArrowDownSvg } from '../svg/arrow-down-svg'
 
 export const SwapForm = ({
   currencies,
+  setCurrencies,
   balances,
   prices,
   showInputCurrencySelect,
@@ -37,6 +38,7 @@ export const SwapForm = ({
   actionButtonProps,
 }: {
   currencies: Currency[]
+  setCurrencies: (currencies: Currency[]) => void
   balances: Balances
   prices: Prices
   showInputCurrencySelect: boolean
@@ -84,6 +86,7 @@ export const SwapForm = ({
             )
           : currencies
       }
+      setCurrencies={setCurrencies}
       balances={balances}
       prices={prices}
       onBack={() => setShowInputCurrencySelect(false)}
@@ -102,6 +105,7 @@ export const SwapForm = ({
             )
           : currencies
       }
+      setCurrencies={setCurrencies}
       balances={balances}
       prices={prices}
       onBack={() => setShowOutputCurrencySelect(false)}

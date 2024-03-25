@@ -14,6 +14,7 @@ import { Market } from '../../model/market'
 
 export const LimitForm = ({
   currencies,
+  setCurrencies,
   balances,
   prices,
   priceInput,
@@ -39,6 +40,7 @@ export const LimitForm = ({
   actionButtonProps,
 }: {
   currencies: Currency[]
+  setCurrencies: (currencies: Currency[]) => void
   balances: Balances
   prices: Prices
   priceInput: string
@@ -73,6 +75,7 @@ export const LimitForm = ({
             )
           : currencies
       }
+      setCurrencies={setCurrencies}
       balances={balances}
       prices={prices}
       onBack={() => setShowInputCurrencySelect(false)}
@@ -91,6 +94,7 @@ export const LimitForm = ({
             )
           : currencies
       }
+      setCurrencies={setCurrencies}
       balances={balances}
       prices={prices}
       onBack={() => setShowOutputCurrencySelect(false)}

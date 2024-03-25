@@ -14,12 +14,14 @@ import { Chain } from '../../model/chain'
 import { getMarketId } from '../../utils/market'
 import { Balances } from '../../model/balances'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
+import { WHITELISTED_CURRENCIES } from '../../constants/currency'
 
 import { useMarketContext } from './market-context'
 
 type LimitContext = {
   balances: Balances
   currencies: Currency[]
+  setCurrencies: (currencies: Currency[]) => void
   isBid: boolean
   setIsBid: (isBid: (prevState: boolean) => boolean) => void
   selectMode: 'none' | 'settings'
@@ -52,6 +54,7 @@ type LimitContext = {
 const Context = React.createContext<LimitContext>({
   balances: {},
   currencies: [],
+  setCurrencies: () => {},
   isBid: true,
   setIsBid: () => {},
   selectMode: 'none',
@@ -121,13 +124,34 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   >(undefined)
   const [priceInput, setPriceInput] = useState('')
 
+  const { data: _currencies } = useQuery(
+    ['currencies', selectedChain, inputCurrency, outputCurrency],
+    async () => {
+      return WHITELISTED_CURRENCIES[selectedChain.id]
+    },
+    {
+      initialData: WHITELISTED_CURRENCIES[selectedChain.id],
+    },
+  ) as {
+    data: Currency[]
+  }
+  const [currencies, setCurrencies] = useState<Currency[]>(_currencies ?? [])
+
   const { data: balances } = useQuery(
-    ['limit-balances', userAddress, balance, markets, selectedChain],
+    [
+      'limit-balances',
+      userAddress,
+      balance,
+      markets,
+      selectedChain,
+      currencies,
+    ],
     async () => {
       if (!userAddress) {
         return {}
       }
       const uniqueCurrencies = [
+        ...currencies.map((currency) => currency),
         ...markets.map((market) => market.quote),
         ...markets.map((market) => market.base),
       ]
@@ -162,18 +186,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       refetchIntervalInBackground: true,
     },
   ) as { data: Balances }
-
-  const { data: currencies } = useQuery(
-    ['currencies', inputCurrency, outputCurrency],
-    async () => {
-      return []
-    },
-    {
-      initialData: [],
-    },
-  ) as {
-    data: Currency[]
-  }
 
   const availableDecimalPlacesGroups = useMemo(() => {
     const availableDecimalPlacesGroups = selectedMarket
@@ -335,6 +347,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       value={{
         balances: balances ?? {},
         currencies,
+        setCurrencies,
         isBid,
         setIsBid,
         selectMode,

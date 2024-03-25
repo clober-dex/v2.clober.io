@@ -24,6 +24,7 @@ type Story = StoryObj<typeof LimitForm>
 export const Default: Story = {
   args: {
     currencies: dummyCurrencies,
+    setCurrencies: () => {},
     balances: {},
     prices: {},
     isBid: true,
@@ -43,6 +44,7 @@ export const Default: Story = {
 export const Selected: Story = {
   args: {
     currencies: dummyCurrencies,
+    setCurrencies: () => {},
     balances: {},
     prices: {},
     isBid: true,
