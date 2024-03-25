@@ -23,6 +23,7 @@ import { OpenOrderCard } from '../components/card/open-order-card'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
 import { getMarketId } from '../utils/market'
 import { WHITELISTED_TOKENS } from '../constants/currency'
+import { invertPrice } from '../utils/tick'
 
 import { ChartContainer } from './chart-container'
 
@@ -227,13 +228,22 @@ export const LimitContainer = () => {
             selectedMarket?.quote.decimals ?? 18,
             selectedMarket?.base.decimals ?? 18,
           )
-        : parsePrice(
-            Number(priceInput),
-            selectedMarket?.base.decimals ?? 18,
-            selectedMarket?.quote.decimals ?? 18,
+        : invertPrice(
+            parsePrice(
+              Number(priceInput),
+              selectedMarket?.quote.decimals ?? 18,
+              selectedMarket?.base.decimals ?? 18,
+            ),
           ),
     ],
-    [inputCurrency, inputCurrencyAmount, isBid, priceInput, selectedMarket],
+    [
+      inputCurrency?.decimals,
+      inputCurrencyAmount,
+      isBid,
+      priceInput,
+      selectedMarket?.base.decimals,
+      selectedMarket?.quote.decimals,
+    ],
   )
 
   return (
