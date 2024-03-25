@@ -10,6 +10,7 @@ import { Balances } from '../../model/balances'
 import { Prices } from '../../model/prices'
 
 const CurrencySelect = ({
+  chainId,
   currencies,
   setCurrencies,
   balances,
@@ -17,6 +18,7 @@ const CurrencySelect = ({
   onBack,
   onCurrencySelect,
 }: {
+  chainId: number
   currencies: Currency[]
   setCurrencies: (currencies: Currency[]) => void
   balances: Balances
