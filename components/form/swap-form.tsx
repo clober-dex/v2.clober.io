@@ -89,11 +89,15 @@ export const SwapForm = ({
             )
           : currencies
       }
-      setCurrencies={setCurrencies}
       balances={balances}
       prices={prices}
       onBack={() => setShowInputCurrencySelect(false)}
       onCurrencySelect={(currency) => {
+        setCurrencies(
+          !currencies.find((c) => isAddressEqual(c.address, currency.address))
+            ? [...currencies, currency]
+            : currencies,
+        )
         setInputCurrency(currency)
         setShowInputCurrencySelect(false)
       }}
@@ -109,11 +113,15 @@ export const SwapForm = ({
             )
           : currencies
       }
-      setCurrencies={setCurrencies}
       balances={balances}
       prices={prices}
       onBack={() => setShowOutputCurrencySelect(false)}
       onCurrencySelect={(currency) => {
+        setCurrencies(
+          !currencies.find((c) => isAddressEqual(c.address, currency.address))
+            ? [...currencies, currency]
+            : currencies,
+        )
         setOutputCurrency(currency)
         setShowOutputCurrencySelect(false)
       }}

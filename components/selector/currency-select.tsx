@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { getAddress, isAddress, isAddressEqual } from 'viem'
 
 import { Currency } from '../../model/currency'
@@ -8,11 +8,11 @@ import { formatDollarValue, formatUnits } from '../../utils/bigint'
 import { CurrencyIcon } from '../icon/currency-icon'
 import { Balances } from '../../model/balances'
 import { Prices } from '../../model/prices'
+import { fetchCurrency } from '../../utils/currency'
 
 const CurrencySelect = ({
   chainId,
   currencies,
-  setCurrencies,
   balances,
   prices,
   onBack,
@@ -20,14 +20,35 @@ const CurrencySelect = ({
 }: {
   chainId: number
   currencies: Currency[]
-  setCurrencies: (currencies: Currency[]) => void
   balances: Balances
   prices: Prices
   onBack: () => void
   onCurrencySelect: (currency: Currency) => void
 } & React.HTMLAttributes<HTMLDivElement>) => {
-  console.log('CurrencySelect', setCurrencies)
-  const [value, setValue] = React.useState('')
+  const [notWhitelistedCurrency, setNotWhitelistedCurrency] = React.useState<
+    Currency | undefined
+  >()
+  const [value, _setValue] = React.useState('')
+  const setValue = useCallback(
+    async (value: string) => {
+      if (
+        isAddress(value) &&
+        !currencies.find((currency) =>
+          isAddressEqual(currency.address, getAddress(value)),
+        )
+      ) {
+        const currency = await fetchCurrency(chainId, value)
+        if (currency) {
+          setNotWhitelistedCurrency(currency)
+        } else {
+          setNotWhitelistedCurrency(undefined)
+        }
+      }
+      _setValue(value)
+    },
+    [chainId, currencies],
+  )
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-center">
@@ -60,7 +81,10 @@ const CurrencySelect = ({
         </div>
       </div>
       <div className="flex flex-col h-72 overflow-y-auto bg-gray-900 rounded-b-xl sm:rounded-b-3xl">
-        {currencies
+        {(notWhitelistedCurrency
+          ? [...currencies, notWhitelistedCurrency]
+          : currencies
+        )
           .filter(
             (currency) =>
               (isAddress(value) &&

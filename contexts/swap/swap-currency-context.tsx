@@ -66,7 +66,9 @@ export const SwapCurrencyProvider = ({
         .filter((currency) => !isAddressEqual(currency.address, zeroAddress))
         .filter(
           (currency, index, self) =>
-            self.findIndex((c) => c.address === currency.address) === index,
+            self.findIndex((c) =>
+              isAddressEqual(c.address, currency.address),
+            ) === index,
         )
       const results = await readContracts({
         contracts: uniqueCurrencies.map((currency) => ({
