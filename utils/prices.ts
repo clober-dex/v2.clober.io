@@ -27,16 +27,6 @@ export const formatPrice = (
   )
 }
 
-export const formatInvertedPrice = (
-  price: bigint,
-  quoteDecimals: number,
-  baseDecimals: number,
-): number => {
-  return (
-    (Math.pow(2, 128) / Number(price)) * 10 ** (quoteDecimals - baseDecimals)
-  )
-}
-
 export const parsePrice = (
   price: number,
   quoteDecimals: number,
