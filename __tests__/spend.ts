@@ -54,6 +54,7 @@ describe('Spend Logic', () => {
     })
     const liquidities = await BookViewer.getLiquidity(toId(key), MAX_TICK, 10n)
     const mockBook = new Book({
+      id: 0n,
       base: { address: key.base, name: 'mock', symbol: 'mock', decimals: 18 },
       quote: { address: key.quote, name: 'mock', symbol: 'mock', decimals: 18 },
       unit: key.unit,

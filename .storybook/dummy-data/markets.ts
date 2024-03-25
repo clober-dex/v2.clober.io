@@ -6,7 +6,6 @@ import { arbitrumSepolia } from 'viem/chains'
 import { parsePrice } from '../../utils/prices'
 import { zeroAddress } from 'viem'
 import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../../constants/fee'
-import { FeePolicy } from '../../model/fee-policy'
 
 export const dummyMarkets: Market[] = [
   new Market({
@@ -28,11 +27,11 @@ export const dummyMarkets: Market[] = [
     makerPolicy: MAKER_DEFAULT_POLICY,
     hooks: zeroAddress,
     takerPolicy: TAKER_DEFAULT_POLICY,
-    latestTick: 0n,
-    latestPrice: 0n,
+    latestPrice: 0,
     latestTimestamp: 0,
     books: [
       new Book({
+        id: 0n,
         quote: {
           address: '0x00BFD44e79FB7f6dd5887A9426c8EF85A0CD23e0',
           name: 'USDC',
@@ -66,6 +65,7 @@ export const dummyMarkets: Market[] = [
         ),
       }),
       new Book({
+        id: 1n,
         quote: {
           address: '0x00BFD44e79FB7f6dd5887A9426c8EF85A0CD23e0',
           name: 'USDC',

@@ -5,6 +5,7 @@ import { Depth } from './depth'
 import { FeePolicy } from './fee-policy'
 
 export class Book {
+  id: bigint
   base: Currency
   unit: bigint
   quote: Currency
@@ -16,6 +17,7 @@ export class Book {
   depths: Depth[]
 
   constructor({
+    id,
     base,
     quote,
     unit,
@@ -26,6 +28,7 @@ export class Book {
     latestPrice,
     depths,
   }: {
+    id: bigint
     base: Currency
     quote: Currency
     unit: bigint
@@ -36,6 +39,7 @@ export class Book {
     latestPrice: bigint
     depths: Depth[]
   }) {
+    this.id = id
     this.base = base
     this.unit = unit
     this.quote = quote
@@ -49,10 +53,10 @@ export class Book {
 
   take = ({
     limitPrice,
-    amountIn, // quote
+    amountOut, // quote
   }: {
     limitPrice: bigint
-    amountIn: bigint
+    amountOut: bigint
   }) => {
     let takenQuoteAmount = 0n
     let spendBaseAmount = 0n
@@ -74,10 +78,10 @@ export class Book {
       }
       let maxAmount = this.takerPolicy.usesQuote
         ? this.takerPolicy.calculateOriginalAmount(
-            amountIn - takenQuoteAmount,
+            amountOut - takenQuoteAmount,
             true,
           )
-        : amountIn - takenQuoteAmount
+        : amountOut - takenQuoteAmount
       maxAmount = divide(maxAmount, this.unit, true)
 
       if (maxAmount === 0n) {
@@ -102,7 +106,7 @@ export class Book {
 
       takenQuoteAmount += quoteAmount
       spendBaseAmount += baseAmount
-      if (amountIn <= takenQuoteAmount) {
+      if (amountOut <= takenQuoteAmount) {
         break
       }
       index++
