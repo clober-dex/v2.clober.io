@@ -154,6 +154,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [priceInput, setPriceInput] = useState('')
   const { inputCurrencyAddress, outputCurrencyAddress } =
     getCurrencyAddress(selectedChain)
+  const [mounted, setMounted] = useState(false)
 
   const { data: _currencies } = useQuery(
     [
@@ -341,18 +342,34 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
 
   useEffect(() => {
-    const inputCurrency = inputCurrencyAddress
-      ? currencies.find((currency) =>
-          isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
-        )
-      : undefined
-    const outputCurrency = outputCurrencyAddress
-      ? currencies.find((currency) =>
-          isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
-        )
-      : undefined
-    setInputCurrency(inputCurrency)
-    setOutputCurrency(outputCurrency)
+    if (!mounted) {
+      const inputCurrency = inputCurrencyAddress
+        ? currencies.find((currency) =>
+            isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
+          )
+        : undefined
+      const outputCurrency = outputCurrencyAddress
+        ? currencies.find((currency) =>
+            isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
+          )
+        : undefined
+      setInputCurrency(inputCurrency)
+      setOutputCurrency(outputCurrency)
+      setMounted(true)
+    }
+  }, [
+    currencies,
+    inputCurrencyAddress,
+    markets,
+    mounted,
+    outputCurrencyAddress,
+    selectedChain,
+    setInputCurrency,
+    setOutputCurrency,
+    setSelectedMarket,
+  ])
+
+  useEffect(() => {
     if (inputCurrency && outputCurrency) {
       const market = markets.find(
         (m) =>
@@ -363,20 +380,12 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
           ]).marketId,
       )
       setSelectedMarket(market)
-    } else {
-      // visit website first time
-      if (markets.length > 0) {
-        setSelectedMarket(markets[0])
-      }
     }
   }, [
-    currencies,
-    inputCurrencyAddress,
+    inputCurrency,
     markets,
-    outputCurrencyAddress,
-    selectedChain,
-    setInputCurrency,
-    setOutputCurrency,
+    outputCurrency,
+    selectedChain.id,
     setSelectedMarket,
   ])
 
