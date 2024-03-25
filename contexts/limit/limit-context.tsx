@@ -5,12 +5,13 @@ import { getAddress, isAddressEqual } from 'viem'
 import { Currency } from '../../model/currency'
 import { formatUnits, min } from '../../utils/bigint'
 import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
-import { formatPrice, getPriceDecimals } from '../../utils/prices'
+import { formatPrice, getPriceDecimals, MAX_PRICE } from '../../utils/prices'
 import { parseDepth } from '../../utils/order-book'
 import { useChainContext } from '../chain-context'
 import { Chain } from '../../model/chain'
 import { getMarketId } from '../../utils/market'
 import { WHITELISTED_TOKENS } from '../../constants/currency'
+import { invertPrice } from '../../utils/tick'
 
 import { useMarketContext } from './market-context'
 
@@ -120,10 +121,12 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
               min(
                 selectedMarket.bids.sort(
                   (a, b) => Number(b.price) - Number(a.price),
-                )[0]?.price ?? 2n ** 256n - 1n,
-                selectedMarket.asks.sort(
-                  (a, b) => Number(a.price) - Number(b.price),
-                )[0]?.price ?? 2n ** 256n - 1n,
+                )[0]?.price ?? MAX_PRICE,
+                invertPrice(
+                  selectedMarket.asks.sort(
+                    (a, b) => Number(a.price) - Number(b.price),
+                  )[0]?.price ?? 0n,
+                ) ?? MAX_PRICE,
               ),
               selectedMarket.quote.decimals,
               selectedMarket.base.decimals,

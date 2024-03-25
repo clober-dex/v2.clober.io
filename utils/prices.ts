@@ -2,6 +2,9 @@ import BigNumber from 'bignumber.js'
 
 import { getDecimalPlaces } from './bignumber'
 
+export const MAX_PRICE =
+  19961636804996334433808922353085948875386438476189866322430503n
+
 export const getPriceDecimals = (price: number, r: number = 1.001) => {
   const priceNumber = new BigNumber(price)
   return getDecimalPlaces(
