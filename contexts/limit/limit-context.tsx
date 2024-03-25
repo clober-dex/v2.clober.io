@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import BigNumber from 'bignumber.js'
-import { getAddress, isAddressEqual } from 'viem'
+import { getAddress, isAddressEqual, zeroAddress } from 'viem'
+import { useAccount, useBalance, useQuery } from 'wagmi'
+import { readContracts } from '@wagmi/core'
 
 import { Currency } from '../../model/currency'
 import { formatUnits } from '../../utils/bigint'
@@ -10,11 +12,14 @@ import { parseDepth } from '../../utils/order-book'
 import { useChainContext } from '../chain-context'
 import { Chain } from '../../model/chain'
 import { getMarketId } from '../../utils/market'
+import { Balances } from '../../model/balances'
+import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 
 import { useMarketContext } from './market-context'
-import { useLimitCurrencyContext } from './limit-currency-context'
 
 type LimitContext = {
+  balances: Balances
+  currencies: Currency[]
   isBid: boolean
   setIsBid: (isBid: (prevState: boolean) => boolean) => void
   selectMode: 'none' | 'settings'
@@ -45,6 +50,8 @@ type LimitContext = {
 }
 
 const Context = React.createContext<LimitContext>({
+  balances: {},
+  currencies: [],
   isBid: true,
   setIsBid: () => {},
   selectMode: 'none',
@@ -82,9 +89,10 @@ const QUERY_PARAM_INPUT_CURRENCY_KEY = 'inputCurrency'
 const QUERY_PARAM_OUTPUT_CURRENCY_KEY = 'outputCurrency'
 
 export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
+  const { address: userAddress } = useAccount()
+  const { data: balance } = useBalance({ address: userAddress, watch: true })
   const { markets, selectedMarket, setSelectedMarket } = useMarketContext()
   const { selectedChain } = useChainContext()
-  const { currencies } = useLimitCurrencyContext()
 
   const [isBid, setIsBid] = useState(true)
   const [selectMode, setSelectMode] = useState<'none' | 'settings'>('none')
@@ -112,6 +120,60 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     Decimals | undefined
   >(undefined)
   const [priceInput, setPriceInput] = useState('')
+
+  const { data: balances } = useQuery(
+    ['limit-balances', userAddress, balance, markets, selectedChain],
+    async () => {
+      if (!userAddress) {
+        return {}
+      }
+      const uniqueCurrencies = [
+        ...markets.map((market) => market.quote),
+        ...markets.map((market) => market.base),
+      ]
+        .filter(
+          (currency, index, self) =>
+            self.findIndex((c) => c.address === currency.address) === index,
+        )
+        .filter((currency) => !isAddressEqual(currency.address, zeroAddress))
+      const results = await readContracts({
+        contracts: uniqueCurrencies.map((currency) => ({
+          address: currency.address,
+          abi: ERC20_PERMIT_ABI,
+          functionName: 'balanceOf',
+          args: [userAddress],
+        })),
+      })
+      return results.reduce(
+        (acc: {}, { result }, index: number) => {
+          const currency = uniqueCurrencies[index]
+          return {
+            ...acc,
+            [getAddress(currency.address)]: result ?? 0n,
+          }
+        },
+        {
+          [zeroAddress]: balance?.value ?? 0n,
+        },
+      )
+    },
+    {
+      refetchInterval: 5 * 1000,
+      refetchIntervalInBackground: true,
+    },
+  ) as { data: Balances }
+
+  const { data: currencies } = useQuery(
+    ['currencies', inputCurrency, outputCurrency],
+    async () => {
+      return []
+    },
+    {
+      initialData: [],
+    },
+  ) as {
+    data: Currency[]
+  }
 
   const availableDecimalPlacesGroups = useMemo(() => {
     const availableDecimalPlacesGroups = selectedMarket
@@ -271,6 +333,8 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   return (
     <Context.Provider
       value={{
+        balances: balances ?? {},
+        currencies,
         isBid,
         setIsBid,
         selectMode,

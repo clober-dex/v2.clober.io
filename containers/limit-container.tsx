@@ -17,7 +17,6 @@ import {
   calculateOutputCurrencyAmountString,
   calculatePriceInputString,
 } from '../utils/order-book'
-import { useLimitCurrencyContext } from '../contexts/limit/limit-currency-context'
 import { ActionButton } from '../components/button/action-button'
 import { OpenOrderCard } from '../components/card/open-order-card'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
@@ -58,8 +57,9 @@ export const LimitContainer = () => {
     availableDecimalPlacesGroups,
     bids,
     asks,
+    balances,
+    currencies,
   } = useLimitContext()
-  const { balances, currencies } = useLimitCurrencyContext()
   const [showOrderBook, setShowOrderBook] = useState(true)
 
   const [depthClickedIndex, setDepthClickedIndex] = useState<
