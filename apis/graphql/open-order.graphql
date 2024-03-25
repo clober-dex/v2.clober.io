@@ -25,23 +25,9 @@ query getOpenOrder($orderId: ID!) {
         createdAt
 
         rawAmount
-        baseAmount
-        quoteAmount
-
         rawFilledAmount
-        baseFilledAmount
-        quoteFilledAmount
-
         rawClaimedAmount
-        baseClaimedAmount
-        quoteClaimedAmount
-
         rawClaimableAmount
-        baseClaimableAmount
-        quoteClaimableAmount
-
         rawOpenAmount
-        baseOpenAmount
-        quoteOpenAmount
     }
 }

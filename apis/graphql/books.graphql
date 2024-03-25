@@ -21,8 +21,6 @@ query getBooks {
             tick
             price
             rawAmount
-            baseAmount
-            quoteAmount
         }
         latestTick
         latestPrice
