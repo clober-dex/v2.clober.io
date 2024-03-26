@@ -24,7 +24,6 @@ import { TransactionProvider } from '../contexts/transaction-context'
 import { LimitProvider } from '../contexts/limit/limit-context'
 import { SwapProvider } from '../contexts/swap/swap-context'
 import { OpenOrderProvider } from '../contexts/limit/open-order-context'
-import { LimitCurrencyProvider } from '../contexts/limit/limit-currency-context'
 import { SwapCurrencyProvider } from '../contexts/swap/swap-currency-context'
 import { LimitContractProvider } from '../contexts/limit/limit-contract-context'
 import { SwapContractProvider } from '../contexts/swap/swap-contract-context'
@@ -74,11 +73,9 @@ const LimitProvidersWrapper = ({ children }: React.PropsWithChildren) => {
   return (
     <MarketProvider>
       <OpenOrderProvider>
-        <LimitCurrencyProvider>
-          <LimitContractProvider>
-            <LimitProvider>{children}</LimitProvider>
-          </LimitContractProvider>
-        </LimitCurrencyProvider>
+        <LimitContractProvider>
+          <LimitProvider>{children}</LimitProvider>
+        </LimitContractProvider>
       </OpenOrderProvider>
     </MarketProvider>
   )

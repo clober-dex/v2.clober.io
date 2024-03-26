@@ -16,7 +16,9 @@ import { Balances } from '../../model/balances'
 import { ArrowDownSvg } from '../svg/arrow-down-svg'
 
 export const SwapForm = ({
+  chainId,
   currencies,
+  setCurrencies,
   balances,
   prices,
   showInputCurrencySelect,
@@ -36,7 +38,9 @@ export const SwapForm = ({
   gasEstimateValue,
   actionButtonProps,
 }: {
+  chainId: number
   currencies: Currency[]
+  setCurrencies: (currencies: Currency[]) => void
   balances: Balances
   prices: Prices
   showInputCurrencySelect: boolean
@@ -76,6 +80,7 @@ export const SwapForm = ({
 
   return showInputCurrencySelect ? (
     <CurrencySelect
+      chainId={chainId}
       currencies={
         outputCurrency
           ? currencies.filter(
@@ -88,12 +93,18 @@ export const SwapForm = ({
       prices={prices}
       onBack={() => setShowInputCurrencySelect(false)}
       onCurrencySelect={(currency) => {
+        setCurrencies(
+          !currencies.find((c) => isAddressEqual(c.address, currency.address))
+            ? [...currencies, currency]
+            : currencies,
+        )
         setInputCurrency(currency)
         setShowInputCurrencySelect(false)
       }}
     />
   ) : showOutputCurrencySelect ? (
     <CurrencySelect
+      chainId={chainId}
       currencies={
         inputCurrency
           ? currencies.filter(
@@ -106,6 +117,11 @@ export const SwapForm = ({
       prices={prices}
       onBack={() => setShowOutputCurrencySelect(false)}
       onCurrencySelect={(currency) => {
+        setCurrencies(
+          !currencies.find((c) => isAddressEqual(c.address, currency.address))
+            ? [...currencies, currency]
+            : currencies,
+        )
         setOutputCurrency(currency)
         setShowOutputCurrencySelect(false)
       }}
