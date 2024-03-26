@@ -25,7 +25,7 @@ export const ETH: Currency = {
   decimals: 18,
 }
 
-export const WHITELISTED_TOKENS: {
+export const WHITELISTED_CURRENCIES: {
   [chain in CHAIN_IDS]: Currency[]
 } = {
   [CHAIN_IDS.ARBITRUM_SEPOLIA]: [

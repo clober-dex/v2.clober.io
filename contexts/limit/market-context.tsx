@@ -8,7 +8,7 @@ import { fetchMarkets } from '../../apis/market'
 type MarketContext = {
   markets: Market[]
   selectedMarket?: Market
-  setSelectedMarket: (market: Market) => void
+  setSelectedMarket: (market: Market | undefined) => void
 }
 
 const Context = React.createContext<MarketContext>({
