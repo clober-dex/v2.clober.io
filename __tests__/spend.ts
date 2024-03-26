@@ -6,7 +6,7 @@ import { BOOK_VIEWER_ABI } from '../abis/core/book-viewer'
 import { toId } from '../utils/book-id'
 import { BookKey } from '../model/book-key'
 import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
-import { MAX_TICK, quoteToBase, toPrice } from '../utils/tick'
+import { MAX_TICK } from '../utils/tick'
 import { Book } from '../model/book'
 import { Depth } from '../model/depth'
 
@@ -69,14 +69,9 @@ describe('Spend Logic', () => {
           (liquidity: any) =>
             ({
               bookId: zeroAddress,
+              unit: key.unit,
               tick: BigInt(liquidity.tick),
-              price: toPrice(BigInt(liquidity.tick)),
               rawAmount: BigInt(liquidity.depth),
-              baseAmount: quoteToBase(
-                BigInt(liquidity.tick),
-                BigInt(liquidity.depth) * key.unit,
-                true,
-              ),
             }) as Depth,
         ),
     })

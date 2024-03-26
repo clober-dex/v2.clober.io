@@ -8,7 +8,7 @@ import { FeePolicy } from '../model/fee-policy'
 import { Book } from '../model/book'
 import { Depth, MarketDepth } from '../model/depth'
 import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
-import { invertPrice, quoteToBase } from '../utils/tick'
+import { invertPrice } from '../utils/tick'
 import { getMarketId } from '../utils/market'
 import { formatPrice } from '../utils/prices'
 import { fetchCurrency } from '../utils/currency'
@@ -77,14 +77,12 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
           latestPrice: BigInt(book.latestPrice),
           depths: book.depths.map((depth) => {
             const rawAmount = BigInt(depth.rawAmount)
-            const quoteAmount = unit * rawAmount
             const tick = BigInt(depth.tick)
             return {
               bookId: String(book.id),
+              unit: BigInt(book.unit),
               tick,
-              price: BigInt(depth.price),
               rawAmount,
-              baseAmount: quoteToBase(tick, quoteAmount, false),
             } as Depth
           }),
         }),
@@ -137,9 +135,9 @@ function mergeDepths(depths: MarketDepth[], isBid: boolean): MarketDepth[] {
   }
   return mergedDepths.sort((a, b) => {
     if (isBid) {
-      return Number(b.price) - Number(a.price)
+      return Number(b.tick) - Number(a.tick)
     } else {
-      return Number(a.price) - Number(b.price)
+      return Number(a.tick) - Number(b.tick)
     }
   })
 }
