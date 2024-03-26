@@ -5,7 +5,7 @@ import { useAccount, useBalance, useQuery } from 'wagmi'
 import { readContracts } from '@wagmi/core'
 
 import { Currency } from '../../model/currency'
-import { formatUnits, min } from '../../utils/bigint'
+import { formatUnits } from '../../utils/bigint'
 import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
 import { formatPrice, getPriceDecimals, MAX_PRICE } from '../../utils/prices'
 import { parseDepth } from '../../utils/order-book'
@@ -260,17 +260,18 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     const availableDecimalPlacesGroups = selectedMarket
       ? (Array.from(Array(4).keys())
           .map((i) => {
-            const minPrice = formatPrice(
-              min(
-                selectedMarket.bids.sort(
-                  (a, b) => Number(b.price) - Number(a.price),
-                )[0]?.price ?? MAX_PRICE,
-                selectedMarket.asks.sort(
-                  (a, b) => Number(a.price) - Number(b.price),
-                )[0]?.price ?? MAX_PRICE,
-              ),
+            const fallbackPrice = formatPrice(
+              MAX_PRICE,
               selectedMarket.quote.decimals,
               selectedMarket.base.decimals,
+            )
+            const minPrice = Math.min(
+              selectedMarket.bids.sort(
+                (a, b) => Number(b.tick) - Number(a.tick),
+              )[0]?.price ?? fallbackPrice,
+              selectedMarket.asks.sort(
+                (a, b) => Number(a.tick) - Number(b.tick),
+              )[0]?.price ?? fallbackPrice,
             )
             const decimalPlaces = getPriceDecimals(minPrice)
             const label = (10 ** (i - decimalPlaces)).toFixed(

@@ -56,10 +56,9 @@ export const dummyMarkets: Market[] = [
             const rawAmount = 10000n * 10n ** 6n
             return {
               bookId: '0x000000000000000000000000000000000000000a',
+              unit: 1n,
               tick,
-              price: parsePrice(price, 6, 18),
               rawAmount,
-              baseAmount: 10n ** 18n,
             } as Depth
           },
         ),
@@ -92,10 +91,9 @@ export const dummyMarkets: Market[] = [
           const rawAmount = 10000n * 10n ** 12n
           return {
             bookId: '0x000000000000000000000000000000000000000b',
+            unit: 1n
             tick,
-            price: parsePrice(price, 18, 6),
             rawAmount,
-            baseAmount: 10n ** 18n,
           } as Depth
         }),
       }),

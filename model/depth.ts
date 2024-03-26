@@ -1,14 +1,13 @@
 export type Depth = {
   // TODO: use bigint for bookId
   bookId: string
+  unit: bigint
   tick: bigint
-  price: bigint
   rawAmount: bigint
-  baseAmount: bigint
 }
 
 export type MarketDepth = {
   tick: bigint
-  price: bigint
+  price: number
   baseAmount: bigint
 }

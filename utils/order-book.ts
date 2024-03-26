@@ -8,7 +8,6 @@ import { Balances } from '../model/balances'
 import { Market } from '../model/market'
 
 import { toPlacesString } from './bignumber'
-import { formatPrice } from './prices'
 import { formatUnits } from './bigint'
 
 export function calculateOutputCurrencyAmountString(
@@ -59,11 +58,7 @@ export function parseDepth(
       )
       .map((x) => {
         return {
-          price: formatPrice(
-            x.price,
-            market.quote.decimals,
-            market.base.decimals,
-          ),
+          price: x.price,
           size: new BigNumber(formatUnits(x.baseAmount, market.base.decimals)),
         }
       })

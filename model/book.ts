@@ -68,7 +68,7 @@ export class Book {
     }
 
     const ticks = this.depths
-      .sort((a, b) => Number(b.price) - Number(a.price))
+      .sort((a, b) => Number(b.tick) - Number(a.tick))
       .map((depth) => depth.tick)
     let index = 0
     let tick = ticks[index]
@@ -135,7 +135,7 @@ export class Book {
     }
 
     const ticks = this.depths
-      .sort((a, b) => Number(b.price) - Number(a.price))
+      .sort((a, b) => Number(b.tick) - Number(a.tick))
       .map((depth) => depth.tick)
     let index = 0
     let tick = ticks[index]
