@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { isAddressEqual, parseUnits, zeroAddress } from 'viem'
 import BigNumber from 'bignumber.js'
+import { useWalletClient } from 'wagmi'
 
 import LimitSettingForm from '../components/form/limit-setting-form'
 import { LimitForm } from '../components/form/limit-form'
@@ -30,6 +31,7 @@ export const LimitContainer = () => {
   const { selectedMarket } = useMarketContext()
   const { openOrders } = useOpenOrderContext()
   const { make, cancels } = useLimitContractContext()
+  const { data: walletClient } = useWalletClient()
   const {
     isBid,
     setIsBid,
@@ -317,14 +319,30 @@ export const LimitContainer = () => {
                 setOutputCurrency(_inputCurrency)
               }}
               actionButtonProps={{
-                disabled: !inputCurrency || !outputCurrency || !amount,
+                disabled:
+                  (!walletClient ||
+                    !inputCurrency ||
+                    !outputCurrency ||
+                    amount === 0n ||
+                    amount > balances[inputCurrency.address]) ??
+                  0n,
                 onClick: async () => {
                   if (!inputCurrency || !outputCurrency) {
                     return
                   }
                   await make(inputCurrency, outputCurrency, amount, price)
                 },
-                text: `Limit ${isBid ? 'Bid' : 'Ask'}`,
+                text: !walletClient
+                  ? 'Connect wallet'
+                  : !inputCurrency
+                    ? 'Select input currency'
+                    : !outputCurrency
+                      ? 'Select output currency'
+                      : amount === 0n
+                        ? 'Enter amount'
+                        : amount > balances[inputCurrency.address]
+                          ? 'Insufficient balance'
+                          : `Limit ${isBid ? 'Bid' : 'Ask'}`,
               }}
             />
           )}

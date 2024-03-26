@@ -20,12 +20,12 @@ export const OpenOrderCard = ({
 }) => {
   const filledRatio =
     (Number(openOrder.baseFilledAmount) / Number(openOrder.baseAmount)) * 100
-  const quoteCurrencyDecimals = openOrder.isBid
-    ? openOrder.inputToken.decimals
-    : openOrder.outputToken.decimals
-  const baseCurrencyDecimals = openOrder.isBid
-    ? openOrder.outputToken.decimals
-    : openOrder.inputToken.decimals
+  const quoteCurrency = openOrder.isBid
+    ? openOrder.inputToken
+    : openOrder.outputToken
+  const baseCurrency = openOrder.isBid
+    ? openOrder.outputToken
+    : openOrder.inputToken
   return (
     <div
       className="flex flex-col shadow border border-solid border-gray-800 lg:w-[310px] gap-4 bg-gray-900 rounded-2xl p-4"
@@ -57,8 +57,8 @@ export const OpenOrderCard = ({
                   openOrder.isBid
                     ? openOrder.price
                     : invertPrice(openOrder.price),
-                  quoteCurrencyDecimals,
-                  baseCurrencyDecimals,
+                  quoteCurrency.decimals,
+                  baseCurrency.decimals,
                 ),
               )}
             </p>
@@ -67,8 +67,9 @@ export const OpenOrderCard = ({
             <label className="text-gray-200">Open amount</label>
             <p className="text-white">
               {toPlacesString(
-                formatUnits(openOrder.baseAmount, baseCurrencyDecimals),
-              )}
+                formatUnits(openOrder.baseAmount, baseCurrency.decimals),
+              )}{' '}
+              {baseCurrency.symbol}
             </p>
           </div>
           <div className="flex flex-row align-baseline justify-between">
@@ -78,7 +79,10 @@ export const OpenOrderCard = ({
               <p className="text-gray-400">
                 (
                 {toPlacesString(
-                  formatUnits(openOrder.baseFilledAmount, baseCurrencyDecimals),
+                  formatUnits(
+                    openOrder.baseFilledAmount,
+                    baseCurrency.decimals,
+                  ),
                 )}
                 )
               </p>
@@ -100,7 +104,8 @@ export const OpenOrderCard = ({
                   openOrder.claimableAmount,
                   openOrder.outputToken.decimals,
                 ),
-              )}
+              )}{' '}
+              {openOrder.outputToken.symbol}
             </p>
           </div>
         </div>
