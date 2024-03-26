@@ -1,5 +1,6 @@
 import { createPublicClient, http, zeroAddress, zeroHash } from 'viem'
 import { arbitrumSepolia } from 'viem/chains'
+import dotenv from 'dotenv'
 
 import { BOOK_VIEWER_ABI } from '../abis/core/book-viewer'
 import { toId } from '../utils/book-id'
@@ -8,6 +9,8 @@ import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
 import { MAX_TICK, quoteToBase, toPrice } from '../utils/tick'
 import { Book } from '../model/book'
 import { Depth } from '../model/depth'
+
+dotenv.config()
 
 const BLOCK_NUMBER = 25020165n
 const BOOK_VIEWER_CONTRACT_ADDRESS =
