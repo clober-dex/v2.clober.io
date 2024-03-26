@@ -6,6 +6,7 @@ import { formatUnits } from '../../utils/bigint'
 import { ActionButton, ActionButtonProps } from '../button/action-button'
 import { toPlacesString } from '../../utils/bignumber'
 import { formatPrice } from '../../utils/prices'
+import { invertPrice } from '../../utils/tick'
 
 export const OpenOrderCard = ({
   openOrder,
@@ -19,6 +20,9 @@ export const OpenOrderCard = ({
 }) => {
   const filledRatio =
     (Number(openOrder.baseFilledAmount) / Number(openOrder.baseAmount)) * 100
+  const quoteCurrencyDecimals = openOrder.isBid
+    ? openOrder.inputToken.decimals
+    : openOrder.outputToken.decimals
   const baseCurrencyDecimals = openOrder.isBid
     ? openOrder.outputToken.decimals
     : openOrder.inputToken.decimals
@@ -50,9 +54,11 @@ export const OpenOrderCard = ({
             <p className="text-white">
               {toPlacesString(
                 formatPrice(
-                  openOrder.price,
-                  openOrder.inputToken.decimals,
-                  openOrder.outputToken.decimals,
+                  openOrder.isBid
+                    ? openOrder.price
+                    : invertPrice(openOrder.price),
+                  quoteCurrencyDecimals,
+                  baseCurrencyDecimals,
                 ),
               )}
             </p>

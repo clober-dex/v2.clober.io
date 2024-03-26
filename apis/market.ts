@@ -8,10 +8,9 @@ import { FeePolicy } from '../model/fee-policy'
 import { Book } from '../model/book'
 import { Depth, MergedDepth } from '../model/depth'
 import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
-import { quoteToBase } from '../utils/tick'
+import { invertPrice, quoteToBase } from '../utils/tick'
 import { getMarketId } from '../utils/market'
-import { formatInvertedPrice, formatPrice } from '../utils/prices'
-
+import { formatPrice } from '../utils/prices'
 import { fetchCurrency } from '../utils/currency'
 
 const { getBooks } = getBuiltGraphSDK()
@@ -41,24 +40,29 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
       isAddressEqual(c.address, getAddress(book.quote.id)),
     )!
     const unit = BigInt(book.unit)
-    const { marketId, quote, base } = getMarketId(chainId, [
+    const { quote, base } = getMarketId(chainId, [
       baseToken.address,
       quoteToken.address,
     ])
-    const latestPrice = isAddressEqual(baseToken.address, base)
-      ? formatPrice(book.latestPrice, quoteToken.decimals, baseToken.decimals)
-      : formatInvertedPrice(
-          book.latestPrice,
-          quoteToken.decimals,
-          baseToken.decimals,
-        )
+    const quoteDecimals = isAddressEqual(quoteToken.address, quote)
+      ? quoteToken.decimals
+      : baseToken.decimals
+    const baseDecimals = isAddressEqual(baseToken.address, base)
+      ? baseToken.decimals
+      : quoteToken.decimals
     return new Market({
       chainId: chainId,
       tokens: [baseToken, quoteToken],
       makerPolicy: FeePolicy.from(BigInt(book.makerPolicy)),
       hooks: getAddress(book.hooks),
       takerPolicy: FeePolicy.from(BigInt(book.takerPolicy)),
-      latestPrice: latestPrice,
+      latestPrice: isAddressEqual(quoteToken.address, quote)
+        ? formatPrice(book.latestPrice, quoteDecimals, baseDecimals)
+        : formatPrice(
+            invertPrice(book.latestPrice),
+            quoteDecimals,
+            baseDecimals,
+          ),
       latestTimestamp: Number(book.latestTimestamp),
       books: [
         new Book({

@@ -85,7 +85,7 @@ export const fromPrice = (price: bigint): bigint => {
 }
 
 export const invertPrice = (price: bigint): bigint => {
-  return (2n << 256n) / price
+  return price ? (1n << 256n) / price : 0n
 }
 
 export const toPrice = (tick: bigint): bigint => {

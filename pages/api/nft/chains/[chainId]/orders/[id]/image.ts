@@ -37,17 +37,18 @@ export default async function handler(
       return
     }
 
-    const isBid = true
-    const orderIndex = openOrder.orderIndex
-    const baseToken = openOrder.outputToken
-    const quoteToken = openOrder.inputToken
+    const baseToken = openOrder.isBid
+      ? openOrder.outputToken
+      : openOrder.inputToken
+    const quoteToken = openOrder.isBid
+      ? openOrder.inputToken
+      : openOrder.outputToken
 
     const price = formatPrice(
       toPrice(openOrder.tick),
-      openOrder.inputToken.decimals,
-      openOrder.outputToken.decimals,
+      quoteToken.decimals,
+      baseToken.decimals,
     )
-    const bookId = String(openOrder.bookId)
     const basePrecision = new BigNumber(10).pow(baseToken.decimals)
 
     const totalBaseAmount = BigNumber(openOrder.baseAmount.toString()).div(
@@ -55,17 +56,9 @@ export default async function handler(
     )
 
     const svg = orderSvg
-      .replace(/IS_BID_TEXT/g, isBid ? 'Buy' : 'Sell')
-      .replace(/POSITION/g, isBid ? 'buy' : 'sell')
+      .replace(/IS_BID_TEXT/g, openOrder.isBid ? 'Buy' : 'Sell')
+      .replace(/POSITION/g, openOrder.isBid ? 'buy' : 'sell')
       .replace(/TOKEN_PAIR_TEXT/g, `${baseToken.symbol}/${quoteToken.symbol}`)
-      .replace(
-        /MARKET_ADDRESS_TEXT/g,
-        `${bookId.slice(0, 6)}...${bookId.slice(
-          bookId.length - 5,
-          bookId.length,
-        )}`,
-      )
-      .replace(/ORDER_INDEX_TEXT/g, `${orderIndex}`)
       .replace(/QUOTE_PRICE_TEXT/g, `${price.toFixed(2)} ${quoteToken.symbol}`)
       .replace(
         /BASE_AMOUNT_TEXT/g,

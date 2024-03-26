@@ -10,6 +10,7 @@ import { Market } from '../model/market'
 import { toPlacesString } from './bignumber'
 import { formatPrice } from './prices'
 import { formatUnits } from './bigint'
+import { invertPrice } from './tick'
 
 export function calculateOutputCurrencyAmountString(
   isBid: boolean,
@@ -56,9 +57,11 @@ export function parseDepth(
       )
       .map((x) => {
         return {
-          price: isBid
-            ? formatPrice(x.price, market.quote.decimals, market.base.decimals)
-            : formatPrice(x.price, market.base.decimals, market.quote.decimals),
+          price: formatPrice(
+            isBid ? x.price : invertPrice(x.price),
+            market.quote.decimals,
+            market.base.decimals,
+          ),
           size: new BigNumber(formatUnits(x.baseAmount, market.base.decimals)),
         }
       })

@@ -2,15 +2,11 @@ import BigNumber from 'bignumber.js'
 
 import { getDecimalPlaces } from './bignumber'
 
-export const getPriceDecimals = (
-  price: bigint,
-  quoteDecimals: number,
-  baseDecimals: number,
-  r: number = 1.001,
-) => {
-  const priceNumber = new BigNumber(
-    formatPrice(price, quoteDecimals, baseDecimals),
-  )
+export const MAX_PRICE =
+  19961636804996334433808922353085948875386438476189866322430503n
+
+export const getPriceDecimals = (price: number, r: number = 1.001) => {
+  const priceNumber = new BigNumber(price)
   return getDecimalPlaces(
     new BigNumber(r).multipliedBy(priceNumber).minus(priceNumber),
     1,
@@ -24,16 +20,6 @@ export const formatPrice = (
 ): number => {
   return (
     (Number(price) / Math.pow(2, 128)) * 10 ** (baseDecimals - quoteDecimals)
-  )
-}
-
-export const formatInvertedPrice = (
-  price: bigint,
-  quoteDecimals: number,
-  baseDecimals: number,
-): number => {
-  return (
-    (Math.pow(2, 128) / Number(price)) * 10 ** (quoteDecimals - baseDecimals)
   )
 }
 
