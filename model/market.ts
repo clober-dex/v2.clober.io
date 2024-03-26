@@ -5,6 +5,7 @@ import { CHAIN_IDS } from '../constants/chain'
 import {
   baseToQuote,
   divide,
+  fromPrice,
   invertPrice,
   quoteToBase,
   toPrice,
@@ -12,7 +13,7 @@ import {
 
 import { Book } from './book'
 import { Currency } from './currency'
-import { Depth, MergedDepth } from './depth'
+import { Depth, MarketDepth } from './depth'
 import { FeePolicy } from './fee-policy'
 
 export class Market {
@@ -24,8 +25,8 @@ export class Market {
   takerPolicy: FeePolicy
   latestPrice: number
   latestTimestamp: number
-  bids: MergedDepth[]
-  asks: MergedDepth[]
+  bids: MarketDepth[]
+  asks: MarketDepth[]
   books: Book[]
 
   constructor({
@@ -67,22 +68,22 @@ export class Market {
           ({
             tick: depth.tick,
             price: depth.price,
-            rawAmount: depth.rawAmount,
             baseAmount: depth.baseAmount,
-          }) as MergedDepth,
+          }) as MarketDepth,
       )
     this.asks = books
       .filter((book) => isAddressEqual(book.quote.address, this.base.address))
       .flatMap((book) => book.depths)
-      .map(
-        (depth) =>
-          ({
-            tick: depth.tick,
-            price: depth.price,
-            rawAmount: depth.rawAmount,
-            baseAmount: depth.baseAmount,
-          }) as MergedDepth,
-      )
+      .map((depth) => {
+        const price = invertPrice(depth.price)
+        const tick = fromPrice(price)
+        const baseAmount = baseToQuote(depth.tick, depth.baseAmount, false)
+        return {
+          tick,
+          price,
+          baseAmount,
+        } as MarketDepth
+      })
     this.books = books
   }
 
