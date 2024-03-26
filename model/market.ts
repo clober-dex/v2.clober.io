@@ -13,7 +13,7 @@ import {
 
 import { Book } from './book'
 import { Currency } from './currency'
-import { Depth, MergedDepth } from './depth'
+import { Depth, MarketDepth } from './depth'
 import { FeePolicy } from './fee-policy'
 
 export class Market {
@@ -25,8 +25,8 @@ export class Market {
   takerPolicy: FeePolicy
   latestPrice: number
   latestTimestamp: number
-  bids: MergedDepth[]
-  asks: MergedDepth[]
+  bids: MarketDepth[]
+  asks: MarketDepth[]
   books: Book[]
 
   constructor({
@@ -69,7 +69,7 @@ export class Market {
             tick: depth.tick,
             price: depth.price,
             baseAmount: depth.baseAmount,
-          }) as MergedDepth,
+          }) as MarketDepth,
       )
     this.asks = books
       .filter((book) => isAddressEqual(book.quote.address, this.base.address))
@@ -82,7 +82,7 @@ export class Market {
           tick,
           price,
           baseAmount,
-        } as MergedDepth
+        } as MarketDepth
       })
     this.books = books
   }
