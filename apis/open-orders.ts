@@ -6,6 +6,7 @@ import { SUBGRAPH_URL } from '../constants/subgraph-url'
 import { OpenOrder } from '../model/open-order'
 import { Chain } from '../model/chain'
 import { getMarketId } from '../utils/market'
+import { quoteToBase } from '../utils/tick'
 import { fetchCurrency } from '../utils/currency'
 
 const { getOpenOrders, getOpenOrder } = getBuiltGraphSDK()
@@ -47,23 +48,32 @@ export async function fetchOpenOrders(
       inputToken.address,
       outputToken.address,
     ])
+    const isBid = isAddressEqual(quote, inputToken.address)
+    const tick = BigInt(openOrder.tick)
+    const rawAmount = BigInt(openOrder.rawAmount)
+    const rawFilledAmount = BigInt(openOrder.rawFilledAmount)
+    const unit = BigInt(openOrder.book.unit)
+    const quoteAmount = unit * rawAmount
+    const rawClaimableAmount = BigInt(openOrder.rawClaimableAmount)
     return {
       id: BigInt(openOrder.id),
-      isBid: isAddressEqual(quote, inputToken.address),
+      isBid,
       bookId: BigInt(openOrder.book.id),
       inputToken,
       outputToken,
-      tick: BigInt(openOrder.tick),
+      tick,
       orderIndex: BigInt(openOrder.orderIndex),
       txHash: openOrder.txHash as `0x${string}`,
       txUrl: chain.blockExplorers
         ? `${chain.blockExplorers.default.url}/tx/${openOrder.txHash}`
         : '',
       price: BigInt(openOrder.price),
-      baseFilledAmount: BigInt(openOrder.baseFilledAmount),
-      quoteAmount: BigInt(openOrder.quoteAmount),
-      baseAmount: BigInt(openOrder.baseAmount),
-      claimableAmount: BigInt(openOrder.baseClaimableAmount),
+      quoteAmount,
+      baseAmount: isBid ? quoteToBase(tick, quoteAmount, false) : quoteAmount,
+      baseFilledAmount: isBid
+        ? quoteToBase(tick, unit * rawFilledAmount, false)
+        : unit * rawFilledAmount,
+      claimableAmount: quoteToBase(tick, unit * rawClaimableAmount, false),
     }
   })
 }
@@ -96,22 +106,31 @@ export async function fetchOpenOrder(
     inputToken.address,
     outputToken.address,
   ])
+  const isBid = isAddressEqual(quote, inputToken.address)
+  const tick = BigInt(openOrder.tick)
+  const rawAmount = BigInt(openOrder.rawAmount)
+  const rawFilledAmount = BigInt(openOrder.rawFilledAmount)
+  const unit = BigInt(openOrder.book.unit)
+  const quoteAmount = unit * rawAmount
+  const rawClaimableAmount = BigInt(openOrder.rawClaimableAmount)
   return {
     id: BigInt(openOrder.id),
-    isBid: isAddressEqual(quote, inputToken.address),
+    isBid,
     bookId: BigInt(openOrder.book.id),
     inputToken,
     outputToken,
-    tick: BigInt(openOrder.tick),
+    tick,
     orderIndex: BigInt(openOrder.orderIndex),
     txHash: openOrder.txHash as `0x${string}`,
     txUrl: chain.blockExplorers
       ? `${chain.blockExplorers.default.url}/tx/${openOrder.txHash}`
       : '',
     price: BigInt(openOrder.price),
-    baseFilledAmount: BigInt(openOrder.baseFilledAmount),
-    quoteAmount: BigInt(openOrder.quoteAmount),
-    baseAmount: BigInt(openOrder.baseAmount),
-    claimableAmount: BigInt(openOrder.baseClaimableAmount),
+    quoteAmount,
+    baseAmount: isBid ? quoteToBase(tick, quoteAmount, false) : quoteAmount,
+    baseFilledAmount: isBid
+      ? quoteToBase(tick, unit * rawFilledAmount, false)
+      : unit * rawFilledAmount,
+    claimableAmount: quoteToBase(tick, unit * rawClaimableAmount, false),
   }
 }

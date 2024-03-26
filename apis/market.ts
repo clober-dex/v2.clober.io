@@ -33,30 +33,30 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
       .map((address) => fetchCurrency(chainId, address)),
   )
   const markets = books.map((book) => {
-    const baseToken = currencies.find((c) =>
+    const outputToken = currencies.find((c) =>
       isAddressEqual(c.address, getAddress(book.base.id)),
     )!
-    const quoteToken = currencies.find((c) =>
+    const inputToken = currencies.find((c) =>
       isAddressEqual(c.address, getAddress(book.quote.id)),
     )!
     const unit = BigInt(book.unit)
     const { quote, base } = getMarketId(chainId, [
-      baseToken.address,
-      quoteToken.address,
+      outputToken.address,
+      inputToken.address,
     ])
-    const quoteDecimals = isAddressEqual(quoteToken.address, quote)
-      ? quoteToken.decimals
-      : baseToken.decimals
-    const baseDecimals = isAddressEqual(baseToken.address, base)
-      ? baseToken.decimals
-      : quoteToken.decimals
+    const quoteDecimals = isAddressEqual(inputToken.address, quote)
+      ? inputToken.decimals
+      : outputToken.decimals
+    const baseDecimals = isAddressEqual(outputToken.address, base)
+      ? outputToken.decimals
+      : inputToken.decimals
     return new Market({
       chainId: chainId,
-      tokens: [baseToken, quoteToken],
+      tokens: [outputToken, inputToken],
       makerPolicy: FeePolicy.from(BigInt(book.makerPolicy)),
       hooks: getAddress(book.hooks),
       takerPolicy: FeePolicy.from(BigInt(book.takerPolicy)),
-      latestPrice: isAddressEqual(quoteToken.address, quote)
+      latestPrice: isAddressEqual(inputToken.address, quote)
         ? formatPrice(book.latestPrice, quoteDecimals, baseDecimals)
         : formatPrice(
             invertPrice(book.latestPrice),
@@ -67,8 +67,8 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
       books: [
         new Book({
           id: BigInt(book.id),
-          base: baseToken,
-          quote: quoteToken,
+          quote: inputToken,
+          base: outputToken,
           unit,
           makerPolicy: FeePolicy.from(BigInt(book.makerPolicy)),
           hooks: getAddress(book.hooks),
@@ -80,10 +80,10 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
             const quoteAmount = unit * rawAmount
             const tick = BigInt(depth.tick)
             const { quote } = getMarketId(chainId, [
-              baseToken.address,
-              quoteToken.address,
+              inputToken.address,
+              outputToken.address,
             ])
-            const isBid = isAddressEqual(quoteToken.address, quote)
+            const isBid = isAddressEqual(inputToken.address, quote)
             return {
               bookId: String(book.id),
               tick,
