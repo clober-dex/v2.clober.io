@@ -6,7 +6,7 @@ import { SUBGRAPH_URL } from '../constants/subgraph-url'
 import { getBuiltGraphSDK } from '../.graphclient'
 import { FeePolicy } from '../model/fee-policy'
 import { Book } from '../model/book'
-import { Depth, MergedDepth } from '../model/depth'
+import { Depth, MarketDepth } from '../model/depth'
 import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
 import { invertPrice, quoteToBase } from '../utils/tick'
 import { getMarketId } from '../utils/market'
@@ -79,19 +79,12 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
             const rawAmount = BigInt(depth.rawAmount)
             const quoteAmount = unit * rawAmount
             const tick = BigInt(depth.tick)
-            const { quote } = getMarketId(chainId, [
-              inputToken.address,
-              outputToken.address,
-            ])
-            const isBid = isAddressEqual(inputToken.address, quote)
             return {
               bookId: String(book.id),
               tick,
               price: BigInt(depth.price),
               rawAmount,
-              baseAmount: isBid
-                ? quoteToBase(tick, quoteAmount, false)
-                : quoteAmount,
+              baseAmount: quoteToBase(tick, quoteAmount, false),
             } as Depth
           }),
         }),
@@ -132,12 +125,11 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
   return mergedMarkets
 }
 
-function mergeDepths(depths: MergedDepth[], isBid: boolean): MergedDepth[] {
-  const mergedDepths: MergedDepth[] = []
+function mergeDepths(depths: MarketDepth[], isBid: boolean): MarketDepth[] {
+  const mergedDepths: MarketDepth[] = []
   for (const depth of depths) {
     const existingDepth = mergedDepths.find((d) => d.tick === depth.tick)
     if (existingDepth) {
-      existingDepth.rawAmount += depth.rawAmount
       existingDepth.baseAmount += depth.baseAmount
     } else {
       mergedDepths.push(depth)

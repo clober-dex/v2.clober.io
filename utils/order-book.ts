@@ -10,7 +10,6 @@ import { Market } from '../model/market'
 import { toPlacesString } from './bignumber'
 import { formatPrice } from './prices'
 import { formatUnits } from './bigint'
-import { invertPrice } from './tick'
 
 export function calculateOutputCurrencyAmountString(
   isBid: boolean,
@@ -47,7 +46,10 @@ export function parseDepth(
   isBid: boolean,
   market: Market,
   decimalPlaces: Decimals,
-): { price: string; size: string }[] {
+): {
+  price: string
+  size: string
+}[] {
   return Array.from(
     [...(isBid ? market.bids : market.asks).map((depth) => ({ ...depth }))]
       .sort((a, b) =>
@@ -58,33 +60,42 @@ export function parseDepth(
       .map((x) => {
         return {
           price: formatPrice(
-            isBid ? x.price : invertPrice(x.price),
+            x.price,
             market.quote.decimals,
             market.base.decimals,
           ),
           size: new BigNumber(formatUnits(x.baseAmount, market.base.decimals)),
         }
       })
-      .reduce((prev, curr) => {
-        const price = new BigNumber(curr.price)
-        const key = new BigNumber(price).toFixed(
-          decimalPlaces.value,
-          BigNumber.ROUND_FLOOR,
-        )
-        prev.set(
-          key,
-          prev.has(key)
-            ? {
-                price: key,
-                size: curr.size.plus(prev.get(key)?.size || 0),
-              }
-            : {
-                price: key,
-                size: curr.size,
-              },
-        )
-        return prev
-      }, new Map<string, { price: string; size: BigNumber }>())
+      .reduce(
+        (prev, curr) => {
+          const price = new BigNumber(curr.price)
+          const key = new BigNumber(price).toFixed(
+            decimalPlaces.value,
+            BigNumber.ROUND_FLOOR,
+          )
+          prev.set(
+            key,
+            prev.has(key)
+              ? {
+                  price: key,
+                  size: curr.size.plus(prev.get(key)?.size || 0),
+                }
+              : {
+                  price: key,
+                  size: curr.size,
+                },
+          )
+          return prev
+        },
+        new Map<
+          string,
+          {
+            price: string
+            size: BigNumber
+          }
+        >(),
+      )
       .values(),
   ).map((x) => {
     return {
