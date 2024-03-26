@@ -1,6 +1,5 @@
-import hre from 'hardhat'
-import { zeroAddress, zeroHash } from 'viem'
-import { Contract } from '@ethersproject/contracts'
+import { createPublicClient, http, zeroAddress, zeroHash } from 'viem'
+import { arbitrumSepolia } from 'viem/chains'
 
 import { BOOK_VIEWER_ABI } from '../abis/core/book-viewer'
 import { toId } from '../utils/book-id'
@@ -10,50 +9,49 @@ import { MAX_TICK, quoteToBase, toPrice } from '../utils/tick'
 import { Book } from '../model/book'
 import { Depth } from '../model/depth'
 
+const BLOCK_NUMBER = 25020165n
+const BOOK_VIEWER_CONTRACT_ADDRESS =
+  '0x56319f390C3B85Fb8eb18B03b8E14440F3a8c66b'
+const publicClient = createPublicClient({
+  chain: arbitrumSepolia,
+  transport: http(process.env.ARBITRUM_SEPOLIA_RPC_URL),
+})
+
 describe('Take Logic', () => {
-  const setUp = async ({ blockNumber }: { blockNumber: number }) => {
-    await hre.network.provider.request({
-      method: 'hardhat_reset',
-      params: [
-        {
-          forking: {
-            jsonRpcUrl: 'https://arbitrum-sepolia-archive.allthatnode.com',
-            blockNumber,
-          },
-        },
-      ],
-    })
-    hre.network.provider.emit('hardhatNetworkReset')
-
-    const [admin] = await (hre as any).ethers.getSigners()
-
-    return {
-      admin,
-      BookViewer: await (hre as any).ethers.getContractAt(
-        BOOK_VIEWER_ABI as any,
-        '0x56319f390C3B85Fb8eb18B03b8E14440F3a8c66b',
-        admin,
-      ),
-    }
-  }
-
   const checkTakeLogic = async ({
-    BookViewer,
+    blockNumber,
     key,
     quoteAmount,
   }: {
-    BookViewer: Contract
+    blockNumber: bigint
     key: BookKey
     quoteAmount: bigint
   }) => {
-    const actual = await BookViewer.getExpectedInput({
-      id: toId(key),
-      limitPrice: MAX_TICK,
-      quoteAmount,
-      hookData: zeroHash,
+    const [takenQuoteAmount, spendBaseAmount] = await publicClient.readContract(
+      {
+        address: BOOK_VIEWER_CONTRACT_ADDRESS,
+        abi: BOOK_VIEWER_ABI,
+        functionName: 'getExpectedInput',
+        args: [
+          {
+            id: toId(key),
+            limitPrice: MAX_TICK,
+            quoteAmount,
+            hookData: zeroHash,
+          },
+        ],
+        blockNumber,
+      },
+    )
+    const liquidities = await publicClient.readContract({
+      address: BOOK_VIEWER_CONTRACT_ADDRESS,
+      abi: BOOK_VIEWER_ABI,
+      functionName: 'getLiquidity',
+      args: [toId(key), Number(MAX_TICK), 10n],
+      blockNumber,
     })
-    const liquidities = await BookViewer.getLiquidity(toId(key), MAX_TICK, 10n)
     const mockBook = new Book({
+      id: 0n,
       base: { address: key.base, name: 'mock', symbol: 'mock', decimals: 18 },
       quote: { address: key.quote, name: 'mock', symbol: 'mock', decimals: 18 },
       unit: key.unit,
@@ -81,18 +79,17 @@ describe('Take Logic', () => {
     })
     const expected = mockBook.take({
       limitPrice: MAX_TICK,
-      amountIn: quoteAmount,
+      amountOut: quoteAmount,
     })
-    expect(actual.takenQuoteAmount.toString()).toEqual(
+    expect(takenQuoteAmount.toString()).toEqual(
       expected.takenQuoteAmount.toString(),
     )
-    expect(actual.spendBaseAmount.toString()).toEqual(
+    expect(spendBaseAmount.toString()).toEqual(
       expected.spendBaseAmount.toString(),
     )
   }
 
   it('take bid side', async () => {
-    const { BookViewer } = await setUp({ blockNumber: 25020165 })
     const key: BookKey = {
       base: zeroAddress,
       unit: 1n,
@@ -103,34 +100,33 @@ describe('Take Logic', () => {
     }
 
     await checkTakeLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       quoteAmount: 10000n * 10n ** 6n,
     })
     await checkTakeLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       quoteAmount: 10000000n * 10n ** 6n,
     })
     await checkTakeLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       quoteAmount: 0n * 10n ** 6n,
     })
     await checkTakeLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       quoteAmount: 1n * 10n ** 6n,
     })
     await checkTakeLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       quoteAmount: 1000000000000n * 10n ** 6n,
     })
   }, 100000)
 
   it('take ask side', async () => {
-    const { BookViewer } = await setUp({ blockNumber: 25036851 })
     const key: BookKey = {
       quote: zeroAddress,
       unit: 10n ** 12n,
@@ -141,27 +137,27 @@ describe('Take Logic', () => {
     }
 
     await checkTakeLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       quoteAmount: 10000n * 10n ** 6n,
     })
     await checkTakeLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       quoteAmount: 10000000n * 10n ** 6n,
     })
     await checkTakeLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       quoteAmount: 0n * 10n ** 6n,
     })
     await checkTakeLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       quoteAmount: 1n * 10n ** 6n,
     })
     await checkTakeLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       quoteAmount: 1000000000000n * 10n ** 6n,
     })

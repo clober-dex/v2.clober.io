@@ -6,10 +6,12 @@ import { SUBGRAPH_URL } from '../constants/subgraph-url'
 import { getBuiltGraphSDK } from '../.graphclient'
 import { FeePolicy } from '../model/fee-policy'
 import { Book } from '../model/book'
-import { Depth } from '../model/depth'
+import { Depth, MergedDepth } from '../model/depth'
 import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
 import { quoteToBase } from '../utils/tick'
 import { getMarketId } from '../utils/market'
+import { formatInvertedPrice, formatPrice } from '../utils/prices'
+
 import { fetchCurrency } from '../utils/currency'
 
 const { getBooks } = getBuiltGraphSDK()
@@ -39,17 +41,28 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
       isAddressEqual(c.address, getAddress(book.quote.id)),
     )!
     const unit = BigInt(book.unit)
+    const { marketId, quote, base } = getMarketId(chainId, [
+      baseToken.address,
+      quoteToken.address,
+    ])
+    const latestPrice = isAddressEqual(baseToken.address, base)
+      ? formatPrice(book.latestPrice, quoteToken.decimals, baseToken.decimals)
+      : formatInvertedPrice(
+          book.latestPrice,
+          quoteToken.decimals,
+          baseToken.decimals,
+        )
     return new Market({
       chainId: chainId,
       tokens: [baseToken, quoteToken],
       makerPolicy: FeePolicy.from(BigInt(book.makerPolicy)),
       hooks: getAddress(book.hooks),
       takerPolicy: FeePolicy.from(BigInt(book.takerPolicy)),
-      latestTick: BigInt(book.latestTick),
-      latestPrice: BigInt(book.latestPrice),
+      latestPrice: latestPrice,
       latestTimestamp: Number(book.latestTimestamp),
       books: [
         new Book({
+          id: BigInt(book.id),
           base: baseToken,
           quote: quoteToken,
           unit,
@@ -96,7 +109,6 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
     })
     if (existingMarket) {
       if (existingMarket.latestTimestamp < market.latestTimestamp) {
-        existingMarket.latestTick = market.latestTick
         existingMarket.latestPrice = market.latestPrice
         existingMarket.latestTimestamp = market.latestTimestamp
       }
@@ -116,8 +128,8 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
   return mergedMarkets
 }
 
-function mergeDepths(depths: Depth[], isBid: boolean): Depth[] {
-  const mergedDepths: Depth[] = []
+function mergeDepths(depths: MergedDepth[], isBid: boolean): MergedDepth[] {
+  const mergedDepths: MergedDepth[] = []
   for (const depth of depths) {
     const existingDepth = mergedDepths.find((d) => d.tick === depth.tick)
     if (existingDepth) {

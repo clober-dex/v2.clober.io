@@ -1,6 +1,5 @@
-import hre from 'hardhat'
-import { zeroAddress, zeroHash } from 'viem'
-import { Contract } from '@ethersproject/contracts'
+import { createPublicClient, http, zeroAddress, zeroHash } from 'viem'
+import { arbitrumSepolia } from 'viem/chains'
 
 import { BOOK_VIEWER_ABI } from '../abis/core/book-viewer'
 import { toId } from '../utils/book-id'
@@ -10,50 +9,49 @@ import { MAX_TICK, quoteToBase, toPrice } from '../utils/tick'
 import { Book } from '../model/book'
 import { Depth } from '../model/depth'
 
+const BLOCK_NUMBER = 25020165n
+const BOOK_VIEWER_CONTRACT_ADDRESS =
+  '0x56319f390C3B85Fb8eb18B03b8E14440F3a8c66b'
+const publicClient = createPublicClient({
+  chain: arbitrumSepolia,
+  transport: http(process.env.ARBITRUM_SEPOLIA_RPC_URL),
+})
+
 describe('Spend Logic', () => {
-  const setUp = async ({ blockNumber }: { blockNumber: number }) => {
-    await hre.network.provider.request({
-      method: 'hardhat_reset',
-      params: [
-        {
-          forking: {
-            jsonRpcUrl: 'https://arbitrum-sepolia-archive.allthatnode.com',
-            blockNumber,
-          },
-        },
-      ],
-    })
-    hre.network.provider.emit('hardhatNetworkReset')
-
-    const [admin] = await (hre as any).ethers.getSigners()
-
-    return {
-      admin,
-      BookViewer: await (hre as any).ethers.getContractAt(
-        BOOK_VIEWER_ABI as any,
-        '0x56319f390C3B85Fb8eb18B03b8E14440F3a8c66b',
-        admin,
-      ),
-    }
-  }
-
   const checkSpendLogic = async ({
-    BookViewer,
+    blockNumber,
     key,
     baseAmount,
   }: {
-    BookViewer: Contract
+    blockNumber: bigint
     key: BookKey
     baseAmount: bigint
   }) => {
-    const actual = await BookViewer.getExpectedOutput({
-      id: toId(key),
-      limitPrice: MAX_TICK,
-      baseAmount,
-      hookData: zeroHash,
+    const [takenQuoteAmount, spendBaseAmount] = await publicClient.readContract(
+      {
+        address: BOOK_VIEWER_CONTRACT_ADDRESS,
+        abi: BOOK_VIEWER_ABI,
+        functionName: 'getExpectedOutput',
+        args: [
+          {
+            id: toId(key),
+            limitPrice: MAX_TICK,
+            baseAmount,
+            hookData: zeroHash,
+          },
+        ],
+        blockNumber,
+      },
+    )
+    const liquidities = await publicClient.readContract({
+      address: BOOK_VIEWER_CONTRACT_ADDRESS,
+      abi: BOOK_VIEWER_ABI,
+      functionName: 'getLiquidity',
+      args: [toId(key), Number(MAX_TICK), 10n],
+      blockNumber,
     })
-    const liquidities = await BookViewer.getLiquidity(toId(key), MAX_TICK, 10n)
     const mockBook = new Book({
+      id: 0n,
       base: { address: key.base, name: 'mock', symbol: 'mock', decimals: 18 },
       quote: { address: key.quote, name: 'mock', symbol: 'mock', decimals: 18 },
       unit: key.unit,
@@ -83,16 +81,15 @@ describe('Spend Logic', () => {
       limitPrice: MAX_TICK,
       amountIn: baseAmount,
     })
-    expect(actual.takenQuoteAmount.toString()).toEqual(
+    expect(takenQuoteAmount.toString()).toEqual(
       expected.takenQuoteAmount.toString(),
     )
-    expect(actual.spendBaseAmount.toString()).toEqual(
+    expect(spendBaseAmount.toString()).toEqual(
       expected.spendBaseAmount.toString(),
     )
   }
 
   it('spend bid side', async () => {
-    const { BookViewer } = await setUp({ blockNumber: 25020165 })
     const key: BookKey = {
       base: zeroAddress,
       unit: 1n,
@@ -103,39 +100,38 @@ describe('Spend Logic', () => {
     }
 
     await checkSpendLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       baseAmount: 1n * 10n ** 18n,
     })
     await checkSpendLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       baseAmount: 10n * 10n ** 18n,
     })
     await checkSpendLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       baseAmount: 0n * 10n ** 18n,
     })
     await checkSpendLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       baseAmount: 1n * 10n ** 18n,
     })
     await checkSpendLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       baseAmount: 5n * 10n ** 17n,
     })
     await checkSpendLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       baseAmount: 1234n * 10n ** 14n,
     })
   }, 100000)
 
   it('spend ask side', async () => {
-    const { BookViewer } = await setUp({ blockNumber: 25036851 })
     const key: BookKey = {
       quote: zeroAddress,
       unit: 10n ** 12n,
@@ -146,32 +142,32 @@ describe('Spend Logic', () => {
     }
 
     await checkSpendLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       baseAmount: 1n * 10n ** 18n,
     })
     await checkSpendLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       baseAmount: 10n * 10n ** 18n,
     })
     await checkSpendLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       baseAmount: 0n * 10n ** 18n,
     })
     await checkSpendLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       baseAmount: 1n * 10n ** 18n,
     })
     await checkSpendLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       baseAmount: 5n * 10n ** 17n,
     })
     await checkSpendLogic({
-      BookViewer,
+      blockNumber: BLOCK_NUMBER,
       key,
       baseAmount: 1234n * 10n ** 14n,
     })
