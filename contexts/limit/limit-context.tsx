@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import BigNumber from 'bignumber.js'
-import { getAddress, isAddressEqual } from 'viem'
+import { getAddress, isAddressEqual, zeroAddress } from 'viem'
+import { useAccount, useBalance, useQuery } from 'wagmi'
+import { readContracts } from '@wagmi/core'
 
 import { Currency } from '../../model/currency'
 import { formatUnits, min } from '../../utils/bigint'
@@ -10,12 +12,18 @@ import { parseDepth } from '../../utils/order-book'
 import { useChainContext } from '../chain-context'
 import { Chain } from '../../model/chain'
 import { getMarketId } from '../../utils/market'
-import { WHITELISTED_TOKENS } from '../../constants/currency'
+import { Balances } from '../../model/balances'
+import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
+import { WHITELISTED_CURRENCIES } from '../../constants/currency'
+import { fetchCurrency } from '../../utils/currency'
 import { invertPrice } from '../../utils/tick'
 
 import { useMarketContext } from './market-context'
 
 type LimitContext = {
+  balances: Balances
+  currencies: Currency[]
+  setCurrencies: (currencies: Currency[]) => void
   isBid: boolean
   setIsBid: (isBid: (prevState: boolean) => boolean) => void
   selectMode: 'none' | 'settings'
@@ -46,6 +54,9 @@ type LimitContext = {
 }
 
 const Context = React.createContext<LimitContext>({
+  balances: {},
+  currencies: [],
+  setCurrencies: () => {},
   isBid: true,
   setIsBid: () => {},
   selectMode: 'none',
@@ -82,7 +93,37 @@ const LOCAL_STORAGE_OUTPUT_CURRENCY_KEY = (chain: Chain) =>
 const QUERY_PARAM_INPUT_CURRENCY_KEY = 'inputCurrency'
 const QUERY_PARAM_OUTPUT_CURRENCY_KEY = 'outputCurrency'
 
+const getCurrencyAddress = (chain: Chain) => {
+  const params = new URLSearchParams(window.location.search)
+  const queryParamInputCurrencyAddress = params.get(
+    QUERY_PARAM_INPUT_CURRENCY_KEY,
+  )
+  const queryParamOutputCurrencyAddress = params.get(
+    QUERY_PARAM_OUTPUT_CURRENCY_KEY,
+  )
+  const localStorageInputCurrencyAddress = localStorage.getItem(
+    LOCAL_STORAGE_INPUT_CURRENCY_KEY(chain),
+  )
+  const localStorageOutputCurrencyAddress = localStorage.getItem(
+    LOCAL_STORAGE_OUTPUT_CURRENCY_KEY(chain),
+  )
+  const inputCurrencyAddress =
+    queryParamInputCurrencyAddress ||
+    localStorageInputCurrencyAddress ||
+    undefined
+  const outputCurrencyAddress =
+    queryParamOutputCurrencyAddress ||
+    localStorageOutputCurrencyAddress ||
+    undefined
+  return {
+    inputCurrencyAddress,
+    outputCurrencyAddress,
+  }
+}
+
 export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
+  const { address: userAddress } = useAccount()
+  const { data: balance } = useBalance({ address: userAddress, watch: true })
   const { markets, selectedMarket, setSelectedMarket } = useMarketContext()
   const { selectedChain } = useChainContext()
 
@@ -112,6 +153,101 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     Decimals | undefined
   >(undefined)
   const [priceInput, setPriceInput] = useState('')
+  const { inputCurrencyAddress, outputCurrencyAddress } =
+    getCurrencyAddress(selectedChain)
+  const [mounted, setMounted] = useState(false)
+
+  const { data: _currencies } = useQuery(
+    [
+      'limit-currencies',
+      selectedChain,
+      inputCurrencyAddress,
+      outputCurrencyAddress,
+    ],
+    async () => {
+      const _inputCurrency = inputCurrencyAddress
+        ? await fetchCurrency(
+            selectedChain.id,
+            getAddress(inputCurrencyAddress),
+          )
+        : undefined
+      const _outputCurrency = outputCurrencyAddress
+        ? await fetchCurrency(
+            selectedChain.id,
+            getAddress(outputCurrencyAddress),
+          )
+        : undefined
+      return [...WHITELISTED_CURRENCIES[selectedChain.id]]
+        .concat(
+          _inputCurrency ? [_inputCurrency] : [],
+          _outputCurrency ? [_outputCurrency] : [],
+        )
+        .filter(
+          (currency, index, self) =>
+            self.findIndex((c) =>
+              isAddressEqual(c.address, currency.address),
+            ) === index,
+        )
+    },
+    {
+      initialData: WHITELISTED_CURRENCIES[selectedChain.id],
+    },
+  ) as {
+    data: Currency[]
+  }
+  const [currencies, setCurrencies] = useState<Currency[]>(_currencies ?? [])
+
+  const { data: balances } = useQuery(
+    [
+      'limit-balances',
+      userAddress,
+      balance,
+      markets,
+      selectedChain,
+      currencies,
+    ],
+    async () => {
+      if (!userAddress) {
+        return {}
+      }
+      const uniqueCurrencies = [
+        ...currencies.map((currency) => currency),
+        ...markets.map((market) => market.quote),
+        ...markets.map((market) => market.base),
+      ]
+        .filter(
+          (currency, index, self) =>
+            self.findIndex((c) =>
+              isAddressEqual(c.address, currency.address),
+            ) === index,
+        )
+        .filter((currency) => !isAddressEqual(currency.address, zeroAddress))
+      const results = await readContracts({
+        contracts: uniqueCurrencies.map((currency) => ({
+          address: currency.address,
+          abi: ERC20_PERMIT_ABI,
+          functionName: 'balanceOf',
+          args: [userAddress],
+        })),
+      })
+      return results.reduce(
+        (acc: {}, { result }, index: number) => {
+          const currency = uniqueCurrencies[index]
+          return {
+            ...acc,
+            [getAddress(currency.address)]: result ?? 0n,
+          }
+        },
+        {
+          [zeroAddress]: balance?.value ?? 0n,
+        },
+      )
+    },
+    {
+      refetchInterval: 5 * 1000,
+      refetchIntervalInBackground: true,
+    },
+  ) as { data: Balances }
 
   const availableDecimalPlacesGroups = useMemo(() => {
     const availableDecimalPlacesGroups = selectedMarket
@@ -187,40 +323,34 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const queryParamInputCurrencyAddress = params.get(
-      QUERY_PARAM_INPUT_CURRENCY_KEY,
-    )
-    const queryParamOutputCurrencyAddress = params.get(
-      QUERY_PARAM_OUTPUT_CURRENCY_KEY,
-    )
-    const localStorageInputCurrencyAddress = localStorage.getItem(
-      LOCAL_STORAGE_INPUT_CURRENCY_KEY(selectedChain),
-    )
-    const localStorageOutputCurrencyAddress = localStorage.getItem(
-      LOCAL_STORAGE_OUTPUT_CURRENCY_KEY(selectedChain),
-    )
-    const inputCurrencyAddress =
-      queryParamInputCurrencyAddress ||
-      localStorageInputCurrencyAddress ||
-      undefined
-    const outputCurrencyAddress =
-      queryParamOutputCurrencyAddress ||
-      localStorageOutputCurrencyAddress ||
-      undefined
+    if (!mounted) {
+      const inputCurrency = inputCurrencyAddress
+        ? currencies.find((currency) =>
+            isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
+          )
+        : undefined
+      const outputCurrency = outputCurrencyAddress
+        ? currencies.find((currency) =>
+            isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
+          )
+        : undefined
+      setInputCurrency(inputCurrency)
+      setOutputCurrency(outputCurrency)
+      setMounted(true)
+    }
+  }, [
+    currencies,
+    inputCurrencyAddress,
+    markets,
+    mounted,
+    outputCurrencyAddress,
+    selectedChain,
+    setInputCurrency,
+    setOutputCurrency,
+    setSelectedMarket,
+  ])
 
-    const inputCurrency = inputCurrencyAddress
-      ? WHITELISTED_TOKENS[selectedChain.id].find((currency) =>
-          isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
-        )
-      : undefined
-    const outputCurrency = outputCurrencyAddress
-      ? WHITELISTED_TOKENS[selectedChain.id].find((currency) =>
-          isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
-        )
-      : undefined
-    setInputCurrency(inputCurrency)
-    setOutputCurrency(outputCurrency)
+  useEffect(() => {
     if (inputCurrency && outputCurrency) {
       const market = markets.find(
         (m) =>
@@ -230,26 +360,22 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
             outputCurrency.address,
           ]).marketId,
       )
-      if (market) {
-        setSelectedMarket(market)
-      }
-    } else {
-      // visit website first time
-      if (markets.length > 0) {
-        setSelectedMarket(markets[0])
-      }
+      setSelectedMarket(market)
     }
   }, [
+    inputCurrency,
     markets,
-    selectedChain,
-    setInputCurrency,
-    setOutputCurrency,
+    outputCurrency,
+    selectedChain.id,
     setSelectedMarket,
   ])
 
   return (
     <Context.Provider
       value={{
+        balances: balances ?? {},
+        currencies,
+        setCurrencies,
         isBid,
         setIsBid,
         selectMode,

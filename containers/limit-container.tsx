@@ -17,12 +17,10 @@ import {
   calculateOutputCurrencyAmountString,
   calculatePriceInputString,
 } from '../utils/order-book'
-import { useLimitCurrencyContext } from '../contexts/limit/limit-currency-context'
 import { ActionButton } from '../components/button/action-button'
 import { OpenOrderCard } from '../components/card/open-order-card'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
 import { getMarketId } from '../utils/market'
-import { WHITELISTED_TOKENS } from '../constants/currency'
 import { invertPrice } from '../utils/tick'
 
 import { ChartContainer } from './chart-container'
@@ -60,8 +58,10 @@ export const LimitContainer = () => {
     availableDecimalPlacesGroups,
     bids,
     asks,
+    balances,
+    currencies,
+    setCurrencies,
   } = useLimitContext()
-  const { balances } = useLimitCurrencyContext()
   const [showOrderBook, setShowOrderBook] = useState(true)
 
   const [depthClickedIndex, setDepthClickedIndex] = useState<
@@ -89,22 +89,6 @@ export const LimitContainer = () => {
     selectedChain.defaultGasPrice,
     selectedChain.nativeCurrency.decimals,
     setClaimBounty,
-  ])
-
-  // When selectedMarket is changed
-  useEffect(() => {
-    if (selectedMarket?.quote && selectedMarket?.base) {
-      setInputCurrency(isBid ? selectedMarket.quote : selectedMarket.base)
-      setOutputCurrency(isBid ? selectedMarket.base : selectedMarket.quote)
-    }
-  }, [
-    isBid,
-    selectedMarket?.base,
-    selectedMarket?.quote,
-    setInputCurrency,
-    setInputCurrencyAmount,
-    setOutputCurrency,
-    setOutputCurrencyAmount,
   ])
 
   // When depth is changed
@@ -292,9 +276,11 @@ export const LimitContainer = () => {
             />
           ) : (
             <LimitForm
+              chainId={selectedChain.id}
               prices={{}} // todo
               balances={balances}
-              currencies={WHITELISTED_TOKENS[selectedChain.id]}
+              currencies={currencies}
+              setCurrencies={setCurrencies}
               priceInput={priceInput}
               setPriceInput={setPriceInput}
               selectedMarket={selectedMarket}
@@ -324,6 +310,11 @@ export const LimitContainer = () => {
                 )
                 setDepthClickedIndex(undefined)
                 setInputCurrencyAmount(outputCurrencyAmount)
+
+                // swap currencies
+                const _inputCurrency = inputCurrency
+                setInputCurrency(outputCurrency)
+                setOutputCurrency(_inputCurrency)
               }}
               actionButtonProps={{
                 disabled: !inputCurrency || !outputCurrency || !amount,

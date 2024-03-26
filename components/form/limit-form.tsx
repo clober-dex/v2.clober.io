@@ -13,7 +13,9 @@ import { Prices } from '../../model/prices'
 import { Market } from '../../model/market'
 
 export const LimitForm = ({
+  chainId,
   currencies,
+  setCurrencies,
   balances,
   prices,
   priceInput,
@@ -38,7 +40,9 @@ export const LimitForm = ({
   swapInputCurrencyAndOutputCurrency,
   actionButtonProps,
 }: {
+  chainId: number
   currencies: Currency[]
+  setCurrencies: (currencies: Currency[]) => void
   balances: Balances
   prices: Prices
   priceInput: string
@@ -65,6 +69,7 @@ export const LimitForm = ({
 }) => {
   return showInputCurrencySelect ? (
     <CurrencySelect
+      chainId={chainId}
       currencies={
         outputCurrency
           ? currencies.filter(
@@ -77,12 +82,18 @@ export const LimitForm = ({
       prices={prices}
       onBack={() => setShowInputCurrencySelect(false)}
       onCurrencySelect={(currency) => {
+        setCurrencies(
+          !currencies.find((c) => isAddressEqual(c.address, currency.address))
+            ? [...currencies, currency]
+            : currencies,
+        )
         setInputCurrency(currency)
         setShowInputCurrencySelect(false)
       }}
     />
   ) : showOutputCurrencySelect ? (
     <CurrencySelect
+      chainId={chainId}
       currencies={
         inputCurrency
           ? currencies.filter(
@@ -95,6 +106,11 @@ export const LimitForm = ({
       prices={prices}
       onBack={() => setShowOutputCurrencySelect(false)}
       onCurrencySelect={(currency) => {
+        setCurrencies(
+          !currencies.find((c) => isAddressEqual(c.address, currency.address))
+            ? [...currencies, currency]
+            : currencies,
+        )
         setOutputCurrency(currency)
         setShowOutputCurrencySelect(false)
       }}

@@ -24,7 +24,9 @@ type Story = StoryObj<typeof SwapForm>
 
 export const Default: Story = {
   args: {
+    chainId: 1,
     currencies: dummyCurrencies,
+    setCurrencies: () => {},
     prices: dummyPrices,
     showInputCurrencySelect: false,
     setShowInputCurrencySelect: () => {},
@@ -49,7 +51,9 @@ export const Default: Story = {
 
 export const Selected: Story = {
   args: {
+    chainId: 1,
     currencies: dummyCurrencies,
+    setCurrencies: () => {},
     prices: dummyPrices,
     showInputCurrencySelect: false,
     setShowInputCurrencySelect: () => {},

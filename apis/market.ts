@@ -8,11 +8,10 @@ import { FeePolicy } from '../model/fee-policy'
 import { Book } from '../model/book'
 import { Depth, MergedDepth } from '../model/depth'
 import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
-import { quoteToBase } from '../utils/tick'
+import { invertPrice, quoteToBase } from '../utils/tick'
 import { getMarketId } from '../utils/market'
 import { formatPrice } from '../utils/prices'
-
-import { toCurrency } from './utils'
+import { fetchCurrency } from '../utils/currency'
 
 const { getBooks } = getBuiltGraphSDK()
 
@@ -23,9 +22,23 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
       url: SUBGRAPH_URL[chainId],
     },
   )
+  const currencies = await Promise.all(
+    books
+      .map((book) => [getAddress(book.base.id), getAddress(book.quote.id)])
+      .flat()
+      .filter(
+        (address, index, self) =>
+          self.findIndex((c) => isAddressEqual(c, address)) === index,
+      )
+      .map((address) => fetchCurrency(chainId, address)),
+  )
   const markets = books.map((book) => {
-    const inputToken = toCurrency(chainId, book.quote)
-    const outputToken = toCurrency(chainId, book.base)
+    const outputToken = currencies.find((c) =>
+      isAddressEqual(c.address, getAddress(book.base.id)),
+    )!
+    const inputToken = currencies.find((c) =>
+      isAddressEqual(c.address, getAddress(book.quote.id)),
+    )!
     const unit = BigInt(book.unit)
     const { quote, base } = getMarketId(chainId, [
       outputToken.address,
@@ -43,7 +56,13 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
       makerPolicy: FeePolicy.from(BigInt(book.makerPolicy)),
       hooks: getAddress(book.hooks),
       takerPolicy: FeePolicy.from(BigInt(book.takerPolicy)),
-      latestPrice: formatPrice(book.latestPrice, quoteDecimals, baseDecimals), // quote is fixed
+      latestPrice: isAddressEqual(inputToken.address, quote)
+        ? formatPrice(book.latestPrice, quoteDecimals, baseDecimals)
+        : formatPrice(
+            invertPrice(book.latestPrice),
+            quoteDecimals,
+            baseDecimals,
+          ),
       latestTimestamp: Number(book.latestTimestamp),
       books: [
         new Book({
