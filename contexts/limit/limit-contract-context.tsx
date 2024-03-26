@@ -230,7 +230,12 @@ export const LimitContractProvider = ({
         const r = new Market({
           chainId: selectedChain.id,
           tokens: [market.base, market.quote],
-          ...market,
+          makerPolicy: MAKER_DEFAULT_POLICY,
+          hooks: market.hooks,
+          takerPolicy: TAKER_DEFAULT_POLICY,
+          latestPrice: market.latestPrice,
+          latestTimestamp: market.latestTimestamp,
+          books: market.books,
         }).spend({
           spendBase: !isBid,
           limitPrice: price,

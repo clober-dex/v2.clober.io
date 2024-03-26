@@ -2,13 +2,7 @@ import { isAddressEqual } from 'viem'
 
 import { getMarketId } from '../utils/market'
 import { CHAIN_IDS } from '../constants/chain'
-import {
-  baseToQuote,
-  divide,
-  invertPrice,
-  quoteToBase,
-  toPrice,
-} from '../utils/tick'
+import { baseToQuote, divide, quoteToBase, toPrice } from '../utils/tick'
 
 import { Book } from './book'
 import { Currency } from './currency'
@@ -108,7 +102,7 @@ export class Market {
         .flatMap((book) => book.depths)
       return this.takeInner({
         depths: askDepths,
-        limitPrice: invertPrice(limitPrice),
+        limitPrice,
         amountOut,
       })
     }
@@ -136,7 +130,7 @@ export class Market {
         .flatMap((book) => book.depths)
       return this.spendInner({
         depths: askDepths,
-        limitPrice: invertPrice(limitPrice),
+        limitPrice,
         amountIn,
       })
     }
@@ -156,15 +150,15 @@ export class Market {
     }
     const takeResult: {
       [key in string]: {
-        takenQuoteAmount: bigint
-        spendBaseAmount: bigint
+        takenAmount: bigint
+        spendAmount: bigint
       }
     } = {}
     for (const depth of depths) {
       if (!takeResult[depth.bookId]) {
         takeResult[depth.bookId] = {
-          takenQuoteAmount: 0n,
-          spendBaseAmount: 0n,
+          takenAmount: 0n,
+          spendAmount: 0n,
         }
       }
     }
@@ -210,8 +204,8 @@ export class Market {
         break
       }
 
-      takeResult[currentDepth.bookId].takenQuoteAmount += quoteAmount
-      takeResult[currentDepth.bookId].spendBaseAmount += baseAmount
+      takeResult[currentDepth.bookId].takenAmount += quoteAmount
+      takeResult[currentDepth.bookId].spendAmount += baseAmount
       totalTakenQuoteAmount += quoteAmount
       if (amountOut <= totalTakenQuoteAmount) {
         break
@@ -239,15 +233,15 @@ export class Market {
     }
     const spendResult: {
       [key in string]: {
-        takenQuoteAmount: bigint
-        spendBaseAmount: bigint
+        takenAmount: bigint
+        spendAmount: bigint
       }
     } = {}
     for (const depth of depths) {
       if (!spendResult[depth.bookId]) {
         spendResult[depth.bookId] = {
-          takenQuoteAmount: 0n,
-          spendBaseAmount: 0n,
+          takenAmount: 0n,
+          spendAmount: 0n,
         }
       }
     }
@@ -293,8 +287,8 @@ export class Market {
         break
       }
 
-      spendResult[currentDepth.bookId].takenQuoteAmount += quoteAmount
-      spendResult[currentDepth.bookId].spendBaseAmount += baseAmount
+      spendResult[currentDepth.bookId].takenAmount += quoteAmount
+      spendResult[currentDepth.bookId].spendAmount += baseAmount
       totalSpendBaseAmount += baseAmount
       if (ticks.length === index + 1) {
         break
