@@ -262,7 +262,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
                   selectedMarket.asks.sort(
                     (a, b) => Number(a.price) - Number(b.price),
                   )[0]?.price ?? 0n,
-                ) ?? MAX_PRICE,
+                ) || MAX_PRICE,
               ),
               selectedMarket.quote.decimals,
               selectedMarket.base.decimals,
