@@ -155,6 +155,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [priceInput, setPriceInput] = useState('')
   const { inputCurrencyAddress, outputCurrencyAddress } =
     getCurrencyAddress(selectedChain)
+  const [mounted, setMounted] = useState(false)
 
   const { data: _currencies } = useQuery(
     [
@@ -284,6 +285,17 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       : DEFAULT_DECIMAL_PLACES_GROUPS
   }, [selectedMarket])
 
+  const [bids, asks] = useMemo(
+    () =>
+      selectedMarket && selectedDecimalPlaces
+        ? [
+            parseDepth(true, selectedMarket, selectedDecimalPlaces),
+            parseDepth(false, selectedMarket, selectedDecimalPlaces),
+          ]
+        : [[], []],
+    [selectedDecimalPlaces, selectedMarket],
+  )
+
   const setInputCurrency = useCallback(
     (currency: Currency | undefined) => {
       if (currency) {
@@ -310,24 +322,34 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     [selectedChain],
   )
 
-  // set input/output currency from query params
   useEffect(() => {
-    const inputCurrency = inputCurrencyAddress
-      ? currencies.find((currency) =>
-          isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
-        )
-      : undefined
-    const outputCurrency = outputCurrencyAddress
-      ? currencies.find((currency) =>
-          isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
-        )
-      : undefined
-    setInputCurrency(inputCurrency)
-    setOutputCurrency(outputCurrency)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    if (!mounted) {
+      const inputCurrency = inputCurrencyAddress
+        ? currencies.find((currency) =>
+            isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
+          )
+        : undefined
+      const outputCurrency = outputCurrencyAddress
+        ? currencies.find((currency) =>
+            isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
+          )
+        : undefined
+      setInputCurrency(inputCurrency)
+      setOutputCurrency(outputCurrency)
+      setMounted(true)
+    }
+  }, [
+    currencies,
+    inputCurrencyAddress,
+    markets,
+    mounted,
+    outputCurrencyAddress,
+    selectedChain,
+    setInputCurrency,
+    setOutputCurrency,
+    setSelectedMarket,
+  ])
 
-  // change selected market when input/output currency changes
   useEffect(() => {
     if (inputCurrency && outputCurrency) {
       const market = markets.find(
@@ -392,14 +414,8 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
         priceInput,
         setPriceInput,
         availableDecimalPlacesGroups,
-        bids:
-          selectedMarket && selectedDecimalPlaces
-            ? parseDepth(true, selectedMarket, selectedDecimalPlaces)
-            : [],
-        asks:
-          selectedMarket && selectedDecimalPlaces
-            ? parseDepth(false, selectedMarket, selectedDecimalPlaces)
-            : [],
+        bids,
+        asks,
       }}
     >
       {children}
