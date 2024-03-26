@@ -216,6 +216,9 @@ export class Market {
       if (amountOut <= totalTakenQuoteAmount) {
         break
       }
+      if (ticks.length === index + 1) {
+        break
+      }
       index++
       tick = ticks[index]
     }
@@ -293,6 +296,9 @@ export class Market {
       spendResult[currentDepth.bookId].takenQuoteAmount += quoteAmount
       spendResult[currentDepth.bookId].spendBaseAmount += baseAmount
       totalSpendBaseAmount += baseAmount
+      if (ticks.length === index + 1) {
+        break
+      }
       index++
       tick = ticks[index]
     }
