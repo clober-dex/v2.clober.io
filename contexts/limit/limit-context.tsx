@@ -5,7 +5,7 @@ import { useAccount, useBalance, useQuery } from 'wagmi'
 import { readContracts } from '@wagmi/core'
 
 import { Currency } from '../../model/currency'
-import { formatUnits } from '../../utils/bigint'
+import { formatUnits, min } from '../../utils/bigint'
 import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
 import { formatPrice, getPriceDecimals, MAX_PRICE } from '../../utils/prices'
 import { parseDepth } from '../../utils/order-book'
@@ -261,10 +261,14 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       ? (Array.from(Array(4).keys())
           .map((i) => {
             const minPrice = formatPrice(
-              selectedMarket.bids
-                .concat(selectedMarket.asks)
-                .sort((a, b) => Number(b.price) - Number(a.price))[0]?.price ??
-                MAX_PRICE,
+              min(
+                selectedMarket.bids.sort(
+                  (a, b) => Number(b.price) - Number(a.price),
+                )[0]?.price ?? MAX_PRICE,
+                selectedMarket.asks.sort(
+                  (a, b) => Number(a.price) - Number(b.price),
+                )[0]?.price ?? MAX_PRICE,
+              ),
               selectedMarket.quote.decimals,
               selectedMarket.base.decimals,
             )

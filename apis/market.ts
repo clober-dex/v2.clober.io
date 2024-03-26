@@ -79,19 +79,12 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
             const rawAmount = BigInt(depth.rawAmount)
             const quoteAmount = unit * rawAmount
             const tick = BigInt(depth.tick)
-            const { quote } = getMarketId(chainId, [
-              inputToken.address,
-              outputToken.address,
-            ])
-            const isBid = isAddressEqual(inputToken.address, quote)
             return {
               bookId: String(book.id),
               tick,
               price: BigInt(depth.price),
               rawAmount,
-              baseAmount: isBid
-                ? quoteToBase(tick, quoteAmount, false)
-                : quoteAmount,
+              baseAmount: quoteToBase(tick, quoteAmount, false),
             } as Depth
           }),
         }),
@@ -135,7 +128,7 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
 function mergeDepths(depths: MergedDepth[], isBid: boolean): MergedDepth[] {
   const mergedDepths: MergedDepth[] = []
   for (const depth of depths) {
-    const existingDepth = mergedDepths.find((d) => d.price === depth.price)
+    const existingDepth = mergedDepths.find((d) => d.tick === depth.tick)
     if (existingDepth) {
       existingDepth.baseAmount += depth.baseAmount
     } else {
