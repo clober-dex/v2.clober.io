@@ -8,7 +8,7 @@ import { FeePolicy } from '../model/fee-policy'
 import { Book } from '../model/book'
 import { Depth, MergedDepth } from '../model/depth'
 import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
-import { quoteToBase } from '../utils/tick'
+import { invertPrice, quoteToBase } from '../utils/tick'
 import { getMarketId } from '../utils/market'
 import { formatPrice } from '../utils/prices'
 
@@ -43,7 +43,13 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
       makerPolicy: FeePolicy.from(BigInt(book.makerPolicy)),
       hooks: getAddress(book.hooks),
       takerPolicy: FeePolicy.from(BigInt(book.takerPolicy)),
-      latestPrice: formatPrice(book.latestPrice, quoteDecimals, baseDecimals), // quote is fixed
+      latestPrice: isAddressEqual(quoteToken.address, quote)
+        ? formatPrice(book.latestPrice, quoteDecimals, baseDecimals)
+        : formatPrice(
+            invertPrice(book.latestPrice),
+            quoteDecimals,
+            baseDecimals,
+          ),
       latestTimestamp: Number(book.latestTimestamp),
       books: [
         new Book({
