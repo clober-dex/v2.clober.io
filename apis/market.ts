@@ -57,9 +57,9 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
       hooks: getAddress(book.hooks),
       takerPolicy: FeePolicy.from(BigInt(book.takerPolicy)),
       latestPrice: isAddressEqual(inputToken.address, quote)
-        ? formatPrice(book.latestPrice, quoteDecimals, baseDecimals)
+        ? formatPrice(BigInt(book.latestPrice), quoteDecimals, baseDecimals)
         : formatPrice(
-            invertPrice(book.latestPrice),
+            invertPrice(BigInt(book.latestPrice)),
             quoteDecimals,
             baseDecimals,
           ),
