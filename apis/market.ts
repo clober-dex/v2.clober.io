@@ -11,7 +11,6 @@ import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
 import { invertPrice, quoteToBase } from '../utils/tick'
 import { getMarketId } from '../utils/market'
 import { formatPrice } from '../utils/prices'
-
 import { fetchCurrency } from '../utils/currency'
 
 const { getBooks } = getBuiltGraphSDK()
