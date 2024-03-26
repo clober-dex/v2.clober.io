@@ -135,9 +135,8 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
 function mergeDepths(depths: MergedDepth[], isBid: boolean): MergedDepth[] {
   const mergedDepths: MergedDepth[] = []
   for (const depth of depths) {
-    const existingDepth = mergedDepths.find((d) => d.tick === depth.tick)
+    const existingDepth = mergedDepths.find((d) => d.price === depth.price)
     if (existingDepth) {
-      existingDepth.rawAmount += depth.rawAmount
       existingDepth.baseAmount += depth.baseAmount
     } else {
       mergedDepths.push(depth)

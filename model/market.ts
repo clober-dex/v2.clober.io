@@ -5,6 +5,7 @@ import { CHAIN_IDS } from '../constants/chain'
 import {
   baseToQuote,
   divide,
+  fromPrice,
   invertPrice,
   quoteToBase,
   toPrice,
@@ -67,22 +68,22 @@ export class Market {
           ({
             tick: depth.tick,
             price: depth.price,
-            rawAmount: depth.rawAmount,
             baseAmount: depth.baseAmount,
           }) as MergedDepth,
       )
     this.asks = books
       .filter((book) => isAddressEqual(book.quote.address, this.base.address))
       .flatMap((book) => book.depths)
-      .map(
-        (depth) =>
-          ({
-            tick: depth.tick,
-            price: depth.price,
-            rawAmount: depth.rawAmount,
-            baseAmount: depth.baseAmount,
-          }) as MergedDepth,
-      )
+      .map((depth) => {
+        const price = invertPrice(depth.price)
+        const tick = fromPrice(price)
+        const baseAmount = baseToQuote(depth.tick, depth.baseAmount, false)
+        return {
+          tick,
+          price,
+          baseAmount,
+        } as MergedDepth
+      })
     this.books = books
   }
 

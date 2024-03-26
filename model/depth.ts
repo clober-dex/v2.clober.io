@@ -10,6 +10,5 @@ export type Depth = {
 export type MergedDepth = {
   tick: bigint
   price: bigint
-  rawAmount: bigint
   baseAmount: bigint
 }
