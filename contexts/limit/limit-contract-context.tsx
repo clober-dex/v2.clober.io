@@ -139,6 +139,7 @@ export const LimitContractProvider = ({
               value: toPlacesString(
                 formatUnits(amount, inputCurrency.decimals),
               ),
+              direction: 'in',
             },
           ],
         })

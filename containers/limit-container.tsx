@@ -94,17 +94,15 @@ export const LimitContainer = () => {
   ])
 
   // When depth is changed
-  const highestBidPrice = bids[0]?.price
-  const lowestAskPrice = asks[0]?.price
   useEffect(() => {
     setDepthClickedIndex(undefined)
 
     setPriceInput(
       isBid
-        ? toPlacesString(lowestAskPrice || highestBidPrice || '1')
-        : toPlacesString(highestBidPrice || lowestAskPrice || '1'),
+        ? toPlacesString(asks[0]?.price ?? '')
+        : toPlacesString(bids[0]?.price ?? ''),
     )
-  }, [highestBidPrice, isBid, lowestAskPrice, setPriceInput])
+  }, [asks, bids, isBid, setPriceInput])
 
   // When depthClickedIndex is changed, reset the priceInput
   useEffect(() => {

@@ -360,7 +360,9 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
             outputCurrency.address,
           ]).marketId,
       )
-      setSelectedMarket(market)
+      if (market?.id !== selectedMarket?.id) {
+        setSelectedMarket(market)
+      }
       const { quote, base } = getMarketId(selectedChain.id, [
         inputCurrency.address,
         outputCurrency.address,
