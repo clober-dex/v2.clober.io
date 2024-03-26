@@ -24,9 +24,17 @@ import { getMarketId } from '../../utils/market'
 import { OpenOrder } from '../../model/open-order'
 import { fetchIsApprovedForAll } from '../../utils/approval'
 import { ERC721_ABI } from '../../abis/@openzeppelin/erc721-abi'
+import { Market } from '../../model/market'
 
 type LimitContractContext = {
   make: (
+    inputCurrency: Currency,
+    outputCurrency: Currency,
+    amount: bigint,
+    price: bigint,
+  ) => Promise<void>
+  limit: (
+    market: Market,
     inputCurrency: Currency,
     outputCurrency: Currency,
     amount: bigint,
@@ -37,6 +45,7 @@ type LimitContractContext = {
 
 const Context = React.createContext<LimitContractContext>({
   make: () => Promise.resolve(),
+  limit: () => Promise.resolve(),
   cancels: () => Promise.resolve(),
 })
 
@@ -185,6 +194,63 @@ export const LimitContractProvider = ({
     [publicClient, queryClient, selectedChain, setConfirmation, walletClient],
   )
 
+  const limit = useCallback(
+    async (
+      market: Market,
+      inputCurrency: Currency,
+      outputCurrency: Currency,
+      amount: bigint,
+      price: bigint,
+    ) => {
+      if (!walletClient || !selectedChain) {
+        return
+      }
+
+      const tick = fromPrice(price)
+      const isBid = isAddressEqual(inputCurrency.address, market.quote.address)
+      try {
+        const unit = await calculateUnit(selectedChain.id, inputCurrency)
+        const key: BookKey = {
+          base: outputCurrency.address,
+          unit,
+          quote: inputCurrency.address,
+          makerPolicy: MAKER_DEFAULT_POLICY,
+          hooks: zeroAddress,
+          takerPolicy: TAKER_DEFAULT_POLICY,
+        }
+        const param = {
+          id: toId(key),
+          tick,
+          quoteAmount: amount,
+          hookData: zeroHash,
+        }
+
+        console.log(isBid)
+
+        const r = new Market({
+          chainId: selectedChain.id,
+          tokens: [market.base, market.quote],
+          ...market,
+        }).spend({
+          spendBase: !isBid,
+          limitPrice: price,
+          amountIn: amount,
+        })
+        console.log(r)
+      } catch (e) {
+        console.error(e)
+      } finally {
+        await Promise.all([
+          queryClient.invalidateQueries(['limit-balances']),
+          queryClient.invalidateQueries(['open-orders']),
+          queryClient.invalidateQueries(['markets']),
+        ])
+        setConfirmation(undefined)
+      }
+    },
+    [queryClient, selectedChain, setConfirmation, walletClient],
+  )
+
   const cancels = useCallback(
     async (openOrders: OpenOrder[]) => {
       if (!walletClient || !selectedChain) {
@@ -281,7 +347,9 @@ export const LimitContractProvider = ({
   )
 
   return (
-    <Context.Provider value={{ make, cancels }}>{children}</Context.Provider>
+    <Context.Provider value={{ limit, make, cancels }}>
+      {children}
+    </Context.Provider>
   )
 }
 

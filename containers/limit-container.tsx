@@ -30,7 +30,7 @@ export const LimitContainer = () => {
   const { selectedChain } = useChainContext()
   const { selectedMarket } = useMarketContext()
   const { openOrders } = useOpenOrderContext()
-  const { make, cancels } = useLimitContractContext()
+  const { limit, make, cancels } = useLimitContractContext()
   const { data: walletClient } = useWalletClient()
   const {
     isBid,
@@ -99,8 +99,8 @@ export const LimitContainer = () => {
 
     setPriceInput(
       isBid
-        ? toPlacesString(asks[0]?.price ?? '')
-        : toPlacesString(bids[0]?.price ?? ''),
+        ? toPlacesString(asks[0]?.price ?? '0')
+        : toPlacesString(bids[0]?.price ?? '0'),
     )
   }, [asks, bids, isBid, setPriceInput])
 
@@ -328,7 +328,17 @@ export const LimitContainer = () => {
                   if (!inputCurrency || !outputCurrency) {
                     return
                   }
-                  await make(inputCurrency, outputCurrency, amount, price)
+                  if (selectedMarket) {
+                    await limit(
+                      selectedMarket,
+                      inputCurrency,
+                      outputCurrency,
+                      amount,
+                      price,
+                    )
+                  } else {
+                    await make(inputCurrency, outputCurrency, amount, price)
+                  }
                 },
                 text: !walletClient
                   ? 'Connect wallet'
