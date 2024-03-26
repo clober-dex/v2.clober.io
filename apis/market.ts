@@ -10,8 +10,7 @@ import { Depth } from '../model/depth'
 import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../constants/fee'
 import { quoteToBase } from '../utils/tick'
 import { getMarketId } from '../utils/market'
-
-import { toCurrency } from './utils'
+import { fetchCurrency } from '../utils/currency'
 
 const { getBooks } = getBuiltGraphSDK()
 
@@ -22,9 +21,23 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
       url: SUBGRAPH_URL[chainId],
     },
   )
+  const currencies = await Promise.all(
+    books
+      .map((book) => [getAddress(book.base.id), getAddress(book.quote.id)])
+      .flat()
+      .filter(
+        (address, index, self) =>
+          self.findIndex((c) => isAddressEqual(c, address)) === index,
+      )
+      .map((address) => fetchCurrency(chainId, address)),
+  )
   const markets = books.map((book) => {
-    const baseToken = toCurrency(chainId, book.base)
-    const quoteToken = toCurrency(chainId, book.quote)
+    const baseToken = currencies.find((c) =>
+      isAddressEqual(c.address, getAddress(book.base.id)),
+    )!
+    const quoteToken = currencies.find((c) =>
+      isAddressEqual(c.address, getAddress(book.quote.id)),
+    )!
     const unit = BigInt(book.unit)
     return new Market({
       chainId: chainId,
