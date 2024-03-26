@@ -5,6 +5,7 @@ import { CHAIN_IDS } from '../constants/chain'
 import {
   baseToQuote,
   divide,
+  fromPrice,
   invertPrice,
   quoteToBase,
   toPrice,
