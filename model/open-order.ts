@@ -15,4 +15,5 @@ export type OpenOrder = {
   quoteAmount: bigint
   baseAmount: bigint
   claimableAmount: bigint
+  cancelable: boolean
 }

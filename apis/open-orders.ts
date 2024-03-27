@@ -74,6 +74,7 @@ export async function fetchOpenOrders(
         ? quoteToBase(tick, unit * rawFilledAmount, false)
         : unit * rawFilledAmount,
       claimableAmount: quoteToBase(tick, unit * rawClaimableAmount, false),
+      cancelable: rawAmount > rawFilledAmount,
     }
   })
 }
@@ -132,5 +133,6 @@ export async function fetchOpenOrder(
       ? quoteToBase(tick, unit * rawFilledAmount, false)
       : unit * rawFilledAmount,
     claimableAmount: quoteToBase(tick, unit * rawClaimableAmount, false),
+    cancelable: rawAmount > rawFilledAmount,
   }
 }

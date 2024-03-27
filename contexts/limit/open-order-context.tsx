@@ -24,7 +24,7 @@ export const OpenOrderProvider = ({
     () => (userAddress ? fetchOpenOrders(selectedChain.id, userAddress) : []),
     {
       refetchIntervalInBackground: true,
-      refetchInterval: 10 * 1000,
+      refetchInterval: 2 * 1000,
       initialData: [],
     },
   )

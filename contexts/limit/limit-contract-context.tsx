@@ -47,12 +47,14 @@ type LimitContractContext = {
     price: bigint,
   ) => Promise<void>
   cancels: (openOrders: OpenOrder[]) => Promise<void>
+  claims: (openOrders: OpenOrder[]) => Promise<void>
 }
 
 const Context = React.createContext<LimitContractContext>({
   make: () => Promise.resolve(),
   limit: () => Promise.resolve(),
   cancels: () => Promise.resolve(),
+  claims: () => Promise.resolve(),
 })
 
 enum Action {
@@ -549,22 +551,41 @@ export const LimitContractProvider = ({
       }
 
       const refundCurrencyMaps: {
-        [currency: `0x${string}`]: { currency: Currency; amount: bigint }
-      } = openOrders.reduce(
-        (acc, order) => {
-          const refundCurrency = order.inputToken
-          if (!acc[refundCurrency.address]) {
-            acc[refundCurrency.address] = {
-              currency: refundCurrency,
-              amount: 0n,
-            }
-          }
-          acc[refundCurrency.address].amount += order.quoteAmount
-          return acc
-        },
-        {} as {
-          [currency: `0x${string}`]: { currency: Currency; amount: bigint }
-        },
+        [currency: `0x${string}`]: {
+          currency: Currency
+          amount: bigint
+        }
+      } = Object.fromEntries(
+        Object.entries(
+          openOrders.reduce(
+            (acc, order) => {
+              const refundCurrency = order.inputToken
+              const claimCurrency = order.outputToken
+              if (!acc[refundCurrency.address]) {
+                acc[refundCurrency.address] = {
+                  currency: refundCurrency,
+                  amount: 0n,
+                }
+              }
+              if (!acc[claimCurrency.address]) {
+                acc[claimCurrency.address] = {
+                  currency: claimCurrency,
+                  amount: 0n,
+                }
+              }
+              acc[refundCurrency.address].amount +=
+                order.quoteAmount - order.baseFilledAmount
+              acc[claimCurrency.address].amount += order.claimableAmount
+              return acc
+            },
+            {} as {
+              [currency: `0x${string}`]: {
+                currency: Currency
+                amount: bigint
+              }
+            },
+          ),
+        ).filter(([, { amount }]) => amount > 0n),
       )
 
       try {
@@ -593,7 +614,7 @@ export const LimitContractProvider = ({
           fields: Object.values(refundCurrencyMaps).map(
             ({ currency, amount }) => ({
               currency,
-              direction: 'in',
+              direction: 'out',
               label: currency.symbol,
               value: toPlacesString(formatUnits(amount, currency.decimals)),
             }),
@@ -637,8 +658,108 @@ export const LimitContractProvider = ({
     [publicClient, queryClient, selectedChain, setConfirmation, walletClient],
   )
 
+  const claims = useCallback(
+    async (openOrders: OpenOrder[]) => {
+      if (!walletClient || !selectedChain) {
+        return
+      }
+
+      const claimCurrencyMaps: {
+        [currency: `0x${string}`]: {
+          currency: Currency
+          amount: bigint
+        }
+      } = openOrders.reduce(
+        (acc, order) => {
+          const claimCurrency = order.outputToken
+          if (!acc[claimCurrency.address]) {
+            acc[claimCurrency.address] = {
+              currency: claimCurrency,
+              amount: 0n,
+            }
+          }
+          acc[claimCurrency.address].amount += order.claimableAmount
+          return acc
+        },
+        {} as {
+          [currency: `0x${string}`]: {
+            currency: Currency
+            amount: bigint
+          }
+        },
+      )
+
+      try {
+        const isApprovedForAll = await fetchIsApprovedForAll(
+          selectedChain.id,
+          CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].BookManager,
+          walletClient.account.address,
+          CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
+        )
+        if (!isApprovedForAll) {
+          await writeContract(publicClient, walletClient, {
+            address:
+              CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].BookManager,
+            abi: ERC721_ABI,
+            functionName: 'setApprovalForAll',
+            args: [
+              CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
+              true,
+            ],
+          })
+        }
+
+        setConfirmation({
+          title: `Claim Order`,
+          body: 'Please confirm in your wallet.',
+          fields: Object.values(claimCurrencyMaps).map(
+            ({ currency, amount }) => ({
+              currency,
+              direction: 'out',
+              label: currency.symbol,
+              value: toPlacesString(formatUnits(amount, currency.decimals)),
+            }),
+          ),
+        })
+
+        const tokensToSettle = Object.values(claimCurrencyMaps)
+          .map(({ currency }) => currency.address)
+          .filter((address) => !isAddressEqual(address, zeroAddress))
+          .filter(
+            (address) =>
+              !WETH_ADDRESSES[selectedChain.id as CHAIN_IDS].includes(address),
+          )
+
+        await writeContract(publicClient, walletClient, {
+          address: CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
+          abi: CONTROLLER_ABI,
+          functionName: 'claim',
+          args: [
+            openOrders.map((order) => ({
+              id: order.id,
+              hookData: zeroHash,
+            })),
+            tokensToSettle,
+            [],
+            getDeadlineTimestampInSeconds(),
+          ],
+        })
+      } catch (e) {
+        console.error(e)
+      } finally {
+        await Promise.all([
+          queryClient.invalidateQueries(['limit-balances']),
+          queryClient.invalidateQueries(['open-orders']),
+          queryClient.invalidateQueries(['markets']),
+        ])
+        setConfirmation(undefined)
+      }
+    },
+    [publicClient, queryClient, selectedChain, setConfirmation, walletClient],
+  )
+
   return (
-    <Context.Provider value={{ limit, make, cancels }}>
+    <Context.Provider value={{ limit, make, cancels, claims }}>
       {children}
     </Context.Provider>
   )
