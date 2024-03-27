@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect } from 'react'
 import { useNetwork, useSwitchNetwork } from 'wagmi'
+import { arbitrumSepolia } from 'viem/chains'
 
 import { Chain } from '../model/chain'
 import { findSupportChain, supportChains } from '../constants/chain'
 import { setQueryParams } from '../utils/url'
-import { beraTestnetChain } from '../constants/dev-chain'
 
 type ChainContext = {
   selectedChain: Chain
@@ -13,7 +13,7 @@ type ChainContext = {
 
 const Context = React.createContext<ChainContext>({
   selectedChain: supportChains.find(
-    (chain) => chain.id === beraTestnetChain.id,
+    (chain) => chain.id === arbitrumSepolia.id,
   )!,
   setSelectedChain: (_) => _,
 })
