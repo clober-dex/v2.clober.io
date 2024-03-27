@@ -65,6 +65,66 @@ enum Action {
   CANCEL,
 }
 
+const TAKE_ABI = [
+  {
+    components: [
+      {
+        internalType: 'BookId',
+        name: 'id',
+        type: 'uint192',
+      },
+      {
+        internalType: 'uint256',
+        name: 'limitPrice',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'quoteAmount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bytes',
+        name: 'hookData',
+        type: 'bytes',
+      },
+    ],
+    internalType: 'struct IController.TakeOrderParams',
+    name: 'params',
+    type: 'tuple',
+  },
+]
+
+const MAKE_ABI = [
+  {
+    components: [
+      {
+        internalType: 'BookId',
+        name: 'id',
+        type: 'uint192',
+      },
+      {
+        internalType: 'Tick',
+        name: 'tick',
+        type: 'int24',
+      },
+      {
+        internalType: 'uint256',
+        name: 'quoteAmount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bytes',
+        name: 'hookData',
+        type: 'bytes',
+      },
+    ],
+    internalType: 'struct IController.MakeOrderParams',
+    name: 'params',
+    type: 'tuple',
+  },
+]
+
 export const LimitContractProvider = ({
   children,
 }: React.PropsWithChildren<{}>) => {
@@ -274,7 +334,6 @@ export const LimitContractProvider = ({
           limitPrice: price,
           amountIn: amount,
         })
-        console.log('result', result)
 
         if (Object.keys(result).length === 0) {
           setConfirmation({
@@ -425,60 +484,33 @@ export const LimitContractProvider = ({
             abi: CONTROLLER_ABI,
             functionName: 'execute',
             args: [
-              [...Object.values(result).map(() => Action.TAKE), Action.LIMIT],
               [
-                ...Object.entries(result).map(([bookId, { spendAmount }]) =>
-                  encodeAbiParameters(
-                    [
-                      {
-                        internalType: 'BookId',
-                        name: 'id',
-                        type: 'uint192',
-                      },
-                      {
-                        internalType: 'uint256',
-                        name: 'limitPrice',
-                        type: 'uint256',
-                      },
-                      {
-                        internalType: 'uint256',
-                        name: 'quoteAmount',
-                        type: 'uint256',
-                      },
-                      {
-                        internalType: 'bytes',
-                        name: 'hookData',
-                        type: 'bytes',
-                      },
-                    ],
-                    [BigInt(bookId), price, spendAmount, zeroHash],
-                  ),
+                ...Object.values(result).map(() => Action.TAKE),
+                ...(makeAmount > 0n ? [Action.MAKE] : []),
+              ],
+              [
+                ...Object.entries(result).map(([bookId, { takenAmount }]) =>
+                  encodeAbiParameters(TAKE_ABI, [
+                    {
+                      id: BigInt(bookId),
+                      limitPrice: price,
+                      quoteAmount: takenAmount,
+                      hookData: zeroHash,
+                    },
+                  ]),
                 ),
-                encodeAbiParameters(
-                  [
-                    {
-                      internalType: 'BookId',
-                      name: 'id',
-                      type: 'uint192',
-                    },
-                    {
-                      internalType: 'Tick',
-                      name: 'tick',
-                      type: 'int24',
-                    },
-                    {
-                      internalType: 'uint256',
-                      name: 'quoteAmount',
-                      type: 'uint256',
-                    },
-                    {
-                      internalType: 'bytes',
-                      name: 'hookData',
-                      type: 'bytes',
-                    },
-                  ],
-                  [BigInt(makeParam.id), Number(tick), makeAmount, zeroHash],
-                ),
+                ...(makeAmount > 0n
+                  ? [
+                      encodeAbiParameters(MAKE_ABI, [
+                        {
+                          id: BigInt(makeParam.id),
+                          tick: Number(tick),
+                          quoteAmount: makeAmount,
+                          hookData: zeroHash,
+                        },
+                      ]),
+                    ]
+                  : []),
               ],
               tokensToSettle,
               [
