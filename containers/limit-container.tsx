@@ -240,8 +240,18 @@ export const LimitContainer = () => {
         {showOrderBook ? 'View Chart' : 'View Order Book'}
       </button>
       <div className="flex flex-col w-full lg:flex-row gap-4">
+        {!showOrderBook && !selectedMarket ? (
+          <div className="flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[704px]" />
+        ) : (
+          <></>
+        )}
         {!showOrderBook && selectedMarket ? (
           <ChartContainer selectedMarket={selectedMarket} />
+        ) : (
+          <></>
+        )}
+        {showOrderBook && !quoteCurrency && !baseCurrency ? (
+          <div className="flex flex-col p-4 sm:p-6 bg-gray-900 rounded-lg sm:rounded-xl gap-6 w-[360px] sm:w-[480px]" />
         ) : (
           <></>
         )}
