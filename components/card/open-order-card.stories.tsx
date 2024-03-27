@@ -39,6 +39,7 @@ export const Bid: Story = {
       baseFilledAmount: 120000000000000000n,
       baseAmount: 1000000000000000000n,
       claimableAmount: 700000000000000000n,
+      cancelable: true,
     },
   },
 }
@@ -61,6 +62,7 @@ export const Ask: Story = {
       baseFilledAmount: 1000000000000000000n,
       baseAmount: 1000000000000000000n,
       claimableAmount: 1000000000000000000n,
+      cancelable: true,
     },
   },
 }
