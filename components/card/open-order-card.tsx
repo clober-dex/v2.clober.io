@@ -64,7 +64,7 @@ export const OpenOrderCard = ({
             </p>
           </div>
           <div className="flex flex-row align-baseline justify-between">
-            <label className="text-gray-200">Open amount</label>
+            <label className="text-gray-200">Amount</label>
             <p className="text-white">
               {toPlacesString(
                 formatUnits(openOrder.baseAmount, baseCurrency.decimals),
