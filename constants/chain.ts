@@ -15,10 +15,9 @@ export const supportChains: Chain[] =
       ]
     : [
         {
-          ...beraTestnetChain,
+          ...arbitrumSepolia,
           defaultGasPrice: 0n,
           expireIn: 240,
-          icon: '/bera-chain-logo.svg',
         },
       ]
 
