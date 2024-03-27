@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import '../styles/globals.css'
 import '@rainbow-me/rainbowkit/styles.css'
 import {
@@ -27,6 +27,7 @@ import { OpenOrderProvider } from '../contexts/limit/open-order-context'
 import { SwapCurrencyProvider } from '../contexts/swap/swap-currency-context'
 import { LimitContractProvider } from '../contexts/limit/limit-contract-context'
 import { SwapContractProvider } from '../contexts/swap/swap-contract-context'
+import Panel from '../components/panel'
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   supportChains.map((chain) => toWagmiChain(chain)),
@@ -129,6 +130,7 @@ const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
 }
 
 function App({ Component, pageProps }: AppProps) {
+  const [open, setOpen] = useState(false)
   return (
     <>
       <Head>
@@ -145,7 +147,8 @@ function App({ Component, pageProps }: AppProps) {
               <LimitProvidersWrapper>
                 <SwapProvidersWrapper>
                   <div className="flex flex-col w-[100vw] min-h-[100vh] bg-gray-950">
-                    <HeaderContainer />
+                    <Panel open={open} setOpen={setOpen} />
+                    <HeaderContainer onMenuClick={() => setOpen(true)} />
                     <MainComponentWrapper>
                       <Component {...pageProps} />
                     </MainComponentWrapper>
