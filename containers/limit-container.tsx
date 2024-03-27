@@ -325,8 +325,8 @@ export const LimitContainer = () => {
                 }
                 if (isPostOnly) {
                   await make(inputCurrency, outputCurrency, amount, price)
+                  return
                 }
-
                 if (selectedMarket) {
                   await limit(
                     selectedMarket,

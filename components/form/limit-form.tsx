@@ -69,7 +69,6 @@ export const LimitForm = ({
   swapInputCurrencyAndOutputCurrency: () => void
   actionButtonProps: ActionButtonProps
 }) => {
-  console.log('setIsPostOnly', setIsPostOnly)
   return showInputCurrencySelect ? (
     <CurrencySelect
       chainId={chainId}
