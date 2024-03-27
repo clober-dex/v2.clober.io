@@ -237,7 +237,11 @@ export class Market {
       index++
       tick = ticks[index]
     }
-    return takeResult
+    return Object.fromEntries(
+      Object.entries(takeResult).filter(
+        ([, value]) => value.spendAmount > 0 && value.takenAmount > 0,
+      ),
+    )
   }
 
   spendInner = ({
@@ -317,6 +321,10 @@ export class Market {
       index++
       tick = ticks[index]
     }
-    return spendResult
+    return Object.fromEntries(
+      Object.entries(spendResult).filter(
+        ([, value]) => value.spendAmount > 0 && value.takenAmount > 0,
+      ),
+    )
   }
 }
