@@ -123,7 +123,7 @@ export class Market {
         .flatMap((book) => book.depths)
       return this.takeInner({
         depths: askDepths,
-        limitPrice,
+        limitPrice: invertPrice(limitPrice),
         amountOut,
       })
     }
@@ -151,7 +151,7 @@ export class Market {
         .flatMap((book) => book.depths)
       return this.spendInner({
         depths: askDepths,
-        limitPrice,
+        limitPrice: invertPrice(limitPrice),
         amountIn,
       })
     }

@@ -3,6 +3,7 @@ import { usePublicClient, useQueryClient, useWalletClient } from 'wagmi'
 import {
   encodeAbiParameters,
   isAddressEqual,
+  parseUnits,
   zeroAddress,
   zeroHash,
 } from 'viem'
@@ -21,7 +22,7 @@ import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../../constants/fee'
 import { writeContract } from '../../utils/wallet'
 import { CONTROLLER_ABI } from '../../abis/core/controller-abi'
 import { WETH_ADDRESSES } from '../../constants/currency'
-import { fromPrice } from '../../utils/tick'
+import { fromPrice, invertPrice } from '../../utils/tick'
 import { calculateUnit } from '../../utils/unit'
 import { isOpen } from '../../utils/book'
 import { BookKey } from '../../model/book-key'
@@ -85,12 +86,12 @@ export const LimitContractProvider = ({
         return
       }
 
-      const tick = fromPrice(price)
       const { quote } = getMarketId(selectedChain.id, [
         inputCurrency.address,
         outputCurrency.address,
       ])
       const isBid = isAddressEqual(inputCurrency.address, quote)
+      const tick = isBid ? fromPrice(price) : fromPrice(invertPrice(price))
       try {
         const unit = await calculateUnit(selectedChain.id, inputCurrency)
         const key: BookKey = {
@@ -221,8 +222,8 @@ export const LimitContractProvider = ({
         return
       }
 
-      const tick = fromPrice(price)
       const isBid = isAddressEqual(inputCurrency.address, market.quote.address)
+      const tick = isBid ? fromPrice(price) : fromPrice(invertPrice(price))
       try {
         const unit = await calculateUnit(selectedChain.id, inputCurrency)
         const makeParam = {
