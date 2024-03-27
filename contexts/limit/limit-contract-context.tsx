@@ -601,7 +601,7 @@ export const LimitContractProvider = ({
           fields: Object.values(refundCurrencyMaps).map(
             ({ currency, amount }) => ({
               currency,
-              direction: 'in',
+              direction: 'out',
               label: currency.symbol,
               value: toPlacesString(formatUnits(amount, currency.decimals)),
             }),
@@ -702,7 +702,7 @@ export const LimitContractProvider = ({
           fields: Object.values(claimCurrencyMaps).map(
             ({ currency, amount }) => ({
               currency,
-              direction: 'in',
+              direction: 'out',
               label: currency.symbol,
               value: toPlacesString(formatUnits(amount, currency.decimals)),
             }),
