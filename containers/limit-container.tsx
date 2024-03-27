@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { isAddressEqual, parseUnits, zeroAddress } from 'viem'
+import { isAddressEqual, parseUnits } from 'viem'
 import BigNumber from 'bignumber.js'
 import { useWalletClient } from 'wagmi'
 
-import LimitSettingForm from '../components/form/limit-setting-form'
 import { LimitForm } from '../components/form/limit-form'
 import OrderBook from '../components/order-book'
 import { useChainContext } from '../contexts/chain-context'
@@ -34,8 +33,6 @@ export const LimitContainer = () => {
   const {
     isBid,
     setIsBid,
-    selectMode,
-    setSelectMode,
     showInputCurrencySelect,
     setShowInputCurrencySelect,
     inputCurrency,
@@ -48,7 +45,6 @@ export const LimitContainer = () => {
     setOutputCurrency,
     outputCurrencyAmount,
     setOutputCurrencyAmount,
-    claimBounty,
     setClaimBounty,
     isPostOnly,
     setIsPostOnly,
@@ -273,98 +269,88 @@ export const LimitContainer = () => {
           <></>
         )}
         <div className="flex flex-col rounded-2xl bg-gray-900 p-6 w-[360px] sm:w-[480px] lg:h-[460px]">
-          {selectMode === 'settings' ? (
-            <LimitSettingForm
-              isPostOnly={isPostOnly}
-              setIsPostOnly={setIsPostOnly}
-              nativeCurrency={{
-                address: zeroAddress,
-                ...selectedChain.nativeCurrency,
-              }}
-              claimBounty={claimBounty}
-              setClaimBounty={setClaimBounty}
-              onBackClick={() => setSelectMode('none')}
-            />
-          ) : (
-            <LimitForm
-              chainId={selectedChain.id}
-              prices={{}} // todo
-              balances={balances}
-              currencies={currencies}
-              setCurrencies={setCurrencies}
-              priceInput={priceInput}
-              setPriceInput={setPriceInput}
-              selectedMarket={selectedMarket}
-              isBid={isBid}
-              setSelectMode={setSelectMode}
-              showInputCurrencySelect={showInputCurrencySelect}
-              setShowInputCurrencySelect={setShowInputCurrencySelect}
-              inputCurrency={inputCurrency}
-              setInputCurrency={setInputCurrency}
-              inputCurrencyAmount={inputCurrencyAmount}
-              setInputCurrencyAmount={setInputCurrencyAmount}
-              availableInputCurrencyBalance={
-                inputCurrency ? balances[inputCurrency.address] ?? 0n : 0n
-              }
-              showOutputCurrencySelect={showOutputCurrencySelect}
-              setShowOutputCurrencySelect={setShowOutputCurrencySelect}
-              outputCurrency={outputCurrency}
-              setOutputCurrency={setOutputCurrency}
-              outputCurrencyAmount={outputCurrencyAmount}
-              setOutputCurrencyAmount={setOutputCurrencyAmount}
-              availableOutputCurrencyBalance={
-                outputCurrency ? balances[outputCurrency.address] ?? 0n : 0n
-              }
-              swapInputCurrencyAndOutputCurrency={() => {
-                setIsBid((prevState) =>
-                  depthClickedIndex ? depthClickedIndex.isBid : !prevState,
-                )
-                setDepthClickedIndex(undefined)
-                setInputCurrencyAmount(outputCurrencyAmount)
+          <LimitForm
+            chainId={selectedChain.id}
+            prices={{}} // todo
+            balances={balances}
+            currencies={currencies}
+            setCurrencies={setCurrencies}
+            priceInput={priceInput}
+            setPriceInput={setPriceInput}
+            selectedMarket={selectedMarket}
+            isBid={isBid}
+            setIsPostOnly={setIsPostOnly}
+            showInputCurrencySelect={showInputCurrencySelect}
+            setShowInputCurrencySelect={setShowInputCurrencySelect}
+            inputCurrency={inputCurrency}
+            setInputCurrency={setInputCurrency}
+            inputCurrencyAmount={inputCurrencyAmount}
+            setInputCurrencyAmount={setInputCurrencyAmount}
+            availableInputCurrencyBalance={
+              inputCurrency ? balances[inputCurrency.address] ?? 0n : 0n
+            }
+            showOutputCurrencySelect={showOutputCurrencySelect}
+            setShowOutputCurrencySelect={setShowOutputCurrencySelect}
+            outputCurrency={outputCurrency}
+            setOutputCurrency={setOutputCurrency}
+            outputCurrencyAmount={outputCurrencyAmount}
+            setOutputCurrencyAmount={setOutputCurrencyAmount}
+            availableOutputCurrencyBalance={
+              outputCurrency ? balances[outputCurrency.address] ?? 0n : 0n
+            }
+            swapInputCurrencyAndOutputCurrency={() => {
+              setIsBid((prevState) =>
+                depthClickedIndex ? depthClickedIndex.isBid : !prevState,
+              )
+              setDepthClickedIndex(undefined)
+              setInputCurrencyAmount(outputCurrencyAmount)
 
-                // swap currencies
-                const _inputCurrency = inputCurrency
-                setInputCurrency(outputCurrency)
-                setOutputCurrency(_inputCurrency)
-              }}
-              actionButtonProps={{
-                disabled:
-                  (!walletClient ||
-                    !inputCurrency ||
-                    !outputCurrency ||
-                    amount === 0n ||
-                    amount > balances[inputCurrency.address]) ??
-                  0n,
-                onClick: async () => {
-                  if (!inputCurrency || !outputCurrency) {
-                    return
-                  }
-                  if (selectedMarket) {
-                    await limit(
-                      selectedMarket,
-                      inputCurrency,
-                      outputCurrency,
-                      amount,
-                      price,
-                    )
-                  } else {
-                    await make(inputCurrency, outputCurrency, amount, price)
-                  }
-                },
-                text: !walletClient
-                  ? 'Connect wallet'
-                  : !inputCurrency
-                    ? 'Select input currency'
-                    : !outputCurrency
-                      ? 'Select output currency'
-                      : amount === 0n
-                        ? 'Enter amount'
-                        : amount > balances[inputCurrency.address]
-                          ? 'Insufficient balance'
-                          : `Limit ${isBid ? 'Bid' : 'Ask'}`,
-              }}
-            />
-          )}
+              // swap currencies
+              const _inputCurrency = inputCurrency
+              setInputCurrency(outputCurrency)
+              setOutputCurrency(_inputCurrency)
+            }}
+            actionButtonProps={{
+              disabled:
+                (!walletClient ||
+                  !inputCurrency ||
+                  !outputCurrency ||
+                  amount === 0n ||
+                  amount > balances[inputCurrency.address]) ??
+                0n,
+              onClick: async () => {
+                if (!inputCurrency || !outputCurrency) {
+                  return
+                }
+                if (isPostOnly) {
+                  await make(inputCurrency, outputCurrency, amount, price)
+                }
+
+                if (selectedMarket) {
+                  await limit(
+                    selectedMarket,
+                    inputCurrency,
+                    outputCurrency,
+                    amount,
+                    price,
+                  )
+                } else {
+                  await make(inputCurrency, outputCurrency, amount, price)
+                }
+              },
+              text: !walletClient
+                ? 'Connect wallet'
+                : !inputCurrency
+                  ? 'Select input currency'
+                  : !outputCurrency
+                    ? 'Select output currency'
+                    : amount === 0n
+                      ? 'Enter amount'
+                      : amount > balances[inputCurrency.address]
+                        ? 'Insufficient balance'
+                        : `Limit ${isBid ? 'Bid' : 'Ask'}`,
+            }}
+          />
         </div>
       </div>
       <div className="flex pb-4 pt-8 px-1 sm:border-solid border-b-gray-800 border-b-[1.5px]">

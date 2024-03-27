@@ -22,7 +22,7 @@ export const LimitForm = ({
   setPriceInput,
   selectedMarket,
   isBid,
-  setSelectMode,
+  setIsPostOnly,
   showInputCurrencySelect,
   setShowInputCurrencySelect,
   inputCurrency,
@@ -49,7 +49,7 @@ export const LimitForm = ({
   setPriceInput: (priceInput: string) => void
   selectedMarket?: Market
   isBid: boolean
-  setSelectMode: (selectMode: 'none' | 'settings') => void
+  setIsPostOnly: (isPostOnly: boolean) => void
   showInputCurrencySelect: boolean
   setShowInputCurrencySelect: (showInputCurrencySelect: boolean) => void
   inputCurrency: Currency | undefined
@@ -67,6 +67,7 @@ export const LimitForm = ({
   swapInputCurrencyAndOutputCurrency: () => void
   actionButtonProps: ActionButtonProps
 }) => {
+  console.log('setIsPostOnly', setIsPostOnly)
   return showInputCurrencySelect ? (
     <CurrencySelect
       chainId={chainId}
@@ -156,10 +157,7 @@ export const LimitForm = ({
         </div>
       </div>
       <div className="flex justify-end mb-3 sm:mb-4">
-        <button
-          className="flex items-center gap-1 text-blue-500 bg-blue-500 hover:bg-opacity-30 bg-opacity-20 rounded px-2 text-xs sm:text-sm h-6 sm:h-7"
-          onClick={() => setSelectMode('settings')}
-        >
+        <button className="flex items-center gap-1 text-blue-500 bg-blue-500 hover:bg-opacity-30 bg-opacity-20 rounded px-2 text-xs sm:text-sm h-6 sm:h-7">
           <SettingSvg className="w-3 h-3 sm:w-4 sm:h-4" />
           Setting
         </button>
