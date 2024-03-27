@@ -10,6 +10,7 @@ import {
   quoteToBase,
   toPrice,
 } from '../utils/tick'
+import { formatPrice } from '../utils/prices'
 
 import { Book } from './book'
 import { Currency } from './currency'
@@ -67,20 +68,33 @@ export class Market {
         (depth) =>
           ({
             tick: depth.tick,
-            price: depth.price,
-            baseAmount: depth.baseAmount,
+            price: formatPrice(
+              toPrice(depth.tick),
+              this.quote.decimals,
+              this.base.decimals,
+            ),
+            baseAmount: quoteToBase(
+              depth.tick,
+              depth.rawAmount * depth.unit,
+              false,
+            ),
           }) as MarketDepth,
       )
     this.asks = books
       .filter((book) => isAddressEqual(book.quote.address, this.base.address))
       .flatMap((book) => book.depths)
       .map((depth) => {
-        const price = invertPrice(depth.price)
+        const price = invertPrice(toPrice(depth.tick))
         const tick = fromPrice(price)
-        const baseAmount = baseToQuote(depth.tick, depth.baseAmount, false)
+        const readablePrice = formatPrice(
+          price,
+          this.quote.decimals,
+          this.base.decimals,
+        )
+        const baseAmount = depth.rawAmount * depth.unit
         return {
           tick,
-          price,
+          price: readablePrice,
           baseAmount,
         } as MarketDepth
       })
@@ -172,7 +186,7 @@ export class Market {
     let totalTakenQuoteAmount = 0n
 
     const ticks = depths
-      .sort((a, b) => Number(b.price) - Number(a.price))
+      .sort((a, b) => Number(b.tick) - Number(a.tick))
       .map((depth) => depth.tick)
     let index = 0
     let tick = ticks[index]
@@ -255,7 +269,7 @@ export class Market {
     let totalSpendBaseAmount = 0n
 
     const ticks = depths
-      .sort((a, b) => Number(b.price) - Number(a.price))
+      .sort((a, b) => Number(b.tick) - Number(a.tick))
       .map((depth) => depth.tick)
     let index = 0
     let tick = ticks[index]
