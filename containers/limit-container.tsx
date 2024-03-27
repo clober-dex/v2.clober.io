@@ -228,7 +228,7 @@ export const LimitContainer = () => {
     (openOrder) => openOrder.claimableAmount > 0n,
   )
   const cancellableOpenOrders = openOrders.filter(
-    (openOrder) => openOrder.claimableAmount === 0n,
+    (openOrder) => openOrder.cancelable,
   )
 
   return (
@@ -398,7 +398,7 @@ export const LimitContainer = () => {
                 text: 'Claim',
               }}
               cancelActionButtonProps={{
-                disabled: openOrder.claimableAmount > 0n,
+                disabled: !openOrder.cancelable,
                 onClick: async () => {
                   await cancels([openOrder])
                 },
