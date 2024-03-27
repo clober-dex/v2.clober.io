@@ -279,6 +279,7 @@ export const LimitContainer = () => {
             setPriceInput={setPriceInput}
             selectedMarket={selectedMarket}
             isBid={isBid}
+            isPostOnly={isPostOnly}
             setIsPostOnly={setIsPostOnly}
             showInputCurrencySelect={showInputCurrencySelect}
             setShowInputCurrencySelect={setShowInputCurrencySelect}
