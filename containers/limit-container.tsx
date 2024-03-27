@@ -344,14 +344,14 @@ export const LimitContainer = () => {
                 text: !walletClient
                   ? 'Connect wallet'
                   : !inputCurrency
-                  ? 'Select input currency'
-                  : !outputCurrency
-                  ? 'Select output currency'
-                  : amount === 0n
-                  ? 'Enter amount'
-                  : amount > balances[inputCurrency.address]
-                  ? 'Insufficient balance'
-                  : `Limit ${isBid ? 'Bid' : 'Ask'}`,
+                    ? 'Select input currency'
+                    : !outputCurrency
+                      ? 'Select output currency'
+                      : amount === 0n
+                        ? 'Enter amount'
+                        : amount > balances[inputCurrency.address]
+                          ? 'Insufficient balance'
+                          : `Limit ${isBid ? 'Bid' : 'Ask'}`,
               }}
             />
           )}
