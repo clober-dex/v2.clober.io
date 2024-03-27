@@ -98,8 +98,8 @@ export const LimitContainer = () => {
 
     setPriceInput(
       isBid
-        ? toPlacesString(asks[0]?.price ?? '0')
-        : toPlacesString(bids[0]?.price ?? '0'),
+        ? toPlacesString(asks[0]?.price ?? bids[0]?.price ?? '1')
+        : toPlacesString(bids[0]?.price ?? asks[0]?.price ?? '1'),
     )
   }, [asks, bids, isBid, setPriceInput])
 
