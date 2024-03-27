@@ -29,7 +29,7 @@ export const LimitContainer = () => {
   const { selectedChain } = useChainContext()
   const { selectedMarket } = useMarketContext()
   const { openOrders } = useOpenOrderContext()
-  const { limit, make, cancels } = useLimitContractContext()
+  const { limit, make, cancels, claims } = useLimitContractContext()
   const { data: walletClient } = useWalletClient()
   const {
     isBid,
@@ -66,7 +66,11 @@ export const LimitContainer = () => {
   const [showOrderBook, setShowOrderBook] = useState(true)
 
   const [depthClickedIndex, setDepthClickedIndex] = useState<
-    { isBid: boolean; index: number } | undefined
+    | {
+        isBid: boolean
+        index: number
+      }
+    | undefined
   >(undefined)
 
   // once
@@ -220,6 +224,13 @@ export const LimitContainer = () => {
     ],
   )
 
+  const claimableOpenOrders = openOrders.filter(
+    (openOrder) => openOrder.claimableAmount > 0n,
+  )
+  const cancellableOpenOrders = openOrders.filter(
+    (openOrder) => openOrder.claimableAmount === 0n,
+  )
+
   return (
     <div className="flex flex-col w-fit mb-4 sm:mb-6">
       <button
@@ -333,14 +344,14 @@ export const LimitContainer = () => {
                 text: !walletClient
                   ? 'Connect wallet'
                   : !inputCurrency
-                    ? 'Select input currency'
-                    : !outputCurrency
-                      ? 'Select output currency'
-                      : amount === 0n
-                        ? 'Enter amount'
-                        : amount > balances[inputCurrency.address]
-                          ? 'Insufficient balance'
-                          : `Limit ${isBid ? 'Bid' : 'Ask'}`,
+                  ? 'Select input currency'
+                  : !outputCurrency
+                  ? 'Select output currency'
+                  : amount === 0n
+                  ? 'Enter amount'
+                  : amount > balances[inputCurrency.address]
+                  ? 'Insufficient balance'
+                  : `Limit ${isBid ? 'Bid' : 'Ask'}`,
               }}
             />
           )}
@@ -357,25 +368,19 @@ export const LimitContainer = () => {
         <div className="flex gap-1 sm:gap-2 ml-auto h-6">
           <ActionButton
             className="w-[64px] sm:w-[120px] flex flex-1 items-center justify-center rounded bg-gray-700 hover:bg-blue-600 text-white text-xs sm:text-sm disabled:bg-gray-800 disabled:text-gray-500 h-6 sm:h-7"
-            disabled={
-              openOrders.filter((openOrder) => openOrder.claimableAmount > 0n)
-                .length === 0
-            }
+            disabled={claimableOpenOrders.length === 0}
             onClick={async () => {
-              console.log('claim all')
+              await claims(claimableOpenOrders)
             }}
-            text={`Claim (${
-              openOrders.filter((openOrder) => openOrder.claimableAmount > 0n)
-                .length
-            })`}
+            text={`Claim (${claimableOpenOrders.length})`}
           />
           <ActionButton
             className="w-[64px] sm:w-[120px] flex flex-1 items-center justify-center rounded bg-gray-700 hover:bg-blue-600 text-white text-xs sm:text-sm disabled:bg-gray-800 disabled:text-gray-500 h-6 sm:h-7"
-            disabled={openOrders.length === 0}
+            disabled={cancellableOpenOrders.length === 0}
             onClick={async () => {
-              await cancels(openOrders)
+              await cancels(cancellableOpenOrders)
             }}
-            text={`Cancel (${openOrders.length})`}
+            text={`Cancel (${cancellableOpenOrders.length})`}
           />
         </div>
       </div>
@@ -388,12 +393,12 @@ export const LimitContainer = () => {
               claimActionButtonProps={{
                 disabled: openOrder.claimableAmount === 0n,
                 onClick: async () => {
-                  console.log('claim one')
+                  await claims([openOrder])
                 },
                 text: 'Claim',
               }}
               cancelActionButtonProps={{
-                disabled: false,
+                disabled: openOrder.claimableAmount > 0n,
                 onClick: async () => {
                   await cancels([openOrder])
                 },
