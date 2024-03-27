@@ -1,10 +1,16 @@
 import React, { useCallback } from 'react'
 import { usePublicClient, useQueryClient, useWalletClient } from 'wagmi'
-import { isAddressEqual, zeroAddress, zeroHash } from 'viem'
+import {
+  encodeAbiParameters,
+  isAddressEqual,
+  parseUnits,
+  zeroAddress,
+  zeroHash,
+} from 'viem'
 
 import { useChainContext } from '../chain-context'
 import { Currency } from '../../model/currency'
-import { useTransactionContext } from '../transaction-context'
+import { Confirmation, useTransactionContext } from '../transaction-context'
 import { CHAIN_IDS } from '../../constants/chain'
 import { CONTRACT_ADDRESSES } from '../../constants/addresses'
 import { permit20 } from '../../utils/permit20'
@@ -16,7 +22,7 @@ import { MAKER_DEFAULT_POLICY, TAKER_DEFAULT_POLICY } from '../../constants/fee'
 import { writeContract } from '../../utils/wallet'
 import { CONTROLLER_ABI } from '../../abis/core/controller-abi'
 import { WETH_ADDRESSES } from '../../constants/currency'
-import { fromPrice } from '../../utils/tick'
+import { fromPrice, invertPrice } from '../../utils/tick'
 import { calculateUnit } from '../../utils/unit'
 import { isOpen } from '../../utils/book'
 import { BookKey } from '../../model/book-key'
@@ -24,9 +30,17 @@ import { getMarketId } from '../../utils/market'
 import { OpenOrder } from '../../model/open-order'
 import { fetchIsApprovedForAll } from '../../utils/approval'
 import { ERC721_ABI } from '../../abis/@openzeppelin/erc721-abi'
+import { Market } from '../../model/market'
 
 type LimitContractContext = {
   make: (
+    inputCurrency: Currency,
+    outputCurrency: Currency,
+    amount: bigint,
+    price: bigint,
+  ) => Promise<void>
+  limit: (
+    market: Market,
     inputCurrency: Currency,
     outputCurrency: Currency,
     amount: bigint,
@@ -37,8 +51,19 @@ type LimitContractContext = {
 
 const Context = React.createContext<LimitContractContext>({
   make: () => Promise.resolve(),
+  limit: () => Promise.resolve(),
   cancels: () => Promise.resolve(),
 })
+
+enum Action {
+  OPEN,
+  MAKE,
+  LIMIT,
+  TAKE,
+  SPEND,
+  CLAIM,
+  CANCEL,
+}
 
 export const LimitContractProvider = ({
   children,
@@ -61,12 +86,12 @@ export const LimitContractProvider = ({
         return
       }
 
-      const tick = fromPrice(price)
       const { quote } = getMarketId(selectedChain.id, [
         inputCurrency.address,
         outputCurrency.address,
       ])
       const isBid = isAddressEqual(inputCurrency.address, quote)
+      const tick = isBid ? fromPrice(price) : fromPrice(invertPrice(price))
       try {
         const unit = await calculateUnit(selectedChain.id, inputCurrency)
         const key: BookKey = {
@@ -185,6 +210,306 @@ export const LimitContractProvider = ({
     [publicClient, queryClient, selectedChain, setConfirmation, walletClient],
   )
 
+  const limit = useCallback(
+    async (
+      market: Market,
+      inputCurrency: Currency,
+      outputCurrency: Currency,
+      amount: bigint,
+      price: bigint,
+    ) => {
+      if (!walletClient || !selectedChain) {
+        return
+      }
+
+      const isBid = isAddressEqual(inputCurrency.address, market.quote.address)
+      const tick = isBid ? fromPrice(price) : fromPrice(invertPrice(price))
+      try {
+        const unit = await calculateUnit(selectedChain.id, inputCurrency)
+        const makeParam = {
+          id: toId({
+            base: outputCurrency.address,
+            unit,
+            quote: inputCurrency.address,
+            makerPolicy: MAKER_DEFAULT_POLICY,
+            hooks: zeroAddress,
+            takerPolicy: TAKER_DEFAULT_POLICY,
+          } as BookKey),
+          tick,
+          quoteAmount: amount,
+          hookData: zeroHash,
+        }
+
+        const permitAmount = !isAddressEqual(inputCurrency.address, zeroAddress)
+          ? amount
+          : 0n
+        const { deadline, r, s, v } = await permit20(
+          selectedChain.id,
+          walletClient,
+          inputCurrency,
+          walletClient.account.address,
+          CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
+          permitAmount,
+          getDeadlineTimestampInSeconds(),
+        )
+
+        const tokensToSettle = [inputCurrency.address, outputCurrency.address]
+          .filter((address) => !isAddressEqual(address, zeroAddress))
+          .filter(
+            (address) =>
+              !WETH_ADDRESSES[selectedChain.id as CHAIN_IDS].includes(address),
+          )
+
+        const result = new Market({
+          chainId: selectedChain.id,
+          tokens: [market.base, market.quote],
+          makerPolicy: MAKER_DEFAULT_POLICY,
+          hooks: market.hooks,
+          takerPolicy: TAKER_DEFAULT_POLICY,
+          latestPrice: market.latestPrice,
+          latestTimestamp: market.latestTimestamp,
+          books: market.books,
+        }).spend({
+          spendBase: !isBid,
+          limitPrice: price,
+          amountIn: amount,
+        })
+        console.log('result', result)
+
+        if (Object.keys(result).length === 0) {
+          setConfirmation({
+            title: `Limit ${isBid ? 'Bid' : 'Ask'}`,
+            body: 'Please confirm in your wallet.',
+            fields: [
+              {
+                currency: inputCurrency,
+                label: inputCurrency.symbol,
+                value: toPlacesString(
+                  formatUnits(amount, inputCurrency.decimals),
+                ),
+                direction: 'in',
+              },
+            ],
+          })
+
+          // only make
+          await writeContract(publicClient, walletClient, {
+            address:
+              CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
+            abi: CONTROLLER_ABI,
+            functionName: 'make',
+            args: [
+              [makeParam],
+              tokensToSettle,
+              [
+                {
+                  token: inputCurrency.address,
+                  permitAmount,
+                  signature: { deadline, v, r, s },
+                },
+              ],
+              getDeadlineTimestampInSeconds(),
+            ],
+            value: isAddressEqual(inputCurrency.address, zeroAddress)
+              ? amount
+              : 0n,
+          })
+        } else if (Object.keys(result).length === 1) {
+          setConfirmation({
+            title: `Limit ${isBid ? 'Bid' : 'Ask'}`,
+            body: 'Please confirm in your wallet.',
+            fields: [
+              {
+                currency: inputCurrency,
+                label: inputCurrency.symbol,
+                value: toPlacesString(
+                  formatUnits(amount, inputCurrency.decimals),
+                ),
+                direction: 'in',
+              },
+              {
+                currency: outputCurrency,
+                label: outputCurrency.symbol,
+                value: toPlacesString(
+                  formatUnits(
+                    Object.values(result).reduce(
+                      (acc, { takenAmount }) => acc + takenAmount,
+                      0n,
+                    ),
+                    outputCurrency.decimals,
+                  ),
+                ),
+                direction: 'out',
+              },
+            ].filter(
+              ({ value, currency }) =>
+                parseUnits(value, currency.decimals) > 0n,
+            ) as Confirmation['fields'],
+          })
+
+          // limit
+          await writeContract(publicClient, walletClient, {
+            address:
+              CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
+            abi: CONTROLLER_ABI,
+            functionName: 'limit',
+            args: [
+              [
+                {
+                  takeBookId: Object.keys(result)[0],
+                  makeBookId: makeParam.id,
+                  limitPrice: price,
+                  tick: makeParam.tick,
+                  quoteAmount: amount,
+                  takeHookData: zeroHash,
+                  makeHookData: makeParam.hookData,
+                },
+              ],
+              tokensToSettle,
+              [
+                {
+                  token: inputCurrency.address,
+                  permitAmount,
+                  signature: { deadline, v, r, s },
+                },
+              ],
+              getDeadlineTimestampInSeconds(),
+            ],
+            value: isAddressEqual(inputCurrency.address, zeroAddress)
+              ? amount
+              : 0n,
+          })
+        } else {
+          setConfirmation({
+            title: `Limit ${isBid ? 'Bid' : 'Ask'}`,
+            body: 'Please confirm in your wallet.',
+            fields: [
+              {
+                currency: inputCurrency,
+                label: inputCurrency.symbol,
+                value: toPlacesString(
+                  formatUnits(amount, inputCurrency.decimals),
+                ),
+                direction: 'in',
+              },
+              {
+                currency: outputCurrency,
+                label: outputCurrency.symbol,
+                value: toPlacesString(
+                  formatUnits(
+                    Object.values(result).reduce(
+                      (acc, { takenAmount }) => acc + takenAmount,
+                      0n,
+                    ),
+                    outputCurrency.decimals,
+                  ),
+                ),
+                direction: 'out',
+              },
+            ].filter(
+              ({ value, currency }) =>
+                parseUnits(value, currency.decimals) > 0n,
+            ) as Confirmation['fields'],
+          })
+          const makeAmount =
+            amount -
+            Object.values(result).reduce(
+              (acc, { spendAmount }) => acc + spendAmount,
+              0n,
+            )
+
+          // execute
+          await writeContract(publicClient, walletClient, {
+            address:
+              CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
+            abi: CONTROLLER_ABI,
+            functionName: 'execute',
+            args: [
+              [...Object.values(result).map(() => Action.TAKE), Action.LIMIT],
+              [
+                ...Object.entries(result).map(([bookId, { spendAmount }]) =>
+                  encodeAbiParameters(
+                    [
+                      {
+                        internalType: 'BookId',
+                        name: 'id',
+                        type: 'uint192',
+                      },
+                      {
+                        internalType: 'uint256',
+                        name: 'limitPrice',
+                        type: 'uint256',
+                      },
+                      {
+                        internalType: 'uint256',
+                        name: 'quoteAmount',
+                        type: 'uint256',
+                      },
+                      {
+                        internalType: 'bytes',
+                        name: 'hookData',
+                        type: 'bytes',
+                      },
+                    ],
+                    [BigInt(bookId), price, spendAmount, zeroHash],
+                  ),
+                ),
+                encodeAbiParameters(
+                  [
+                    {
+                      internalType: 'BookId',
+                      name: 'id',
+                      type: 'uint192',
+                    },
+                    {
+                      internalType: 'Tick',
+                      name: 'tick',
+                      type: 'int24',
+                    },
+                    {
+                      internalType: 'uint256',
+                      name: 'quoteAmount',
+                      type: 'uint256',
+                    },
+                    {
+                      internalType: 'bytes',
+                      name: 'hookData',
+                      type: 'bytes',
+                    },
+                  ],
+                  [BigInt(makeParam.id), Number(tick), makeAmount, zeroHash],
+                ),
+              ],
+              tokensToSettle,
+              [
+                {
+                  token: inputCurrency.address,
+                  permitAmount,
+                  signature: { deadline, v, r, s },
+                },
+              ],
+              [],
+              getDeadlineTimestampInSeconds(),
+            ],
+            value: isAddressEqual(inputCurrency.address, zeroAddress)
+              ? amount
+              : 0n,
+          })
+        }
+      } catch (e) {
+        console.error(e)
+      } finally {
+        await Promise.all([
+          queryClient.invalidateQueries(['limit-balances']),
+          queryClient.invalidateQueries(['open-orders']),
+          queryClient.invalidateQueries(['markets']),
+        ])
+        setConfirmation(undefined)
+      }
+    },
+    [publicClient, queryClient, selectedChain, setConfirmation, walletClient],
+  )
+
   const cancels = useCallback(
     async (openOrders: OpenOrder[]) => {
       if (!walletClient || !selectedChain) {
@@ -281,7 +606,9 @@ export const LimitContractProvider = ({
   )
 
   return (
-    <Context.Provider value={{ make, cancels }}>{children}</Context.Provider>
+    <Context.Provider value={{ limit, make, cancels }}>
+      {children}
+    </Context.Provider>
   )
 }
 

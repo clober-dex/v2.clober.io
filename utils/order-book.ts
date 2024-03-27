@@ -6,6 +6,7 @@ import { Currency } from '../model/currency'
 import { WrappedEthers } from '../constants/weths'
 import { Balances } from '../model/balances'
 import { Market } from '../model/market'
+import { MarketDepth } from '../model/depth'
 
 import { toPlacesString } from './bignumber'
 import { formatUnits } from './bigint'
@@ -147,4 +148,19 @@ export function calculateValue(
     useNative: true,
     withClaim: true,
   }
+}
+
+export const isOrderBookEqual = (a: MarketDepth[], b: MarketDepth[]) => {
+  if (a.length !== b.length) {
+    return false
+  }
+  const sortedA = a.sort((x, y) => Number(x.tick) - Number(y.tick))
+  const sortedB = b.sort((x, y) => Number(x.tick) - Number(y.tick))
+  return sortedA.every((x, i) => {
+    return (
+      x.tick === sortedB[i].tick &&
+      x.price === sortedB[i].price &&
+      x.baseAmount === sortedB[i].baseAmount
+    )
+  })
 }

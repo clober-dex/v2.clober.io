@@ -50,3 +50,12 @@ export const fetchCurrency = async (
     decimals: decimals ?? 18,
   }
 }
+
+export const isCurrencyEqual = (a: Currency, b: Currency) => {
+  return (
+    isAddressEqual(a.address, b.address) &&
+    a.decimals === b.decimals &&
+    a.name === b.name &&
+    a.symbol === b.symbol
+  )
+}
