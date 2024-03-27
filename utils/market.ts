@@ -1,6 +1,11 @@
 import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 
 import { STABLE_COIN_ADDRESSES, WETH_ADDRESSES } from '../constants/currency'
+import { Market } from '../model/market'
+
+import { isCurrencyEqual } from './currency'
+import { isOrderBookEqual } from './order-book'
+import { isFeePolicyEqual } from './fee-policy'
 
 export const getMarketId = (
   chainId: number,
@@ -66,4 +71,22 @@ export const getMarketId = (
     quote: _tokens[0],
     base: _tokens[1],
   }
+}
+
+export const isMarketEqual = (a: Market | undefined, b: Market | undefined) => {
+  if (!a || !b) {
+    return false
+  }
+  return (
+    a.id === b.id &&
+    isCurrencyEqual(a.quote, b.quote) &&
+    isCurrencyEqual(a.base, b.base) &&
+    isFeePolicyEqual(a.makerPolicy, b.makerPolicy) &&
+    isAddressEqual(a.hooks, b.hooks) &&
+    isFeePolicyEqual(a.takerPolicy, b.takerPolicy) &&
+    a.latestPrice === b.latestPrice &&
+    a.latestTimestamp === b.latestTimestamp &&
+    isOrderBookEqual(a.bids, b.bids) &&
+    isOrderBookEqual(a.asks, b.asks)
+  )
 }

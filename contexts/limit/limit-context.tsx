@@ -11,7 +11,7 @@ import { formatPrice, getPriceDecimals, MAX_PRICE } from '../../utils/prices'
 import { parseDepth } from '../../utils/order-book'
 import { useChainContext } from '../chain-context'
 import { Chain } from '../../model/chain'
-import { getMarketId } from '../../utils/market'
+import { getMarketId, isMarketEqual } from '../../utils/market'
 import { Balances } from '../../model/balances'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 import { WHITELISTED_CURRENCIES } from '../../constants/currency'
@@ -366,7 +366,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
             outputCurrency.address,
           ]).marketId,
       )
-      if (market?.id !== selectedMarket?.id) {
+      if (!isMarketEqual(market, selectedMarket)) {
         setSelectedMarket(market)
       }
       const { quote, base } = getMarketId(selectedChain.id, [
@@ -388,6 +388,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     markets,
     outputCurrency,
     selectedChain.id,
+    selectedMarket,
     setSelectedMarket,
   ])
 
