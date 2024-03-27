@@ -1,4 +1,5 @@
 import {
+  Bar,
   DatafeedConfiguration,
   ErrorCallback,
   HistoryCallback,
@@ -12,6 +13,7 @@ import {
   SubscribeBarsCallback,
 } from '../public/static/charting_library'
 import { CHAIN_IDS } from '../constants/chain'
+import { fetchChartLogs, fetchLatestChartLog } from '../apis/chart-logs'
 import { Market } from '../model/market'
 
 import { SUPPORTED_INTERVALS } from './chart'
@@ -69,18 +71,13 @@ export default class DataFeed implements IBasicDataFeed {
   async resolveSymbol(
     symbolName: string,
     onResolve: ResolveCallback,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onError: ErrorCallback,
   ) {
-    // TODO
-    // const { close } = await fetchLatestChartLog(
-    //   this.chainId,
-    //   this.market.address,
-    // )
-    // if (close === '0') {
-    //   onError('cannot resolve symbol')
-    //   return
-    // }
+    const { close } = await fetchLatestChartLog(this.chainId, this.market.id)
+    if (close === '0') {
+      onError('cannot resolve symbol')
+      return
+    }
 
     onResolve({
       name: symbolName, // display name for users
@@ -92,12 +89,6 @@ export default class DataFeed implements IBasicDataFeed {
       timezone: 'Etc/UTC',
       exchange: 'Clober',
       listed_exchange: 'Clober',
-      minmov: 1,
-      // TODO
-      // pricescale:
-      //   10 **
-      //   getPriceDecimals(parseUnits(close, 18), this.market.d, this.market.r),
-      pricescale: 0,
       has_intraday: true, // has minutes historical data
       has_weekly_and_monthly: false, // has weekly data
       visible_plots_set: 'ohlcv',
@@ -117,43 +108,37 @@ export default class DataFeed implements IBasicDataFeed {
     onError: ErrorCallback,
   ) {
     try {
-      // const { from, to } = periodParams
-      // const resolutionKey = (SUPPORTED_INTERVALS.find(
-      //   (interval) => interval[0] === resolution,
-      // ) || SUPPORTED_INTERVALS[0])[1]
+      const { from, to } = periodParams
+      const resolutionKey = (SUPPORTED_INTERVALS.find(
+        (interval) => interval[0] === resolution,
+      ) || SUPPORTED_INTERVALS[0])[1]
 
-      // TODO
-      // const chartLogs = await fetchChartLogs(
-      //   this.chainId,
-      //   this.market.address,
-      //   resolutionKey,
-      //   from,
-      //   to,
-      // )
-      // if (chartLogs.length === 0) {
-      //   onResult([], {
-      //     noData: false,
-      //   })
-      //   return
-      // }
-      //
-      // const bars = chartLogs.map<Bar>((v, index) => ({
-      //   time: Number(v.timestamp) * 1000,
-      //   open: Number(index === 0 ? v.open : chartLogs[index - 1].close),
-      //   high: Number(v.high),
-      //   low: Number(v.low),
-      //   close: Number(v.close),
-      //   volume: Number(v.baseVolume),
-      // }))
+      const chartLogs = await fetchChartLogs(
+        this.chainId,
+        this.market.id,
+        resolutionKey,
+        from,
+        to,
+      )
+      if (chartLogs.length === 0) {
+        onResult([], {
+          noData: false,
+        })
+        return
+      }
 
-      // onResult(bars, {
-      //   noData: false,
-      // })
+      const bars = chartLogs.map<Bar>((v, index) => ({
+        time: Number(v.timestamp) * 1000,
+        open: Number(index === 0 ? v.open : chartLogs[index - 1].close),
+        high: Number(v.high),
+        low: Number(v.low),
+        close: Number(v.close),
+        volume: Number(v.baseVolume),
+      }))
 
-      onResult([], {
+      onResult(bars, {
         noData: false,
       })
-      return
     } catch (error) {
       onError((error as Error).message)
     }

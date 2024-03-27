@@ -6,8 +6,12 @@ import { useChainContext } from '../contexts/chain-context'
 import ChainSelector from '../components/selector/chain-selector'
 import { WalletSelector } from '../components/selector/wallet-selector'
 import { supportChains } from '../constants/chain'
+import MenuSvg from '../components/svg/menu-svg'
+import { DocsIconSvg } from '../components/svg/docs-icon-svg'
+import { DiscordIconSvg } from '../components/svg/discord-icon-svg'
+import { TwitterLogoSvg } from '../components/svg/twitter-logo-svg'
 
-const HeaderContainer = () => {
+const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const { selectedChain, setSelectedChain } = useChainContext()
   const { address, status } = useAccount()
 
@@ -24,12 +28,44 @@ const HeaderContainer = () => {
         </Link>
       </div>
       <div className="flex gap-2 w-auto md:gap-4 ml-auto">
+        <div className="hidden lg:flex items-center justify-center mr-2 gap-4">
+          <Link
+            className="link"
+            target="_blank"
+            href="https://docs.clober.io/"
+            rel="noreferrer"
+          >
+            <DocsIconSvg className="w-5 h-5" />
+          </Link>
+          <Link
+            className="link"
+            target="_blank"
+            href="https://discord.gg/clober-coupon-finance"
+            rel="noreferrer"
+          >
+            <DiscordIconSvg className="w-5 h-5" />
+          </Link>
+          <Link
+            className="link"
+            target="_blank"
+            href="https://twitter.com/CloberDEX"
+            rel="noreferrer"
+          >
+            <TwitterLogoSvg className="w-5 h-5" />
+          </Link>
+        </div>
         <ChainSelector
           chain={selectedChain}
           setChain={setSelectedChain}
           chains={supportChains}
         />
         <WalletSelector address={address} status={status} />
+        <button
+          className="w-8 h-8 lg:hover:bg-gray-200 hover:bg-gray-700 rounded sm:rounded-lg flex items-center justify-center lg:hidden"
+          onClick={onMenuClick}
+        >
+          <MenuSvg />
+        </button>
       </div>
     </div>
   )

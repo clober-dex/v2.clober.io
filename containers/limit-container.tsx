@@ -367,7 +367,7 @@ export const LimitContainer = () => {
         </div>
         <div className="flex gap-1 sm:gap-2 ml-auto h-6">
           <ActionButton
-            className="w-[64px] sm:w-[120px] flex flex-1 items-center justify-center rounded bg-gray-700 hover:bg-blue-600 text-white text-xs sm:text-sm disabled:bg-gray-800 disabled:text-gray-500 h-6 sm:h-7"
+            className="w-[64px] sm:w-[120px] flex flex-1 items-center justify-center rounded bg-gray-700 hover:bg-blue-600 text-white text-[10px] sm:text-sm disabled:bg-gray-800 disabled:text-gray-500 h-6 sm:h-7"
             disabled={claimableOpenOrders.length === 0}
             onClick={async () => {
               await claims(claimableOpenOrders)
@@ -375,7 +375,7 @@ export const LimitContainer = () => {
             text={`Claim (${claimableOpenOrders.length})`}
           />
           <ActionButton
-            className="w-[64px] sm:w-[120px] flex flex-1 items-center justify-center rounded bg-gray-700 hover:bg-blue-600 text-white text-xs sm:text-sm disabled:bg-gray-800 disabled:text-gray-500 h-6 sm:h-7"
+            className="w-[64px] sm:w-[120px] flex flex-1 items-center justify-center rounded bg-gray-700 hover:bg-blue-600 text-white text-[10px] sm:text-sm disabled:bg-gray-800 disabled:text-gray-500 h-6 sm:h-7"
             disabled={cancellableOpenOrders.length === 0}
             onClick={async () => {
               await cancels(cancellableOpenOrders)
@@ -385,7 +385,7 @@ export const LimitContainer = () => {
         </div>
       </div>
       <div className="flex w-full justify-center mt-0 sm:mt-4">
-        <div className="flex flex-col w-full h-full lg:grid lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="flex flex-col w-full lg:w-auto h-full lg:grid lg:grid-cols-3 gap-4 sm:gap-6">
           {openOrders.map((openOrder, index) => (
             <OpenOrderCard
               openOrder={openOrder}
