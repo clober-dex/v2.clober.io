@@ -10,7 +10,7 @@ import {
 
 import { useChainContext } from '../chain-context'
 import { Currency } from '../../model/currency'
-import { useTransactionContext } from '../transaction-context'
+import { Confirmation, useTransactionContext } from '../transaction-context'
 import { CHAIN_IDS } from '../../constants/chain'
 import { CONTRACT_ADDRESSES } from '../../constants/addresses'
 import { permit20 } from '../../utils/permit20'
@@ -341,7 +341,10 @@ export const LimitContractProvider = ({
                 ),
                 direction: 'out',
               },
-            ],
+            ].filter(
+              ({ value, currency }) =>
+                parseUnits(value, currency.decimals) > 0n,
+            ) as Confirmation['fields'],
           })
 
           // limit
@@ -403,7 +406,10 @@ export const LimitContractProvider = ({
                 ),
                 direction: 'out',
               },
-            ],
+            ].filter(
+              ({ value, currency }) =>
+                parseUnits(value, currency.decimals) > 0n,
+            ) as Confirmation['fields'],
           })
           const makeAmount =
             amount -
