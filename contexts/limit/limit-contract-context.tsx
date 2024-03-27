@@ -697,7 +697,7 @@ export const LimitContractProvider = ({
         }
 
         setConfirmation({
-          title: `Cancel Order`,
+          title: `Claim Order`,
           body: 'Please confirm in your wallet.',
           fields: Object.values(claimCurrencyMaps).map(
             ({ currency, amount }) => ({
