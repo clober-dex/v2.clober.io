@@ -555,24 +555,37 @@ export const LimitContractProvider = ({
           currency: Currency
           amount: bigint
         }
-      } = openOrders.reduce(
-        (acc, order) => {
-          const refundCurrency = order.inputToken
-          if (!acc[refundCurrency.address]) {
-            acc[refundCurrency.address] = {
-              currency: refundCurrency,
-              amount: 0n,
-            }
-          }
-          acc[refundCurrency.address].amount += order.quoteAmount
-          return acc
-        },
-        {} as {
-          [currency: `0x${string}`]: {
-            currency: Currency
-            amount: bigint
-          }
-        },
+      } = Object.fromEntries(
+        Object.entries(
+          openOrders.reduce(
+            (acc, order) => {
+              const refundCurrency = order.inputToken
+              const claimCurrency = order.outputToken
+              if (!acc[refundCurrency.address]) {
+                acc[refundCurrency.address] = {
+                  currency: refundCurrency,
+                  amount: 0n,
+                }
+              }
+              if (!acc[claimCurrency.address]) {
+                acc[claimCurrency.address] = {
+                  currency: claimCurrency,
+                  amount: 0n,
+                }
+              }
+              acc[refundCurrency.address].amount +=
+                order.quoteAmount - order.baseFilledAmount
+              acc[claimCurrency.address].amount += order.claimableAmount
+              return acc
+            },
+            {} as {
+              [currency: `0x${string}`]: {
+                currency: Currency
+                amount: bigint
+              }
+            },
+          ),
+        ).filter(([, { amount }]) => amount > 0n),
       )
 
       try {
