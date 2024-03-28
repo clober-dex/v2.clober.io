@@ -9,8 +9,8 @@ export const CONTRACT_ADDRESSES: {
   }
 } = {
   [CHAIN_IDS.ARBITRUM_SEPOLIA]: {
-    Controller: getAddress('0xcD79DE6Ee6644A225A87D2F40D3E3DeA8f9F7B39'),
-    BookManager: getAddress('0xe10D92B75Bdb0925f3ABAa2c3E0f93f4ef4b2491'),
+    Controller: getAddress('0x2489e8daffb7A4900074840C24e8096A25e2Eeb0'),
+    BookManager: getAddress('0x6411E5f824E1386d62ea20bFE5d815933F7E8491'),
   },
   [CHAIN_IDS.BERA_CHAIN_TESTNET]: {
     Controller: zeroAddress,
