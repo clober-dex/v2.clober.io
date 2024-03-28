@@ -25,8 +25,6 @@ type LimitContext = {
   setCurrencies: (currencies: Currency[]) => void
   isBid: boolean
   setIsBid: (isBid: (prevState: boolean) => boolean) => void
-  selectMode: 'none' | 'settings'
-  setSelectMode: (selectMode: 'none' | 'settings') => void
   showInputCurrencySelect: boolean
   setShowInputCurrencySelect: (showInputCurrencySelect: boolean) => void
   inputCurrency: Currency | undefined
@@ -64,8 +62,6 @@ const Context = React.createContext<LimitContext>({
   setCurrencies: () => {},
   isBid: true,
   setIsBid: () => {},
-  selectMode: 'none',
-  setSelectMode: () => {},
   showInputCurrencySelect: false,
   setShowInputCurrencySelect: () => {},
   inputCurrency: undefined,
@@ -133,7 +129,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { selectedChain } = useChainContext()
 
   const [isBid, setIsBid] = useState(true)
-  const [selectMode, setSelectMode] = useState<'none' | 'settings'>('none')
 
   const [showInputCurrencySelect, setShowInputCurrencySelect] = useState(false)
   const [inputCurrency, _setInputCurrency] = useState<Currency | undefined>(
@@ -400,8 +395,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
         setCurrencies,
         isBid,
         setIsBid,
-        selectMode,
-        setSelectMode,
         showInputCurrencySelect,
         setShowInputCurrencySelect,
         inputCurrency,

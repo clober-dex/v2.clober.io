@@ -5,12 +5,12 @@ import NumberInput from '../input/number-input'
 import CurrencyAmountInput from '../input/currency-amount-input'
 import { Currency } from '../../model/currency'
 import { ArrowDownSvg } from '../svg/arrow-down-svg'
-import { SettingSvg } from '../svg/setting-svg'
 import { ActionButton, ActionButtonProps } from '../button/action-button'
 import CurrencySelect from '../selector/currency-select'
 import { Balances } from '../../model/balances'
 import { Prices } from '../../model/prices'
 import { Market } from '../../model/market'
+import CheckIcon from '../icon/check-icon'
 
 export const LimitForm = ({
   chainId,
@@ -22,7 +22,8 @@ export const LimitForm = ({
   setPriceInput,
   selectedMarket,
   isBid,
-  setSelectMode,
+  isPostOnly,
+  setIsPostOnly,
   showInputCurrencySelect,
   setShowInputCurrencySelect,
   inputCurrency,
@@ -49,7 +50,8 @@ export const LimitForm = ({
   setPriceInput: (priceInput: string) => void
   selectedMarket?: Market
   isBid: boolean
-  setSelectMode: (selectMode: 'none' | 'settings') => void
+  isPostOnly: boolean
+  setIsPostOnly: (isPostOnly: (prevState: boolean) => boolean) => void
   showInputCurrencySelect: boolean
   setShowInputCurrencySelect: (showInputCurrencySelect: boolean) => void
   inputCurrency: Currency | undefined
@@ -156,13 +158,11 @@ export const LimitForm = ({
         </div>
       </div>
       <div className="flex justify-end mb-3 sm:mb-4">
-        <button
-          className="flex items-center gap-1 text-blue-500 bg-blue-500 hover:bg-opacity-30 bg-opacity-20 rounded px-2 text-xs sm:text-sm h-6 sm:h-7"
-          onClick={() => setSelectMode('settings')}
-        >
-          <SettingSvg className="w-3 h-3 sm:w-4 sm:h-4" />
-          Setting
-        </button>
+        <CheckIcon
+          checked={isPostOnly}
+          onCheck={() => setIsPostOnly((prevState) => !prevState)}
+          text="Post Only"
+        />
       </div>
       <ActionButton {...actionButtonProps} />
     </>
