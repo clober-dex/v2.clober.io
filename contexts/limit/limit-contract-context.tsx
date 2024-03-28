@@ -288,18 +288,51 @@ export const LimitContractProvider = ({
       const tick = isBid ? fromPrice(price) : fromPrice(invertPrice(price))
       try {
         const unit = await calculateUnit(selectedChain.id, inputCurrency)
+        const key = {
+          base: outputCurrency.address,
+          unit,
+          quote: inputCurrency.address,
+          makerPolicy: MAKER_DEFAULT_POLICY,
+          hooks: zeroAddress,
+          takerPolicy: TAKER_DEFAULT_POLICY,
+        }
         const makeParam = {
-          id: toId({
-            base: outputCurrency.address,
-            unit,
-            quote: inputCurrency.address,
-            makerPolicy: MAKER_DEFAULT_POLICY,
-            hooks: zeroAddress,
-            takerPolicy: TAKER_DEFAULT_POLICY,
-          } as BookKey),
+          id: toId(key),
           tick,
           quoteAmount: amount,
           hookData: zeroHash,
+        }
+
+        const open = await isOpen(selectedChain.id, key)
+        if (!open) {
+          setConfirmation({
+            title: `Open Book`,
+            body: 'Please confirm in your wallet.',
+            fields: [],
+          })
+
+          await writeContract(publicClient, walletClient, {
+            address:
+              CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
+            abi: CONTROLLER_ABI,
+            functionName: 'open',
+            args: [
+              [
+                {
+                  key: {
+                    base: key.base,
+                    unit: Number(key.unit),
+                    quote: key.quote,
+                    makerPolicy: Number(key.makerPolicy.value),
+                    hooks: key.hooks,
+                    takerPolicy: Number(key.takerPolicy.value),
+                  },
+                  hookData: makeParam.hookData,
+                },
+              ],
+              getDeadlineTimestampInSeconds(),
+            ],
+          })
         }
 
         const permitAmount = !isAddressEqual(inputCurrency.address, zeroAddress)
