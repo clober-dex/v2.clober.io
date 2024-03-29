@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { usePublicClient, useQueryClient, useWalletClient } from 'wagmi'
+import { useQueryClient, useWalletClient } from 'wagmi'
 import {
   encodeAbiParameters,
   isAddressEqual,
@@ -132,7 +132,6 @@ export const LimitContractProvider = ({
 }: React.PropsWithChildren<{}>) => {
   const queryClient = useQueryClient()
 
-  const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
   const { setConfirmation } = useTransactionContext()
   const { selectedChain } = useChainContext()
@@ -179,7 +178,7 @@ export const LimitContractProvider = ({
             fields: [],
           })
 
-          await writeContract(publicClient, walletClient, {
+          await writeContract(walletClient, {
             address:
               CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
             abi: CONTROLLER_ABI,
@@ -238,7 +237,7 @@ export const LimitContractProvider = ({
               !WETH_ADDRESSES[selectedChain.id as CHAIN_IDS].includes(address),
           )
 
-        await writeContract(publicClient, walletClient, {
+        await writeContract(walletClient, {
           address: CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
           abi: CONTROLLER_ABI,
           functionName: 'make',
@@ -269,7 +268,7 @@ export const LimitContractProvider = ({
         setConfirmation(undefined)
       }
     },
-    [publicClient, queryClient, selectedChain, setConfirmation, walletClient],
+    [queryClient, selectedChain, setConfirmation, walletClient],
   )
 
   const limit = useCallback(
@@ -311,7 +310,7 @@ export const LimitContractProvider = ({
             fields: [],
           })
 
-          await writeContract(publicClient, walletClient, {
+          await writeContract(walletClient, {
             address:
               CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
             abi: CONTROLLER_ABI,
@@ -387,7 +386,7 @@ export const LimitContractProvider = ({
           })
 
           // only make
-          await writeContract(publicClient, walletClient, {
+          await writeContract(walletClient, {
             address:
               CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
             abi: CONTROLLER_ABI,
@@ -442,7 +441,7 @@ export const LimitContractProvider = ({
           })
 
           // limit
-          await writeContract(publicClient, walletClient, {
+          await writeContract(walletClient, {
             address:
               CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
             abi: CONTROLLER_ABI,
@@ -513,7 +512,7 @@ export const LimitContractProvider = ({
             )
 
           // execute
-          await writeContract(publicClient, walletClient, {
+          await writeContract(walletClient, {
             address:
               CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
             abi: CONTROLLER_ABI,
@@ -574,7 +573,7 @@ export const LimitContractProvider = ({
         setConfirmation(undefined)
       }
     },
-    [publicClient, queryClient, selectedChain, setConfirmation, walletClient],
+    [queryClient, selectedChain, setConfirmation, walletClient],
   )
 
   const cancels = useCallback(
@@ -629,7 +628,7 @@ export const LimitContractProvider = ({
           CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
         )
         if (!isApprovedForAll) {
-          await writeContract(publicClient, walletClient, {
+          await writeContract(walletClient, {
             address:
               CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].BookManager,
             abi: ERC721_ABI,
@@ -662,7 +661,7 @@ export const LimitContractProvider = ({
               !WETH_ADDRESSES[selectedChain.id as CHAIN_IDS].includes(address),
           )
 
-        await writeContract(publicClient, walletClient, {
+        await writeContract(walletClient, {
           address: CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
           abi: CONTROLLER_ABI,
           functionName: 'cancel',
@@ -688,7 +687,7 @@ export const LimitContractProvider = ({
         setConfirmation(undefined)
       }
     },
-    [publicClient, queryClient, selectedChain, setConfirmation, walletClient],
+    [queryClient, selectedChain, setConfirmation, walletClient],
   )
 
   const claims = useCallback(
@@ -730,7 +729,7 @@ export const LimitContractProvider = ({
           CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
         )
         if (!isApprovedForAll) {
-          await writeContract(publicClient, walletClient, {
+          await writeContract(walletClient, {
             address:
               CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].BookManager,
             abi: ERC721_ABI,
@@ -763,7 +762,7 @@ export const LimitContractProvider = ({
               !WETH_ADDRESSES[selectedChain.id as CHAIN_IDS].includes(address),
           )
 
-        await writeContract(publicClient, walletClient, {
+        await writeContract(walletClient, {
           address: CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
           abi: CONTROLLER_ABI,
           functionName: 'claim',
@@ -788,7 +787,7 @@ export const LimitContractProvider = ({
         setConfirmation(undefined)
       }
     },
-    [publicClient, queryClient, selectedChain, setConfirmation, walletClient],
+    [queryClient, selectedChain, setConfirmation, walletClient],
   )
 
   return (
