@@ -1,24 +1,31 @@
 import {
+  createPublicClient,
   Hash,
-  PublicClient,
+  http,
   SimulateContractParameters,
   WriteContractParameters,
 } from 'viem'
 import { GetWalletClientResult } from '@wagmi/core'
 
+import { supportChains } from '../constants/chain'
+
 export async function writeContract(
-  publicClient: PublicClient,
   walletClient: GetWalletClientResult,
   args: WriteContractParameters | SimulateContractParameters,
 ): Promise<Hash | undefined> {
   if (!walletClient) {
     return
   }
+  const publicClient = createPublicClient({
+    chain: supportChains.find((chain) => chain.id === walletClient.chain.id),
+    transport: http(),
+  })
   const useSimulate = !(process.env.NEXT_PUBLIC_USE_SIMULATE === 'false')
   if (useSimulate) {
-    const { request } = await publicClient.simulateContract(
-      args as SimulateContractParameters,
-    )
+    const { request } = await publicClient.simulateContract({
+      ...args,
+      account: walletClient.account,
+    } as SimulateContractParameters)
     const hash = await walletClient.writeContract(request)
     await publicClient.waitForTransactionReceipt({
       hash,
