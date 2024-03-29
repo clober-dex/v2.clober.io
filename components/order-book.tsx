@@ -30,10 +30,7 @@ export default function OrderBook({
   )
 
   return (
-    <div
-      {...props}
-      className="flex flex-col p-4 sm:p-6 bg-gray-900 rounded-lg sm:rounded-xl gap-6 w-[360px] sm:w-[480px]"
-    >
+    <div {...props}>
       <div className="flex items-center justify-between">
         <div className="text-sm sm:text-base text-white font-bold">{name}</div>
         <div className="flex items-center gap-2">

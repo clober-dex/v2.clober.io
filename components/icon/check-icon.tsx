@@ -25,8 +25,12 @@ export default function CheckIcon({
       onClick={() => onCheck(!checked)}
     >
       <div className="flex items-center gap-2">
-        {checked ? <CheckSelectedSvg /> : <CheckDefaultSvg />}
-        {label && <p className="text-sm text-white">{label}</p>}
+        {checked ? (
+          <CheckSelectedSvg className="w-3 h-3 sm:w-4 sm:h-4" />
+        ) : (
+          <CheckDefaultSvg className="w-3 h-3 sm:w-4 sm:h-4" />
+        )}
+        {label && <p className="text-xs sm:text-sm text-white">{label}</p>}
       </div>
     </div>
   )

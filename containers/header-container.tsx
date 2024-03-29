@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { useAccount } from 'wagmi'
+import { useRouter } from 'next/router'
 
 import { useChainContext } from '../contexts/chain-context'
 import ChainSelector from '../components/selector/chain-selector'
@@ -12,6 +13,7 @@ import { DiscordIconSvg } from '../components/svg/discord-icon-svg'
 import { TwitterLogoSvg } from '../components/svg/twitter-logo-svg'
 
 const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
+  const router = useRouter()
   const { selectedChain, setSelectedChain } = useChainContext()
   const { address, status } = useAccount()
 
@@ -60,12 +62,16 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
           chains={supportChains}
         />
         <WalletSelector address={address} status={status} />
-        <button
-          className="w-8 h-8 lg:hover:bg-gray-200 hover:bg-gray-700 rounded sm:rounded-lg flex items-center justify-center lg:hidden"
-          onClick={onMenuClick}
-        >
-          <MenuSvg />
-        </button>
+        {router.pathname !== '/iframe' ? (
+          <button
+            className="w-8 h-8 lg:hover:bg-gray-200 hover:bg-gray-700 rounded sm:rounded-lg flex items-center justify-center lg:hidden"
+            onClick={onMenuClick}
+          >
+            <MenuSvg />
+          </button>
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   )

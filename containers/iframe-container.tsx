@@ -24,7 +24,7 @@ import { getMarketId } from '../utils/market'
 
 import { ChartContainer } from './chart-container'
 
-export const LimitContainer = () => {
+export const IframeContainer = () => {
   const { selectedChain } = useChainContext()
   const { selectedMarket } = useMarketContext()
   const { openOrders } = useOpenOrderContext()
@@ -59,7 +59,6 @@ export const LimitContainer = () => {
     currencies,
     setCurrencies,
   } = useLimitContext()
-  const [showOrderBook, setShowOrderBook] = useState(true)
 
   const [depthClickedIndex, setDepthClickedIndex] = useState<
     | {
@@ -220,39 +219,10 @@ export const LimitContainer = () => {
     ],
   )
 
-  const claimableOpenOrders = openOrders.filter(
-    (openOrder) => openOrder.claimableAmount > 0n,
-  )
-  const cancellableOpenOrders = openOrders.filter(
-    (openOrder) => openOrder.cancelable,
-  )
-
   return (
-    <div className="flex flex-col w-fit mb-4 sm:mb-6">
-      <button
-        className="rounded bg-blue-500 bg-opacity-20 text-blue-500 px-2 py-1 w-fit mb-3 text-xs sm:text-sm"
-        onClick={() => setShowOrderBook(!showOrderBook)}
-      >
-        {showOrderBook ? 'View Chart' : 'View Order Book'}
-      </button>
+    <div className="flex flex-col w-full mb-4 sm:mb-6">
       <div className="flex flex-col w-full lg:flex-row gap-4">
-        {!showOrderBook && !selectedMarket ? (
-          <div className="flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[704px]" />
-        ) : (
-          <></>
-        )}
-        {!showOrderBook && selectedMarket ? (
-          <ChartContainer selectedMarket={selectedMarket} />
-        ) : (
-          <></>
-        )}
-        {showOrderBook && !quoteCurrency && !baseCurrency ? (
-          <div className="flex flex-col p-4 sm:p-6 bg-gray-900 rounded-lg sm:rounded-xl gap-6 w-[360px] sm:w-[480px]" />
-        ) : (
-          <></>
-        )}
-        {showOrderBook &&
-        quoteCurrency &&
+        {quoteCurrency &&
         baseCurrency &&
         availableDecimalPlacesGroups &&
         selectedDecimalPlaces ? (
@@ -264,12 +234,12 @@ export const LimitContainer = () => {
             selectedDecimalPlaces={selectedDecimalPlaces}
             setSelectedDecimalPlaces={setSelectedDecimalPlaces}
             setDepthClickedIndex={setDepthClickedIndex}
-            className="flex flex-col p-4 sm:p-6 bg-gray-900 rounded-lg sm:rounded-xl gap-6 w-[360px] sm:w-[480px]"
+            className="flex flex-col p-4 sm:p-6 bg-gray-900 rounded-lg sm:rounded-xl gap-6 w-full"
           />
         ) : (
           <></>
         )}
-        <div className="flex flex-col rounded-2xl bg-gray-900 p-6 w-[360px] sm:w-[480px] lg:h-[460px]">
+        <div className="flex flex-col rounded-2xl bg-gray-900 p-6 w-full">
           <LimitForm
             chainId={selectedChain.id}
             prices={{}} // todo
@@ -353,57 +323,6 @@ export const LimitContainer = () => {
                         : `Limit ${isBid ? 'Bid' : 'Ask'}`,
             }}
           />
-        </div>
-      </div>
-      <div className="flex pb-4 pt-8 px-1 sm:border-solid border-b-gray-800 border-b-[1.5px]">
-        <div className="flex gap-6">
-          <div
-            className={`m-0 p-0 bg-transparent text-white ${textStyles.body2}`}
-          >
-            Open Orders
-          </div>
-        </div>
-        <div className="flex gap-1 sm:gap-2 ml-auto h-6">
-          <ActionButton
-            className="w-[64px] sm:w-[120px] flex flex-1 items-center justify-center rounded bg-gray-700 hover:bg-blue-600 text-white text-[10px] sm:text-sm disabled:bg-gray-800 disabled:text-gray-500 h-6 sm:h-7"
-            disabled={claimableOpenOrders.length === 0}
-            onClick={async () => {
-              await claims(claimableOpenOrders)
-            }}
-            text={`Claim (${claimableOpenOrders.length})`}
-          />
-          <ActionButton
-            className="w-[64px] sm:w-[120px] flex flex-1 items-center justify-center rounded bg-gray-700 hover:bg-blue-600 text-white text-[10px] sm:text-sm disabled:bg-gray-800 disabled:text-gray-500 h-6 sm:h-7"
-            disabled={cancellableOpenOrders.length === 0}
-            onClick={async () => {
-              await cancels(cancellableOpenOrders)
-            }}
-            text={`Cancel (${cancellableOpenOrders.length})`}
-          />
-        </div>
-      </div>
-      <div className="flex w-full justify-center mt-0 sm:mt-4">
-        <div className="flex flex-col w-full lg:w-auto h-full lg:grid lg:grid-cols-3 gap-4 sm:gap-6">
-          {openOrders.map((openOrder, index) => (
-            <OpenOrderCard
-              openOrder={openOrder}
-              key={index}
-              claimActionButtonProps={{
-                disabled: openOrder.claimableAmount === 0n,
-                onClick: async () => {
-                  await claims([openOrder])
-                },
-                text: 'Claim',
-              }}
-              cancelActionButtonProps={{
-                disabled: !openOrder.cancelable,
-                onClick: async () => {
-                  await cancels([openOrder])
-                },
-                text: 'Cancel',
-              }}
-            />
-          ))}
         </div>
       </div>
     </div>
