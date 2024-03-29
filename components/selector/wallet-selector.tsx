@@ -22,7 +22,7 @@ export function WalletSelector({
 
   return (
     <div className="flex items-center">
-      {status === 'disconnected' ? (
+      {status === 'disconnected' || status === 'connecting' ? (
         <ConnectButton openConnectModal={openConnectModal} />
       ) : openAccountModal && address ? (
         <UserButton address={address} openAccountModal={openAccountModal} />
