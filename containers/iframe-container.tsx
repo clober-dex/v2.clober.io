@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { isAddressEqual, parseUnits } from 'viem'
 import BigNumber from 'bignumber.js'
 import { useWalletClient } from 'wagmi'
+import Link from 'next/link'
 
 import { LimitForm } from '../components/form/limit-form'
 import OrderBook from '../components/order-book'
@@ -9,26 +10,19 @@ import { useChainContext } from '../contexts/chain-context'
 import { useMarketContext } from '../contexts/limit/market-context'
 import { formatUnits } from '../utils/bigint'
 import { parsePrice } from '../utils/prices'
-import { textStyles } from '../themes/text-styles'
 import { toPlacesString } from '../utils/bignumber'
-import { useOpenOrderContext } from '../contexts/limit/open-order-context'
 import { useLimitContext } from '../contexts/limit/limit-context'
 import {
   calculateOutputCurrencyAmountString,
   calculatePriceInputString,
 } from '../utils/order-book'
-import { ActionButton } from '../components/button/action-button'
-import { OpenOrderCard } from '../components/card/open-order-card'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
 import { getMarketId } from '../utils/market'
-
-import { ChartContainer } from './chart-container'
 
 export const IframeContainer = () => {
   const { selectedChain } = useChainContext()
   const { selectedMarket } = useMarketContext()
-  const { openOrders } = useOpenOrderContext()
-  const { limit, make, cancels, claims } = useLimitContractContext()
+  const { limit, make } = useLimitContractContext()
   const { data: walletClient } = useWalletClient()
   const {
     isBid,
@@ -221,6 +215,13 @@ export const IframeContainer = () => {
 
   return (
     <div className="flex flex-col w-full mb-4 sm:mb-6">
+      <Link
+        href={`/limit?chain=${selectedChain.id}&inputCurrency=${inputCurrency?.address}&outputCurrency=${outputCurrency?.address}`}
+        target="_blank"
+        className="ml-auto rounded bg-blue-500 bg-opacity-20 text-blue-500 px-2 py-1 w-fit mb-3 text-sm"
+      >
+        Open orders
+      </Link>
       <div className="flex flex-col w-full lg:flex-row gap-4">
         {quoteCurrency &&
         baseCurrency &&
