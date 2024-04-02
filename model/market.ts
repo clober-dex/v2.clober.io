@@ -116,14 +116,18 @@ export class Market {
           isAddressEqual(book.quote.address, this.quote.address),
         )
         .flatMap((book) => book.depths)
-      return this.takeInner({ depths: bidDepths, limitPrice, amountOut })
+      return this.takeInner({
+        depths: bidDepths,
+        limitPrice: invertPrice(limitPrice),
+        amountOut,
+      })
     } else {
       const askDepths = this.books
         .filter((book) => isAddressEqual(book.quote.address, this.base.address))
         .flatMap((book) => book.depths)
       return this.takeInner({
         depths: askDepths,
-        limitPrice: invertPrice(limitPrice),
+        limitPrice,
         amountOut,
       })
     }
@@ -144,14 +148,18 @@ export class Market {
           isAddressEqual(book.quote.address, this.quote.address),
         )
         .flatMap((book) => book.depths)
-      return this.spendInner({ depths: bidDepths, limitPrice, amountIn })
+      return this.spendInner({
+        depths: bidDepths,
+        limitPrice: invertPrice(limitPrice),
+        amountIn,
+      })
     } else {
       const askDepths = this.books
         .filter((book) => isAddressEqual(book.quote.address, this.base.address))
         .flatMap((book) => book.depths)
       return this.spendInner({
         depths: askDepths,
-        limitPrice: invertPrice(limitPrice),
+        limitPrice,
         amountIn,
       })
     }
