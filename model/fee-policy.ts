@@ -20,9 +20,15 @@ export class FeePolicy {
     this.value = (rate + FeePolicy.MAX_FEE_RATE) | mask
   }
 
-  public static from(value: bigint): FeePolicy {
+  public static from(
+    value: bigint,
+    reverseUseQuote: boolean = false,
+  ): FeePolicy {
     const usesQuote = value >> 23n > 0n
-    return new FeePolicy(usesQuote, FeePolicy.getRateFromValue(value))
+    return new FeePolicy(
+      reverseUseQuote ? !usesQuote : usesQuote,
+      FeePolicy.getRateFromValue(value),
+    )
   }
 
   private static getRateFromValue = (value: bigint): bigint => {

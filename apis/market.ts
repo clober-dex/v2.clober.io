@@ -50,13 +50,14 @@ export async function fetchMarkets(chainId: CHAIN_IDS): Promise<Market[]> {
     const baseDecimals = isAddressEqual(outputToken.address, base)
       ? outputToken.decimals
       : inputToken.decimals
+    const isBid = isAddressEqual(inputToken.address, quote)
     return new Market({
       chainId: chainId,
       tokens: [outputToken, inputToken],
-      makerPolicy: FeePolicy.from(BigInt(book.makerPolicy)),
+      makerPolicy: FeePolicy.from(BigInt(book.makerPolicy), !isBid),
       hooks: getAddress(book.hooks),
-      takerPolicy: FeePolicy.from(BigInt(book.takerPolicy)),
-      latestPrice: isAddressEqual(inputToken.address, quote)
+      takerPolicy: FeePolicy.from(BigInt(book.takerPolicy), !isBid),
+      latestPrice: isBid
         ? formatPrice(BigInt(book.latestPrice), quoteDecimals, baseDecimals)
         : formatPrice(
             invertPrice(BigInt(book.latestPrice)),
