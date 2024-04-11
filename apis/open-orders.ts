@@ -9,7 +9,7 @@ import { getMarketId } from '../utils/market'
 import { quoteToBase } from '../utils/tick'
 import { fetchCurrency } from '../utils/currency'
 
-const { getOpenOrders, getOpenOrder } = getBuiltGraphSDK()
+const { getOpenOrders } = getBuiltGraphSDK()
 
 export async function fetchOpenOrders(
   chainId: CHAIN_IDS,
@@ -77,62 +77,4 @@ export async function fetchOpenOrders(
       cancelable: rawAmount > rawFilledAmount,
     }
   })
-}
-
-export async function fetchOpenOrder(
-  chainId: CHAIN_IDS,
-  orderId: string,
-): Promise<OpenOrder | null> {
-  const { openOrder } = await getOpenOrder(
-    {
-      orderId: orderId,
-    },
-    {
-      url: SUBGRAPH_URL[chainId],
-    },
-  )
-  if (!openOrder) {
-    return null
-  }
-  const chain = findSupportChain(chainId) as Chain
-  const inputToken = await fetchCurrency(
-    chainId,
-    getAddress(openOrder.book.quote.id),
-  )
-  const outputToken = await fetchCurrency(
-    chainId,
-    getAddress(openOrder.book.base.id),
-  )
-  const { quote } = getMarketId(chainId, [
-    inputToken.address,
-    outputToken.address,
-  ])
-  const isBid = isAddressEqual(quote, inputToken.address)
-  const tick = BigInt(openOrder.tick)
-  const rawAmount = BigInt(openOrder.rawAmount)
-  const rawFilledAmount = BigInt(openOrder.rawFilledAmount)
-  const unit = BigInt(openOrder.book.unit)
-  const quoteAmount = unit * rawAmount
-  const rawClaimableAmount = BigInt(openOrder.rawClaimableAmount)
-  return {
-    id: BigInt(openOrder.id),
-    isBid,
-    bookId: BigInt(openOrder.book.id),
-    inputToken,
-    outputToken,
-    tick,
-    orderIndex: BigInt(openOrder.orderIndex),
-    txHash: openOrder.txHash as `0x${string}`,
-    txUrl: chain.blockExplorers
-      ? `${chain.blockExplorers.default.url}/tx/${openOrder.txHash}`
-      : '',
-    price: BigInt(openOrder.price),
-    quoteAmount,
-    baseAmount: isBid ? quoteToBase(tick, quoteAmount, false) : quoteAmount,
-    baseFilledAmount: isBid
-      ? quoteToBase(tick, unit * rawFilledAmount, false)
-      : unit * rawFilledAmount,
-    claimableAmount: quoteToBase(tick, unit * rawClaimableAmount, false),
-    cancelable: rawAmount > rawFilledAmount,
-  }
 }
