@@ -22,7 +22,7 @@ import { getMarketId } from '../utils/market'
 export const IframeContainer = () => {
   const { selectedChain } = useChainContext()
   const { selectedMarket } = useMarketContext()
-  const { limit, make } = useLimitContractContext()
+  const { limit } = useLimitContractContext()
   const { data: walletClient } = useWalletClient()
   const {
     isBid,
@@ -295,33 +295,25 @@ export const IframeContainer = () => {
                 if (!inputCurrency || !outputCurrency) {
                   return
                 }
-                if (isPostOnly) {
-                  await make(inputCurrency, outputCurrency, amount, price)
-                  return
-                }
-                if (selectedMarket) {
-                  await limit(
-                    selectedMarket,
-                    inputCurrency,
-                    outputCurrency,
-                    amount,
-                    price,
-                  )
-                } else {
-                  await make(inputCurrency, outputCurrency, amount, price)
-                }
+                await limit(
+                  inputCurrency,
+                  outputCurrency,
+                  inputCurrencyAmount,
+                  priceInput,
+                  isPostOnly,
+                )
               },
               text: !walletClient
                 ? 'Connect wallet'
                 : !inputCurrency
-                  ? 'Select input currency'
-                  : !outputCurrency
-                    ? 'Select output currency'
-                    : amount === 0n
-                      ? 'Enter amount'
-                      : amount > balances[inputCurrency.address]
-                        ? 'Insufficient balance'
-                        : `Limit ${isBid ? 'Bid' : 'Ask'}`,
+                ? 'Select input currency'
+                : !outputCurrency
+                ? 'Select output currency'
+                : amount === 0n
+                ? 'Enter amount'
+                : amount > balances[inputCurrency.address]
+                ? 'Insufficient balance'
+                : `Limit ${isBid ? 'Bid' : 'Ask'}`,
             }}
           />
         </div>

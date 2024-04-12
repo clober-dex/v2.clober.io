@@ -1,11 +1,10 @@
 import { getAddress, isAddressEqual, zeroAddress } from 'viem'
+import { Market } from '@clober/v2-sdk'
 
 import { STABLE_COIN_ADDRESSES, WETH_ADDRESSES } from '../constants/currency'
-import { Market } from '../model/market'
 
 import { isCurrencyEqual } from './currency'
 import { isOrderBookEqual } from './order-book'
-import { isFeePolicyEqual } from './fee-policy'
 
 export const getMarketId = (
   chainId: number,
@@ -78,14 +77,12 @@ export const isMarketEqual = (a: Market | undefined, b: Market | undefined) => {
     return false
   }
   return (
-    a.id === b.id &&
     isCurrencyEqual(a.quote, b.quote) &&
     isCurrencyEqual(a.base, b.base) &&
-    isFeePolicyEqual(a.makerPolicy, b.makerPolicy) &&
-    isAddressEqual(a.hooks, b.hooks) &&
-    isFeePolicyEqual(a.takerPolicy, b.takerPolicy) &&
-    a.latestPrice === b.latestPrice &&
-    a.latestTimestamp === b.latestTimestamp &&
+    a.makerFee === b.makerFee &&
+    a.takerFee === b.takerFee &&
+    a.askBookOpen === b.askBookOpen &&
+    a.bidBookOpen === b.bidBookOpen &&
     isOrderBookEqual(a.bids, b.bids) &&
     isOrderBookEqual(a.asks, b.asks)
   )

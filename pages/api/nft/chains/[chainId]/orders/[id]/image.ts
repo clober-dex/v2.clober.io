@@ -24,7 +24,10 @@ export default async function handler(
       return
     }
 
-    const openOrder = await getOpenOrder(Number(chainId), id)
+    const openOrder = await getOpenOrder({
+      chainId: Number(chainId),
+      id,
+    })
 
     if (!openOrder) {
       res.json({

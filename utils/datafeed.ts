@@ -1,3 +1,5 @@
+import { Market } from '@clober/v2-sdk'
+
 import {
   Bar,
   DatafeedConfiguration,
@@ -14,7 +16,6 @@ import {
 } from '../public/static/charting_library'
 import { CHAIN_IDS } from '../constants/chain'
 import { fetchChartLogs, fetchLatestChartLog } from '../apis/chart-logs'
-import { Market } from '../model/market'
 
 import { SUPPORTED_INTERVALS } from './chart'
 
@@ -47,10 +48,12 @@ const configurationData: Partial<DatafeedConfiguration> &
 export default class DataFeed implements IBasicDataFeed {
   private chainId: CHAIN_IDS
   private market: Market
+
   constructor(chainId: CHAIN_IDS, market: Market) {
     this.chainId = chainId
     this.market = market
   }
+
   onReady(callback: OnReadyCallback) {
     setTimeout(() => callback(configurationData))
   }
@@ -73,7 +76,10 @@ export default class DataFeed implements IBasicDataFeed {
     onResolve: ResolveCallback,
     onError: ErrorCallback,
   ) {
-    const { close } = await fetchLatestChartLog(this.chainId, this.market.id)
+    const { close } = await fetchLatestChartLog(
+      this.chainId,
+      buildMarketCode(this.market),
+    )
     if (close === '0') {
       onError('cannot resolve symbol')
       return
@@ -115,7 +121,7 @@ export default class DataFeed implements IBasicDataFeed {
 
       const chartLogs = await fetchChartLogs(
         this.chainId,
-        this.market.id,
+        buildMarketCode(this.market),
         resolutionKey,
         from,
         to,
@@ -159,4 +165,8 @@ export default class DataFeed implements IBasicDataFeed {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   unsubscribeBars(listenerGuid: string) {}
+}
+
+function buildMarketCode(market: Market): string {
+  return `${market.base.address.toLowerCase()}/${market.quote.address.toLowerCase()}`
 }

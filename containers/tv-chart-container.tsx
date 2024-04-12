@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { Market } from '@clober/v2-sdk'
 
 import {
   CustomTimezones,
@@ -10,7 +11,6 @@ import {
 import DataFeed from '../utils/datafeed'
 import { CHAIN_IDS } from '../constants/chain'
 import { SUPPORTED_INTERVALS } from '../utils/chart'
-import { Market } from '../model/market'
 
 function getLanguageFromURL(): LanguageCode | null {
   const regex = new RegExp('[\\?&]lang=([^&#]*)')
