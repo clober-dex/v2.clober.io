@@ -4,7 +4,6 @@ import { isAddressEqual, parseUnits, zeroAddress } from 'viem'
 import {
   cancelOrders,
   claimOrders,
-  getExpectedOutput,
   getMarket,
   limitOrder,
   openMarket,
@@ -19,7 +18,6 @@ import { CONTRACT_ADDRESSES } from '../../constants/addresses'
 import { permit20 } from '../../utils/permit20'
 import { getDeadlineTimestampInSeconds } from '../../utils/date'
 import { toPlacesString } from '../../utils/bignumber'
-import { formatUnits } from '../../utils/bigint'
 import { sendTransaction, writeContract } from '../../utils/wallet'
 import { OpenOrder } from '../../model/open-order'
 import { fetchIsApprovedForAll } from '../../utils/approval'
@@ -69,19 +67,19 @@ export const LimitContractProvider = ({
         token1: outputCurrency.address,
       })
       const isBid = isAddressEqual(inputCurrency.address, market.quote.address)
-      const openNeeded = isBid ? !market.bidBookOpen : !market.askBookOpen
       try {
-        if (openNeeded) {
+        const openTransaction = await openMarket({
+          chainId: selectedChain.id,
+          inputToken: inputCurrency.address,
+          outputToken: outputCurrency.address,
+        })
+        if (openTransaction) {
           setConfirmation({
             title: `Open Book`,
             body: 'Please confirm in your wallet.',
             fields: [],
           })
-          await openMarket({
-            chainId: selectedChain.id,
-            inputToken: inputCurrency.address,
-            outputToken: outputCurrency.address,
-          })
+          await sendTransaction(walletClient, openTransaction)
         }
 
         const permitAmount = !isAddressEqual(inputCurrency.address, zeroAddress)
@@ -96,7 +94,7 @@ export const LimitContractProvider = ({
           permitAmount,
           getDeadlineTimestampInSeconds(),
         )
-        const transaction = await limitOrder({
+        const { transaction, result } = await limitOrder({
           chainId: selectedChain.id,
           userAddress: walletClient.account.address,
           inputToken: inputCurrency.address,
@@ -109,89 +107,22 @@ export const LimitContractProvider = ({
           },
         })
 
-        const { result } = await getExpectedOutput({
-          chainId: selectedChain.id,
-          inputToken: inputCurrency.address,
-          outputToken: outputCurrency.address,
-          amountIn: amount,
-          options: {
-            limitPrice: price,
-          },
+        setConfirmation({
+          title: `Limit ${isBid ? 'Bid' : 'Ask'}`,
+          body: 'Please confirm in your wallet.',
+          fields: [result.make, result.take]
+            .filter(
+              ({ amount }) =>
+                parseUnits(amount, result.make.currency.decimals) > 0n,
+            )
+            .map(({ amount, currency, direction }) => ({
+              currency,
+              label: currency.symbol,
+              value: toPlacesString(amount),
+              direction,
+            })) as Confirmation['fields'],
         })
-        if (postOnly || Object.keys(result).length === 0) {
-          setConfirmation({
-            title: `Limit ${isBid ? 'Bid' : 'Ask'}`,
-            body: 'Please confirm in your wallet.',
-            fields: [
-              {
-                currency: inputCurrency,
-                label: inputCurrency.symbol,
-                value: toPlacesString(amount),
-                direction: 'in',
-              },
-            ],
-          })
-        } else if (Object.keys(result).length === 1) {
-          setConfirmation({
-            title: `Limit ${isBid ? 'Bid' : 'Ask'}`,
-            body: 'Please confirm in your wallet.',
-            fields: [
-              {
-                currency: inputCurrency,
-                label: inputCurrency.symbol,
-                value: toPlacesString(amount),
-                direction: 'in',
-              },
-              {
-                currency: outputCurrency,
-                label: outputCurrency.symbol,
-                value: toPlacesString(
-                  formatUnits(
-                    Object.values(result).reduce(
-                      (acc, { takenAmount }) => acc + takenAmount,
-                      0n,
-                    ),
-                    outputCurrency.decimals,
-                  ),
-                ),
-                direction: 'out',
-              },
-            ].filter(
-              ({ value, currency }) =>
-                parseUnits(value, currency.decimals) > 0n,
-            ) as Confirmation['fields'],
-          })
-        } else {
-          setConfirmation({
-            title: `Limit ${isBid ? 'Bid' : 'Ask'}`,
-            body: 'Please confirm in your wallet.',
-            fields: [
-              {
-                currency: inputCurrency,
-                label: inputCurrency.symbol,
-                value: toPlacesString(amount),
-                direction: 'in',
-              },
-              {
-                currency: outputCurrency,
-                label: outputCurrency.symbol,
-                value: toPlacesString(
-                  formatUnits(
-                    Object.values(result).reduce(
-                      (acc, { takenAmount }) => acc + takenAmount,
-                      0n,
-                    ),
-                    outputCurrency.decimals,
-                  ),
-                ),
-                direction: 'out',
-              },
-            ].filter(
-              ({ value, currency }) =>
-                parseUnits(value, currency.decimals) > 0n,
-            ) as Confirmation['fields'],
-          })
-        }
+
         await sendTransaction(walletClient, transaction)
       } catch (e) {
         console.error(e)
@@ -213,44 +144,6 @@ export const LimitContractProvider = ({
         return
       }
 
-      const refundCurrencyMaps: {
-        [currency: `0x${string}`]: {
-          currency: Currency
-          amount: bigint
-        }
-      } = Object.fromEntries(
-        Object.entries(
-          openOrders.reduce(
-            (acc, order) => {
-              const refundCurrency = order.inputToken
-              const claimCurrency = order.outputToken
-              if (!acc[refundCurrency.address]) {
-                acc[refundCurrency.address] = {
-                  currency: refundCurrency,
-                  amount: 0n,
-                }
-              }
-              if (!acc[claimCurrency.address]) {
-                acc[claimCurrency.address] = {
-                  currency: claimCurrency,
-                  amount: 0n,
-                }
-              }
-              acc[refundCurrency.address].amount +=
-                order.quoteAmount - order.baseFilledAmount
-              acc[claimCurrency.address].amount += order.claimableAmount
-              return acc
-            },
-            {} as {
-              [currency: `0x${string}`]: {
-                currency: Currency
-                amount: bigint
-              }
-            },
-          ),
-        ).filter(([, { amount }]) => amount > 0n),
-      )
-
       try {
         const isApprovedForAll = await fetchIsApprovedForAll(
           selectedChain.id,
@@ -271,7 +164,7 @@ export const LimitContractProvider = ({
           })
         }
 
-        const transaction = await cancelOrders({
+        const { transaction, result } = await cancelOrders({
           chainId: selectedChain.id,
           userAddress: walletClient.account.address,
           ids: openOrders.map((order) => String(order.id)),
@@ -280,14 +173,12 @@ export const LimitContractProvider = ({
         setConfirmation({
           title: `Cancel Order`,
           body: 'Please confirm in your wallet.',
-          fields: Object.values(refundCurrencyMaps).map(
-            ({ currency, amount }) => ({
-              currency,
-              direction: 'out',
-              label: currency.symbol,
-              value: toPlacesString(formatUnits(amount, currency.decimals)),
-            }),
-          ),
+          fields: result.map(({ currency, amount, direction }) => ({
+            currency,
+            label: currency.symbol,
+            value: toPlacesString(amount),
+            direction,
+          })),
         })
         await sendTransaction(walletClient, transaction)
       } catch (e) {
@@ -310,31 +201,6 @@ export const LimitContractProvider = ({
         return
       }
 
-      const claimCurrencyMaps: {
-        [currency: `0x${string}`]: {
-          currency: Currency
-          amount: bigint
-        }
-      } = openOrders.reduce(
-        (acc, order) => {
-          const claimCurrency = order.outputToken
-          if (!acc[claimCurrency.address]) {
-            acc[claimCurrency.address] = {
-              currency: claimCurrency,
-              amount: 0n,
-            }
-          }
-          acc[claimCurrency.address].amount += order.claimableAmount
-          return acc
-        },
-        {} as {
-          [currency: `0x${string}`]: {
-            currency: Currency
-            amount: bigint
-          }
-        },
-      )
-
       try {
         const isApprovedForAll = await fetchIsApprovedForAll(
           selectedChain.id,
@@ -355,7 +221,7 @@ export const LimitContractProvider = ({
           })
         }
 
-        const transaction = await claimOrders({
+        const { transaction, result } = await claimOrders({
           chainId: selectedChain.id,
           userAddress: walletClient.account.address,
           ids: openOrders.map((order) => String(order.id)),
@@ -364,14 +230,12 @@ export const LimitContractProvider = ({
         setConfirmation({
           title: `Claim Order`,
           body: 'Please confirm in your wallet.',
-          fields: Object.values(claimCurrencyMaps).map(
-            ({ currency, amount }) => ({
-              currency,
-              direction: 'out',
-              label: currency.symbol,
-              value: toPlacesString(formatUnits(amount, currency.decimals)),
-            }),
-          ),
+          fields: result.map(({ currency, amount, direction }) => ({
+            currency,
+            label: currency.symbol,
+            value: toPlacesString(amount),
+            direction,
+          })),
         })
         await sendTransaction(walletClient, transaction)
       } catch (e) {
