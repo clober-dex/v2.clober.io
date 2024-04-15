@@ -265,9 +265,9 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
           .map((i) => {
             const minPrice = Math.min(
               selectedMarket.bids.sort((a, b) => b.price - a.price)[0]?.price ??
-                1,
+                Number.MAX_VALUE,
               selectedMarket.asks.sort((a, b) => a.price - b.price)[0]?.price ??
-                1,
+                Number.MAX_VALUE,
             )
             const decimalPlaces = getPriceDecimals(minPrice)
             const label = (10 ** (i - decimalPlaces)).toFixed(
