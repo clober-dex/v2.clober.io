@@ -22,35 +22,6 @@ const R16 = 0x5d6af8dedb81196699c329225ee604n
 const R17 = 0x2216e584f5fa1ea926041bedfe97n
 const R18 = 0x48a170391f7dc42444e8fa2n
 
-export const mostSignificantBit = (x: bigint): bigint => {
-  return BigInt(Math.floor(Math.log2(Number(x))))
-}
-
-export const log2 = (x: bigint): bigint => {
-  const msb = mostSignificantBit(x)
-
-  if (msb > 128n) {
-    x >>= msb - 128n
-  } else if (msb < 128n) {
-    x <<= 128n - msb
-  }
-
-  x &= 0xffffffffffffffffffffffffffffffffn
-
-  let result = (msb - 128n) << 128n
-  let bit = 0x80000000000000000000000000000000n
-  for (let i = 0n; i < 128n && x > 0n; i++) {
-    x = (x << 1n) + ((x * x + 0x80000000000000000000000000000000n) >> 128n)
-    if (x > 0xffffffffffffffffffffffffffffffffn) {
-      result |= bit
-      x = (x >> 1n) - 0x80000000000000000000000000000000n
-    }
-    bit >>= 1n
-  }
-
-  return result
-}
-
 export const divide = (x: bigint, y: bigint, roundUp: boolean): bigint => {
   if (roundUp) {
     if (x === 0n) {
@@ -61,27 +32,6 @@ export const divide = (x: bigint, y: bigint, roundUp: boolean): bigint => {
   } else {
     return x / y
   }
-}
-
-export const fromPrice = (price: bigint): bigint => {
-  const log = log2(price)
-  const tick = log / 49089913871092318234424474366155889n
-  const tickLow =
-    (log -
-      (price >> 128n == 0n
-        ? 49089913871092318234424474366155887n
-        : 84124744249948177485425n)) /
-    49089913871092318234424474366155889n
-
-  if (tick === tickLow) {
-    return tick
-  }
-
-  if (toPrice(tick) <= price) {
-    return tick
-  }
-
-  return tickLow
 }
 
 export const invertPrice = (price: bigint): bigint => {
@@ -155,14 +105,6 @@ export const toPrice = (tick: bigint): bigint => {
   }
 
   return price
-}
-
-export const baseToQuote = (
-  tick: bigint,
-  base: bigint,
-  roundingUp: boolean,
-): bigint => {
-  return divide(base * toPrice(tick), 1n << 128n, roundingUp)
 }
 
 export const quoteToBase = (
