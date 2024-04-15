@@ -8,7 +8,7 @@ import { getMarket } from '@clober/v2-sdk'
 import { Currency } from '../../model/currency'
 import { formatUnits } from '../../utils/bigint'
 import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
-import { formatPrice, getPriceDecimals, MAX_PRICE } from '../../utils/prices'
+import { getPriceDecimals } from '../../utils/prices'
 import { parseDepth } from '../../utils/order-book'
 import { useChainContext } from '../chain-context'
 import { Chain } from '../../model/chain'
@@ -263,16 +263,11 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     const availableDecimalPlacesGroups = selectedMarket
       ? (Array.from(Array(4).keys())
           .map((i) => {
-            const fallbackPrice = formatPrice(
-              MAX_PRICE,
-              selectedMarket.quote.decimals,
-              selectedMarket.base.decimals,
-            )
             const minPrice = Math.min(
               selectedMarket.bids.sort((a, b) => b.price - a.price)[0]?.price ??
-                fallbackPrice,
+                1,
               selectedMarket.asks.sort((a, b) => a.price - b.price)[0]?.price ??
-                fallbackPrice,
+                1,
             )
             const decimalPlaces = getPriceDecimals(minPrice)
             const label = (10 ** (i - decimalPlaces)).toFixed(

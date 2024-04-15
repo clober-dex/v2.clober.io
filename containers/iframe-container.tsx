@@ -9,7 +9,6 @@ import OrderBook from '../components/order-book'
 import { useChainContext } from '../contexts/chain-context'
 import { useMarketContext } from '../contexts/limit/market-context'
 import { formatUnits } from '../utils/bigint'
-import { parsePrice } from '../utils/prices'
 import { toPlacesString } from '../utils/bignumber'
 import { useLimitContext } from '../contexts/limit/limit-context'
 import {
@@ -195,22 +194,9 @@ export const IframeContainer = () => {
     }
   }, [inputCurrency, outputCurrency, selectedChain.id])
 
-  const [amount, price] = useMemo(
-    () => [
-      parseUnits(inputCurrencyAmount, inputCurrency?.decimals ?? 18),
-      parsePrice(
-        Number(priceInput),
-        selectedMarket?.quote.decimals ?? 18,
-        selectedMarket?.base.decimals ?? 18,
-      ),
-    ],
-    [
-      inputCurrency?.decimals,
-      inputCurrencyAmount,
-      priceInput,
-      selectedMarket?.base.decimals,
-      selectedMarket?.quote.decimals,
-    ],
+  const amount = useMemo(
+    () => parseUnits(inputCurrencyAmount, inputCurrency?.decimals ?? 18),
+    [inputCurrency?.decimals, inputCurrencyAmount],
   )
 
   return (

@@ -8,7 +8,6 @@ import OrderBook from '../components/order-book'
 import { useChainContext } from '../contexts/chain-context'
 import { useMarketContext } from '../contexts/limit/market-context'
 import { formatUnits } from '../utils/bigint'
-import { parsePrice } from '../utils/prices'
 import { textStyles } from '../themes/text-styles'
 import { toPlacesString } from '../utils/bignumber'
 import { useOpenOrderContext } from '../contexts/limit/open-order-context'
@@ -202,29 +201,18 @@ export const LimitContainer = () => {
     }
   }, [inputCurrency, outputCurrency, selectedChain.id])
 
-  const [amount, price] = useMemo(
-    () => [
-      parseUnits(inputCurrencyAmount, inputCurrency?.decimals ?? 18),
-      parsePrice(
-        Number(priceInput),
-        selectedMarket?.quote.decimals ?? 18,
-        selectedMarket?.base.decimals ?? 18,
-      ),
-    ],
-    [
-      inputCurrency?.decimals,
-      inputCurrencyAmount,
-      priceInput,
-      selectedMarket?.base.decimals,
-      selectedMarket?.quote.decimals,
-    ],
+  const amount = useMemo(
+    () => parseUnits(inputCurrencyAmount, inputCurrency?.decimals ?? 18),
+    [inputCurrency?.decimals, inputCurrencyAmount],
   )
 
   const claimableOpenOrders = openOrders.filter(
-    (openOrder) => openOrder.claimableAmount > 0n,
+    ({ claimable }) =>
+      parseUnits(claimable.value, claimable.currency.decimals) > 0n,
   )
   const cancellableOpenOrders = openOrders.filter(
-    (openOrder) => openOrder.cancelable,
+    ({ cancelable }) =>
+      parseUnits(cancelable.value, cancelable.currency.decimals) > 0n,
   )
 
   return (
@@ -378,10 +366,15 @@ export const LimitContainer = () => {
         <div className="flex flex-col w-full lg:w-auto h-full lg:grid lg:grid-cols-3 gap-4 sm:gap-6">
           {openOrders.map((openOrder, index) => (
             <OpenOrderCard
+              chainId={selectedChain.id}
               openOrder={openOrder}
               key={index}
               claimActionButtonProps={{
-                disabled: openOrder.claimableAmount === 0n,
+                disabled:
+                  parseUnits(
+                    openOrder.claimable.value,
+                    openOrder.claimable.currency.decimals,
+                  ) === 0n,
                 onClick: async () => {
                   await claims([openOrder])
                 },

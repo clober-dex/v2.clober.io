@@ -7,6 +7,7 @@ import {
   getMarket,
   limitOrder,
   openMarket,
+  OpenOrder,
   PermitSignature,
 } from '@clober/v2-sdk'
 
@@ -19,7 +20,6 @@ import { permit20 } from '../../utils/permit20'
 import { getDeadlineTimestampInSeconds } from '../../utils/date'
 import { toPlacesString } from '../../utils/bignumber'
 import { sendTransaction, writeContract } from '../../utils/wallet'
-import { OpenOrder } from '../../model/open-order'
 import { fetchIsApprovedForAll } from '../../utils/approval'
 import { ERC721_ABI } from '../../abis/@openzeppelin/erc721-abi'
 
