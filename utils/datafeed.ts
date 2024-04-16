@@ -1,4 +1,4 @@
-import { Market } from '@clober/v2-sdk'
+import { getChartLogs, getLatestChartLog, Market } from '@clober/v2-sdk'
 
 import {
   Bar,
@@ -15,7 +15,6 @@ import {
   SubscribeBarsCallback,
 } from '../public/static/charting_library'
 import { CHAIN_IDS } from '../constants/chain'
-import { fetchChartLogs, fetchLatestChartLog } from '../apis/chart-logs'
 
 import { SUPPORTED_INTERVALS } from './chart'
 
@@ -76,10 +75,11 @@ export default class DataFeed implements IBasicDataFeed {
     onResolve: ResolveCallback,
     onError: ErrorCallback,
   ) {
-    const { close } = await fetchLatestChartLog(
-      this.chainId,
-      buildMarketCode(this.market),
-    )
+    const { close } = await getLatestChartLog({
+      chainId: this.chainId.valueOf(),
+      base: this.market.base.address,
+      quote: this.market.quote.address,
+    })
     if (close === '0') {
       onError('cannot resolve symbol')
       return
@@ -119,13 +119,14 @@ export default class DataFeed implements IBasicDataFeed {
         (interval) => interval[0] === resolution,
       ) || SUPPORTED_INTERVALS[0])[1]
 
-      const chartLogs = await fetchChartLogs(
-        this.chainId,
-        buildMarketCode(this.market),
-        resolutionKey,
+      const chartLogs = await getChartLogs({
+        chainId: this.chainId.valueOf(),
+        quote: this.market.quote.address,
+        base: this.market.base.address,
+        intervalType: resolutionKey,
         from,
         to,
-      )
+      })
       if (chartLogs.length === 0) {
         onResult([], {
           noData: false,
@@ -139,7 +140,7 @@ export default class DataFeed implements IBasicDataFeed {
         high: Number(v.high),
         low: Number(v.low),
         close: Number(v.close),
-        volume: Number(v.baseVolume),
+        volume: Number(v.volume),
       }))
 
       onResult(bars, {
@@ -165,8 +166,4 @@ export default class DataFeed implements IBasicDataFeed {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   unsubscribeBars(listenerGuid: string) {}
-}
-
-function buildMarketCode(market: Market): string {
-  return `${market.base.address.toLowerCase()}/${market.quote.address.toLowerCase()}`
 }
