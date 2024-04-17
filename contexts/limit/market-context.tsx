@@ -24,7 +24,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     ['updated-market'],
     async () => {
       if (!selectedMarket) {
-        return undefined
+        return null
       }
       return getMarket({
         chainId: selectedMarket.chainId,
@@ -33,7 +33,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
       })
     },
     {
-      initialData: undefined,
+      initialData: null,
       refetchInterval: 2000,
       refetchIntervalInBackground: true,
     },
@@ -41,6 +41,8 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
   useEffect(() => {
     if (
+      selectedMarket &&
+      updatedMarket &&
       isMarketEqual(selectedMarket, updatedMarket) &&
       (!isOrderBookEqual(
         selectedMarket?.asks ?? [],
