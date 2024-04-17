@@ -6,7 +6,10 @@ import {
   WriteContractParameters,
 } from 'viem'
 import { GetWalletClientResult } from '@wagmi/core'
-import { Transaction } from '@clober/v2-sdk'
+import {
+  setApprovalOfOpenOrdersForAll as setApprovalOfOpenOrdersForAllInSdk,
+  Transaction,
+} from '@clober/v2-sdk'
 
 import { supportChains } from '../constants/chain'
 
@@ -61,5 +64,27 @@ export async function sendTransaction(
     gas: transaction.gas,
   })
   await publicClient.waitForTransactionReceipt({ hash })
+  return hash
+}
+
+export async function setApprovalOfOpenOrdersForAll(
+  walletClient: GetWalletClientResult,
+): Promise<Hash | undefined> {
+  if (!walletClient) {
+    return
+  }
+  const publicClient = createPublicClient({
+    chain: supportChains.find((chain) => chain.id === walletClient.chain.id),
+    transport: http(),
+  })
+  const hash = await setApprovalOfOpenOrdersForAllInSdk({
+    chainId: walletClient.chain.id,
+    walletClient: walletClient as any,
+  })
+  if (hash) {
+    await publicClient.waitForTransactionReceipt({
+      hash,
+    })
+  }
   return hash
 }

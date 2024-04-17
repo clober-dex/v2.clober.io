@@ -8,20 +8,17 @@ import {
   limitOrder,
   openMarket,
   OpenOrder,
-  PermitSignature,
+  signERC20Permit,
 } from '@clober/v2-sdk'
 
 import { useChainContext } from '../chain-context'
 import { Currency } from '../../model/currency'
 import { Confirmation, useTransactionContext } from '../transaction-context'
-import { CHAIN_IDS } from '../../constants/chain'
-import { CONTRACT_ADDRESSES } from '../../constants/addresses'
-import { permit20 } from '../../utils/permit20'
-import { getDeadlineTimestampInSeconds } from '../../utils/date'
 import { toPlacesString } from '../../utils/bignumber'
-import { sendTransaction, writeContract } from '../../utils/wallet'
-import { fetchIsApprovedForAll } from '../../utils/approval'
-import { ERC721_ABI } from '../../abis/@openzeppelin/erc721-abi'
+import {
+  sendTransaction,
+  setApprovalOfOpenOrdersForAll,
+} from '../../utils/wallet'
 
 type LimitContractContext = {
   limit: (
@@ -83,18 +80,14 @@ export const LimitContractProvider = ({
           return
         }
 
-        const permitAmount = !isAddressEqual(inputCurrency.address, zeroAddress)
-          ? parseUnits(amount, inputCurrency.decimals)
-          : 0n
-        const signature: PermitSignature = await permit20(
-          selectedChain.id,
-          walletClient,
-          inputCurrency,
-          walletClient.account.address,
-          CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
-          permitAmount,
-          getDeadlineTimestampInSeconds(),
-        )
+        const signature = await signERC20Permit({
+          chainId: selectedChain.id,
+          walletClient: walletClient as any,
+          token: inputCurrency.address,
+          amount: !isAddressEqual(inputCurrency.address, zeroAddress)
+            ? amount
+            : '0',
+        })
         const { transaction, result } = await limitOrder({
           chainId: selectedChain.id,
           userAddress: walletClient.account.address,
@@ -146,24 +139,7 @@ export const LimitContractProvider = ({
       }
 
       try {
-        const isApprovedForAll = await fetchIsApprovedForAll(
-          selectedChain.id,
-          CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].BookManager,
-          walletClient.account.address,
-          CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
-        )
-        if (!isApprovedForAll) {
-          await writeContract(walletClient, {
-            address:
-              CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].BookManager,
-            abi: ERC721_ABI,
-            functionName: 'setApprovalForAll',
-            args: [
-              CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
-              true,
-            ],
-          })
-        }
+        await setApprovalOfOpenOrdersForAll(walletClient)
 
         const { transaction, result } = await cancelOrders({
           chainId: selectedChain.id,
@@ -203,24 +179,7 @@ export const LimitContractProvider = ({
       }
 
       try {
-        const isApprovedForAll = await fetchIsApprovedForAll(
-          selectedChain.id,
-          CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].BookManager,
-          walletClient.account.address,
-          CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
-        )
-        if (!isApprovedForAll) {
-          await writeContract(walletClient, {
-            address:
-              CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].BookManager,
-            abi: ERC721_ABI,
-            functionName: 'setApprovalForAll',
-            args: [
-              CONTRACT_ADDRESSES[selectedChain.id as CHAIN_IDS].Controller,
-              true,
-            ],
-          })
-        }
+        await setApprovalOfOpenOrdersForAll(walletClient)
 
         const { transaction, result } = await claimOrders({
           chainId: selectedChain.id,
