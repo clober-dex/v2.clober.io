@@ -3,11 +3,12 @@ import BigNumber from 'bignumber.js'
 import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 import { useAccount, useBalance, useQuery } from 'wagmi'
 import { readContracts } from '@wagmi/core'
+import { getMarket } from '@clober/v2-sdk'
 
 import { Currency } from '../../model/currency'
 import { formatUnits } from '../../utils/bigint'
 import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
-import { formatPrice, getPriceDecimals, MAX_PRICE } from '../../utils/prices'
+import { getPriceDecimals } from '../../utils/prices'
 import { parseDepth } from '../../utils/order-book'
 import { useChainContext } from '../chain-context'
 import { Chain } from '../../model/chain'
@@ -125,7 +126,7 @@ const getCurrencyAddress = (chain: Chain) => {
 export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { address: userAddress } = useAccount()
   const { data: balance } = useBalance({ address: userAddress, watch: true })
-  const { markets, selectedMarket, setSelectedMarket } = useMarketContext()
+  const { selectedMarket, setSelectedMarket } = useMarketContext()
   const { selectedChain } = useChainContext()
 
   const [isBid, setIsBid] = useState(true)
@@ -198,23 +199,12 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [currencies, setCurrencies] = useState<Currency[]>(_currencies ?? [])
 
   const { data: balances } = useQuery(
-    [
-      'limit-balances',
-      userAddress,
-      balance,
-      markets,
-      selectedChain,
-      currencies,
-    ],
+    ['limit-balances', userAddress, balance, selectedChain, currencies],
     async () => {
       if (!userAddress) {
         return {}
       }
-      const uniqueCurrencies = [
-        ...currencies.map((currency) => currency),
-        ...markets.map((market) => market.quote),
-        ...markets.map((market) => market.base),
-      ]
+      const uniqueCurrencies = currencies
         .filter(
           (currency, index, self) =>
             self.findIndex((c) =>
@@ -251,22 +241,33 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     data: Balances
   }
 
+  const { data: _selectedMarket } = useQuery(
+    ['limit-selected-market', selectedChain, inputCurrency, outputCurrency],
+    async () => {
+      if (inputCurrency && outputCurrency) {
+        return getMarket({
+          chainId: selectedChain.id,
+          token0: inputCurrency.address,
+          token1: outputCurrency.address,
+        })
+      } else {
+        return undefined
+      }
+    },
+    {
+      initialData: undefined,
+    },
+  )
+
   const availableDecimalPlacesGroups = useMemo(() => {
     const availableDecimalPlacesGroups = selectedMarket
       ? (Array.from(Array(4).keys())
           .map((i) => {
-            const fallbackPrice = formatPrice(
-              MAX_PRICE,
-              selectedMarket.quote.decimals,
-              selectedMarket.base.decimals,
-            )
             const minPrice = Math.min(
-              selectedMarket.bids.sort(
-                (a, b) => Number(b.tick) - Number(a.tick),
-              )[0]?.price ?? fallbackPrice,
-              selectedMarket.asks.sort(
-                (a, b) => Number(a.tick) - Number(b.tick),
-              )[0]?.price ?? fallbackPrice,
+              selectedMarket.bids.sort((a, b) => b.price - a.price)[0]?.price ??
+                Number.MAX_VALUE,
+              selectedMarket.asks.sort((a, b) => a.price - b.price)[0]?.price ??
+                Number.MAX_VALUE,
             )
             const decimalPlaces = getPriceDecimals(minPrice)
             const label = (10 ** (i - decimalPlaces)).toFixed(
@@ -342,7 +343,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   }, [
     currencies,
     inputCurrencyAddress,
-    markets,
     mounted,
     outputCurrencyAddress,
     selectedChain,
@@ -352,17 +352,9 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   ])
 
   useEffect(() => {
-    if (inputCurrency && outputCurrency) {
-      const market = markets.find(
-        (m) =>
-          m.id ===
-          getMarketId(selectedChain.id, [
-            inputCurrency.address,
-            outputCurrency.address,
-          ]).marketId,
-      )
-      if (!isMarketEqual(market, selectedMarket)) {
-        setSelectedMarket(market)
+    if (inputCurrency && outputCurrency && _selectedMarket) {
+      if (!isMarketEqual(_selectedMarket, selectedMarket)) {
+        setSelectedMarket(_selectedMarket)
       }
       const { quote, base } = getMarketId(selectedChain.id, [
         inputCurrency.address,
@@ -380,7 +372,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     }
   }, [
     inputCurrency,
-    markets,
+    _selectedMarket,
     outputCurrency,
     selectedChain.id,
     selectedMarket,

@@ -24,22 +24,34 @@ type Story = StoryObj<typeof OpenOrderCard>
 export const Bid: Story = {
   args: {
     openOrder: {
-      id: 1n,
-      bookId: 1n,
-      tick: 1n,
-      inputToken: dummyCurrencies[0],
-      outputToken: dummyCurrencies[1],
+      id: '1',
       isBid: true,
+      inputCurrency: dummyCurrencies[0],
+      outputCurrency: dummyCurrencies[1],
       txHash:
         '0x6d91975935196522e7da9911412a1c2c2e509b13f19f215f7aaef820f7125734',
-      txUrl: '',
-      orderIndex: 1n,
-      quoteAmount: 100000000n,
-      price: 1600000000000000000000n,
-      baseFilledAmount: 120000000000000000n,
-      baseAmount: 1000000000000000000n,
-      claimableAmount: 700000000000000000n,
-      cancelable: true,
+      createdAt: 1630000000000,
+      price: 1600,
+      amount: {
+        value: '10000000',
+        currency: dummyCurrencies[0],
+      },
+      filled: {
+        value: '9000000',
+        currency: dummyCurrencies[0],
+      },
+      claimed: {
+        value: '1000000',
+        currency: dummyCurrencies[0],
+      },
+      claimable: {
+        value: '100',
+        currency: dummyCurrencies[0],
+      },
+      cancelable: {
+        value: '1000000',
+        currency: dummyCurrencies[0],
+      },
     },
   },
 }
@@ -47,22 +59,34 @@ export const Bid: Story = {
 export const Ask: Story = {
   args: {
     openOrder: {
-      id: 1n,
-      bookId: 1n,
-      tick: 1n,
-      inputToken: dummyCurrencies[1],
-      outputToken: dummyCurrencies[0],
+      id: '1',
       isBid: false,
+      inputCurrency: dummyCurrencies[1],
+      outputCurrency: dummyCurrencies[0],
       txHash:
         '0x6d91975935196522e7da9911412a1c2c2e509b13f19f215f7aaef820f7125734',
-      txUrl: '',
-      orderIndex: 1n,
-      quoteAmount: 100000000n,
-      price: 1600000000000000000000n,
-      baseFilledAmount: 1000000000000000000n,
-      baseAmount: 1000000000000000000n,
-      claimableAmount: 1000000000000000000n,
-      cancelable: true,
+      createdAt: 1630000000000,
+      price: 1600,
+      amount: {
+        value: '10000000',
+        currency: dummyCurrencies[0],
+      },
+      filled: {
+        value: '9000000',
+        currency: dummyCurrencies[0],
+      },
+      claimed: {
+        value: '1000000',
+        currency: dummyCurrencies[0],
+      },
+      claimable: {
+        value: '100',
+        currency: dummyCurrencies[0],
+      },
+      cancelable: {
+        value: '1000000',
+        currency: dummyCurrencies[0],
+      },
     },
   },
 }

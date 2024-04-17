@@ -1,5 +1,6 @@
+import { CHART_LOG_INTERVALS } from '@clober/v2-sdk'
+
 import { ResolutionString } from '../public/static/charting_library'
-import { CHART_LOG_INTERVALS } from '../apis/chart-logs'
 
 export const SUPPORTED_INTERVALS = [
   ['15', '15m'],

@@ -1,9 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import BigNumber from 'bignumber.js'
-
-import { fetchOpenOrder } from '../../../../../../../apis/open-orders'
-import { toPrice } from '../../../../../../../utils/tick'
-import { formatPrice } from '../../../../../../../utils/prices'
+import { getOpenOrder } from '@clober/v2-sdk'
 
 import orderSvg from './order-svg'
 
@@ -27,7 +24,10 @@ export default async function handler(
       return
     }
 
-    const openOrder = await fetchOpenOrder(Number(chainId), id)
+    const openOrder = await getOpenOrder({
+      chainId: Number(chainId),
+      id,
+    })
 
     if (!openOrder) {
       res.json({
@@ -38,31 +38,23 @@ export default async function handler(
     }
 
     const baseToken = openOrder.isBid
-      ? openOrder.outputToken
-      : openOrder.inputToken
+      ? openOrder.outputCurrency
+      : openOrder.inputCurrency
     const quoteToken = openOrder.isBid
-      ? openOrder.inputToken
-      : openOrder.outputToken
-
-    const price = formatPrice(
-      toPrice(openOrder.tick),
-      quoteToken.decimals,
-      baseToken.decimals,
-    )
-    const basePrecision = new BigNumber(10).pow(baseToken.decimals)
-
-    const totalBaseAmount = BigNumber(openOrder.baseAmount.toString()).div(
-      basePrecision,
-    )
+      ? openOrder.inputCurrency
+      : openOrder.outputCurrency
 
     const svg = orderSvg
       .replace(/IS_BID_TEXT/g, openOrder.isBid ? 'Buy' : 'Sell')
       .replace(/POSITION/g, openOrder.isBid ? 'buy' : 'sell')
       .replace(/TOKEN_PAIR_TEXT/g, `${baseToken.symbol}/${quoteToken.symbol}`)
-      .replace(/QUOTE_PRICE_TEXT/g, `${price.toFixed(2)} ${quoteToken.symbol}`)
+      .replace(
+        /QUOTE_PRICE_TEXT/g,
+        `${openOrder.price.toFixed(2)} ${quoteToken.symbol}`,
+      )
       .replace(
         /BASE_AMOUNT_TEXT/g,
-        `${totalBaseAmount.toFixed(4)} ${baseToken.symbol}`,
+        `${BigNumber(openOrder.amount.value).toFixed(4)} ${baseToken.symbol}`,
       )
 
     res

@@ -1,9 +1,8 @@
 import React from 'react'
 import { useAccount, useQuery } from 'wagmi'
+import { getOpenOrders, OpenOrder } from '@clober/v2-sdk'
 
 import { useChainContext } from '../chain-context'
-import { fetchOpenOrders } from '../../apis/open-orders'
-import { OpenOrder } from '../../model/open-order'
 
 type OpenOrderContext = {
   openOrders: OpenOrder[]
@@ -21,7 +20,13 @@ export const OpenOrderProvider = ({
 
   const { data: openOrders } = useQuery(
     ['open-orders', selectedChain, userAddress],
-    () => (userAddress ? fetchOpenOrders(selectedChain.id, userAddress) : []),
+    () =>
+      userAddress
+        ? getOpenOrders({
+            chainId: selectedChain.id,
+            userAddress,
+          })
+        : [],
     {
       refetchIntervalInBackground: true,
       refetchInterval: 2 * 1000,

@@ -1,3 +1,5 @@
+import { getChartLogs, getLatestChartLog, Market } from '@clober/v2-sdk'
+
 import {
   Bar,
   DatafeedConfiguration,
@@ -13,8 +15,6 @@ import {
   SubscribeBarsCallback,
 } from '../public/static/charting_library'
 import { CHAIN_IDS } from '../constants/chain'
-import { fetchChartLogs, fetchLatestChartLog } from '../apis/chart-logs'
-import { Market } from '../model/market'
 
 import { SUPPORTED_INTERVALS } from './chart'
 
@@ -47,10 +47,12 @@ const configurationData: Partial<DatafeedConfiguration> &
 export default class DataFeed implements IBasicDataFeed {
   private chainId: CHAIN_IDS
   private market: Market
+
   constructor(chainId: CHAIN_IDS, market: Market) {
     this.chainId = chainId
     this.market = market
   }
+
   onReady(callback: OnReadyCallback) {
     setTimeout(() => callback(configurationData))
   }
@@ -73,7 +75,11 @@ export default class DataFeed implements IBasicDataFeed {
     onResolve: ResolveCallback,
     onError: ErrorCallback,
   ) {
-    const { close } = await fetchLatestChartLog(this.chainId, this.market.id)
+    const { close } = await getLatestChartLog({
+      chainId: this.chainId.valueOf(),
+      base: this.market.base.address,
+      quote: this.market.quote.address,
+    })
     if (close === '0') {
       onError('cannot resolve symbol')
       return
@@ -113,13 +119,14 @@ export default class DataFeed implements IBasicDataFeed {
         (interval) => interval[0] === resolution,
       ) || SUPPORTED_INTERVALS[0])[1]
 
-      const chartLogs = await fetchChartLogs(
-        this.chainId,
-        this.market.id,
-        resolutionKey,
+      const chartLogs = await getChartLogs({
+        chainId: this.chainId.valueOf(),
+        quote: this.market.quote.address,
+        base: this.market.base.address,
+        intervalType: resolutionKey,
         from,
         to,
-      )
+      })
       if (chartLogs.length === 0) {
         onResult([], {
           noData: false,
@@ -133,7 +140,7 @@ export default class DataFeed implements IBasicDataFeed {
         high: Number(v.high),
         low: Number(v.low),
         close: Number(v.close),
-        volume: Number(v.baseVolume),
+        volume: Number(v.volume),
       }))
 
       onResult(bars, {

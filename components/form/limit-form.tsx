@@ -1,5 +1,6 @@
 import React from 'react'
 import { isAddressEqual } from 'viem'
+import { Market } from '@clober/v2-sdk'
 
 import NumberInput from '../input/number-input'
 import CurrencyAmountInput from '../input/currency-amount-input'
@@ -9,7 +10,6 @@ import { ActionButton, ActionButtonProps } from '../button/action-button'
 import CurrencySelect from '../selector/currency-select'
 import { Balances } from '../../model/balances'
 import { Prices } from '../../model/prices'
-import { Market } from '../../model/market'
 import CheckIcon from '../icon/check-icon'
 
 export const LimitForm = ({

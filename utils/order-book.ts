@@ -1,12 +1,11 @@
 import BigNumber from 'bignumber.js'
 import { zeroAddress } from 'viem'
+import { Depth, Market } from '@clober/v2-sdk'
 
 import { Decimals } from '../model/decimals'
 import { Currency } from '../model/currency'
 import { WrappedEthers } from '../constants/weths'
 import { Balances } from '../model/balances'
-import { Market } from '../model/market'
-import { MarketDepth } from '../model/depth'
 
 import { toPlacesString } from './bignumber'
 import { formatUnits } from './bigint'
@@ -52,11 +51,7 @@ export function parseDepth(
 }[] {
   return Array.from(
     [...(isBid ? market.bids : market.asks).map((depth) => ({ ...depth }))]
-      .sort((a, b) =>
-        isBid
-          ? Number(b.tick) - Number(a.tick)
-          : Number(a.tick) - Number(b.tick),
-      )
+      .sort((a, b) => (isBid ? b.price - a.price : a.price - b.price))
       .map((x) => {
         return {
           price: x.price,
@@ -150,17 +145,15 @@ export function calculateValue(
   }
 }
 
-export const isOrderBookEqual = (a: MarketDepth[], b: MarketDepth[]) => {
+export const isOrderBookEqual = (a: Depth[], b: Depth[]) => {
   if (a.length !== b.length) {
     return false
   }
-  const sortedA = a.sort((x, y) => Number(x.tick) - Number(y.tick))
-  const sortedB = b.sort((x, y) => Number(x.tick) - Number(y.tick))
+  const sortedA = a.sort((x, y) => x.price - y.price)
+  const sortedB = b.sort((x, y) => x.price - y.price)
   return sortedA.every((x, i) => {
     return (
-      x.tick === sortedB[i].tick &&
-      x.price === sortedB[i].price &&
-      x.baseAmount === sortedB[i].baseAmount
+      x.price === sortedB[i].price && x.baseAmount === sortedB[i].baseAmount
     )
   })
 }

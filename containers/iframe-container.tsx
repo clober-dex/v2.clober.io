@@ -9,7 +9,6 @@ import OrderBook from '../components/order-book'
 import { useChainContext } from '../contexts/chain-context'
 import { useMarketContext } from '../contexts/limit/market-context'
 import { formatUnits } from '../utils/bigint'
-import { parsePrice } from '../utils/prices'
 import { toPlacesString } from '../utils/bignumber'
 import { useLimitContext } from '../contexts/limit/limit-context'
 import {
@@ -22,7 +21,7 @@ import { getMarketId } from '../utils/market'
 export const IframeContainer = () => {
   const { selectedChain } = useChainContext()
   const { selectedMarket } = useMarketContext()
-  const { limit, make } = useLimitContractContext()
+  const { limit } = useLimitContractContext()
   const { data: walletClient } = useWalletClient()
   const {
     isBid,
@@ -195,22 +194,9 @@ export const IframeContainer = () => {
     }
   }, [inputCurrency, outputCurrency, selectedChain.id])
 
-  const [amount, price] = useMemo(
-    () => [
-      parseUnits(inputCurrencyAmount, inputCurrency?.decimals ?? 18),
-      parsePrice(
-        Number(priceInput),
-        selectedMarket?.quote.decimals ?? 18,
-        selectedMarket?.base.decimals ?? 18,
-      ),
-    ],
-    [
-      inputCurrency?.decimals,
-      inputCurrencyAmount,
-      priceInput,
-      selectedMarket?.base.decimals,
-      selectedMarket?.quote.decimals,
-    ],
+  const amount = useMemo(
+    () => parseUnits(inputCurrencyAmount, inputCurrency?.decimals ?? 18),
+    [inputCurrency?.decimals, inputCurrencyAmount],
   )
 
   return (
@@ -295,33 +281,25 @@ export const IframeContainer = () => {
                 if (!inputCurrency || !outputCurrency) {
                   return
                 }
-                if (isPostOnly) {
-                  await make(inputCurrency, outputCurrency, amount, price)
-                  return
-                }
-                if (selectedMarket) {
-                  await limit(
-                    selectedMarket,
-                    inputCurrency,
-                    outputCurrency,
-                    amount,
-                    price,
-                  )
-                } else {
-                  await make(inputCurrency, outputCurrency, amount, price)
-                }
+                await limit(
+                  inputCurrency,
+                  outputCurrency,
+                  inputCurrencyAmount,
+                  priceInput,
+                  isPostOnly,
+                )
               },
               text: !walletClient
                 ? 'Connect wallet'
                 : !inputCurrency
-                  ? 'Select input currency'
-                  : !outputCurrency
-                    ? 'Select output currency'
-                    : amount === 0n
-                      ? 'Enter amount'
-                      : amount > balances[inputCurrency.address]
-                        ? 'Insufficient balance'
-                        : `Limit ${isBid ? 'Bid' : 'Ask'}`,
+                ? 'Select input currency'
+                : !outputCurrency
+                ? 'Select output currency'
+                : amount === 0n
+                ? 'Enter amount'
+                : amount > balances[inputCurrency.address]
+                ? 'Insufficient balance'
+                : `Limit ${isBid ? 'Bid' : 'Ask'}`,
             }}
           />
         </div>

@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-
-import { fetchOpenOrder } from '../../../../../../../apis/open-orders'
+import { getOpenOrder } from '@clober/v2-sdk'
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,7 +19,10 @@ export default async function handler(
     })
     return
   }
-  const openOrder = await fetchOpenOrder(Number(chainId), id)
+  const openOrder = await getOpenOrder({
+    chainId: Number(chainId),
+    id,
+  })
   if (!openOrder) {
     res.json({
       status: 'error',
@@ -32,8 +34,8 @@ export default async function handler(
   res.json({
     id,
     name: `Order #${id} on Clober Market ${
-      openOrder.outputToken.symbol ?? '?'
-    }/${openOrder.inputToken.symbol ?? '?'}`,
+      openOrder.outputCurrency.symbol ?? '?'
+    }/${openOrder.inputCurrency.symbol ?? '?'}`,
     description: 'Clober Market Order',
     image: `https://clober.io/api/nft/chains/${chainId}/orders/${id}/image`,
   })

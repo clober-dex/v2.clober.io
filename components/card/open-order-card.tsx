@@ -1,31 +1,30 @@
 import React from 'react'
+import { CHAIN_IDS, OpenOrder } from '@clober/v2-sdk'
 
 import { OutlinkSvg } from '../svg/outlink-svg'
-import { OpenOrder } from '../../model/open-order'
-import { formatUnits } from '../../utils/bigint'
 import { ActionButton, ActionButtonProps } from '../button/action-button'
 import { toPlacesString } from '../../utils/bignumber'
-import { formatPrice } from '../../utils/prices'
-import { invertPrice } from '../../utils/tick'
+import { findSupportChain } from '../../constants/chain'
+import { Chain } from '../../model/chain'
 
 export const OpenOrderCard = ({
+  chainId,
   openOrder,
   claimActionButtonProps,
   cancelActionButtonProps,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
+  chainId: CHAIN_IDS
   openOrder: OpenOrder
   claimActionButtonProps: ActionButtonProps
   cancelActionButtonProps: ActionButtonProps
 }) => {
   const filledRatio =
-    (Number(openOrder.baseFilledAmount) / Number(openOrder.baseAmount)) * 100
-  const quoteCurrency = openOrder.isBid
-    ? openOrder.inputToken
-    : openOrder.outputToken
-  const baseCurrency = openOrder.isBid
-    ? openOrder.outputToken
-    : openOrder.inputToken
+    (Number(openOrder.filled.value) / Number(openOrder.amount.value)) * 100
+  const chain = findSupportChain(chainId) as Chain
+  const txUrl = chain.blockExplorers
+    ? `${chain.blockExplorers.default.url}/tx/${openOrder.txHash}`
+    : ''
   return (
     <div
       className="flex flex-col shadow border border-solid border-gray-800 lg:w-[310px] gap-4 bg-gray-900 rounded-2xl p-4"
@@ -33,9 +32,9 @@ export const OpenOrderCard = ({
     >
       <div className="flex text-sm text-white justify-between">
         <div className="font-bold flex flex-row items-center gap-1">
-          {openOrder.inputToken.symbol} &#x2192;{'  '}
-          {openOrder.outputToken.symbol}
-          <a target="_blank" href={openOrder.txUrl} rel="noreferrer">
+          {openOrder.inputCurrency.symbol} &#x2192;{'  '}
+          {openOrder.outputCurrency.symbol}
+          <a target="_blank" href={txUrl} rel="noreferrer">
             <OutlinkSvg className="w-3 h-3" />
           </a>
         </div>
@@ -51,25 +50,13 @@ export const OpenOrderCard = ({
         <div className="flex flex-col align-baseline justify-between gap-2">
           <div className="flex flex-row align-baseline justify-between">
             <label className="text-gray-200">Price</label>
-            <p className="text-white">
-              {toPlacesString(
-                formatPrice(
-                  openOrder.isBid
-                    ? openOrder.price
-                    : invertPrice(openOrder.price),
-                  quoteCurrency.decimals,
-                  baseCurrency.decimals,
-                ),
-              )}
-            </p>
+            <p className="text-white">{toPlacesString(openOrder.price)}</p>
           </div>
           <div className="flex flex-row align-baseline justify-between">
             <label className="text-gray-200">Amount</label>
             <p className="text-white">
-              {toPlacesString(
-                formatUnits(openOrder.baseAmount, baseCurrency.decimals),
-              )}{' '}
-              {baseCurrency.symbol}
+              {toPlacesString(openOrder.amount.value)}{' '}
+              {openOrder.amount.currency.symbol}
             </p>
           </div>
           <div className="flex flex-row align-baseline justify-between">
@@ -77,14 +64,7 @@ export const OpenOrderCard = ({
             <div className="flex flex-row gap-1">
               <p className="text-white">{filledRatio.toFixed(2)}%</p>
               <p className="text-gray-400">
-                (
-                {toPlacesString(
-                  formatUnits(
-                    openOrder.baseFilledAmount,
-                    baseCurrency.decimals,
-                  ),
-                )}
-                )
+                ({toPlacesString(openOrder.filled.value)})
               </p>
             </div>
           </div>
@@ -99,13 +79,8 @@ export const OpenOrderCard = ({
           <div className="flex flex-row align-baseline justify-between">
             <label className="text-gray-200">Claimable</label>
             <p className="text-white">
-              {toPlacesString(
-                formatUnits(
-                  openOrder.claimableAmount,
-                  openOrder.outputToken.decimals,
-                ),
-              )}{' '}
-              {openOrder.outputToken.symbol}
+              {toPlacesString(openOrder.claimable.value)}{' '}
+              {openOrder.claimable.currency.symbol}
             </p>
           </div>
         </div>
