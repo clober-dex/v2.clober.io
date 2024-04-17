@@ -1,5 +1,9 @@
-import React from 'react'
-import { Market } from '@clober/v2-sdk'
+import React, { useEffect } from 'react'
+import { getMarket, Market } from '@clober/v2-sdk'
+import { useQuery } from 'wagmi'
+
+import { isMarketEqual } from '../../utils/market'
+import { isOrderBookEqual } from '../../utils/order-book'
 
 type MarketContext = {
   selectedMarket?: Market
@@ -15,6 +19,43 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [selectedMarket, setSelectedMarket] = React.useState<
     Market | undefined
   >(undefined)
+
+  const { data: updatedMarket } = useQuery(
+    ['updated-market'],
+    async () => {
+      if (!selectedMarket) {
+        return null
+      }
+      return getMarket({
+        chainId: selectedMarket.chainId,
+        token0: selectedMarket.base.address,
+        token1: selectedMarket.quote.address,
+      })
+    },
+    {
+      initialData: null,
+      refetchInterval: 2000,
+      refetchIntervalInBackground: true,
+    },
+  )
+
+  useEffect(() => {
+    if (
+      selectedMarket &&
+      updatedMarket &&
+      isMarketEqual(selectedMarket, updatedMarket) &&
+      (!isOrderBookEqual(
+        selectedMarket?.asks ?? [],
+        updatedMarket?.asks ?? [],
+      ) ||
+        !isOrderBookEqual(
+          selectedMarket?.bids ?? [],
+          updatedMarket?.bids ?? [],
+        ))
+    ) {
+      setSelectedMarket(updatedMarket)
+    }
+  }, [selectedMarket, updatedMarket])
 
   return (
     <Context.Provider value={{ selectedMarket, setSelectedMarket }}>

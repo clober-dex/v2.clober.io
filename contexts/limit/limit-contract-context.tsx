@@ -58,6 +58,11 @@ export const LimitContractProvider = ({
       if (!walletClient || !selectedChain) {
         return
       }
+      setConfirmation({
+        title: `Checking Book Availability`,
+        body: '',
+        fields: [],
+      })
       const market = await getMarket({
         chainId: selectedChain.id,
         token0: inputCurrency.address,
@@ -77,8 +82,13 @@ export const LimitContractProvider = ({
             fields: [],
           })
           await sendTransaction(walletClient, openTransaction)
-          return
         }
+
+        setConfirmation({
+          title: `Limit ${isBid ? 'Bid' : 'Ask'}`,
+          body: 'Please confirm in your wallet.',
+          fields: [],
+        })
 
         const signature = await signERC20Permit({
           chainId: selectedChain.id,
@@ -139,6 +149,11 @@ export const LimitContractProvider = ({
       }
 
       try {
+        setConfirmation({
+          title: `Cancel Order`,
+          body: 'Please confirm in your wallet.',
+          fields: [],
+        })
         await setApprovalOfOpenOrdersForAll(walletClient)
 
         const { transaction, result } = await cancelOrders({
@@ -179,6 +194,11 @@ export const LimitContractProvider = ({
       }
 
       try {
+        setConfirmation({
+          title: `Claim Order`,
+          body: 'Please confirm in your wallet.',
+          fields: [],
+        })
         await setApprovalOfOpenOrdersForAll(walletClient)
 
         const { transaction, result } = await claimOrders({
