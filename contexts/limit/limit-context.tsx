@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 import { useAccount, useBalance, useQuery } from 'wagmi'
 import { readContracts } from '@wagmi/core'
-import { getMarket } from '@clober/v2-sdk'
+import { getMarket, getQuoteToken } from '@clober/v2-sdk'
 
 import { Currency } from '../../model/currency'
 import { formatUnits } from '../../utils/bigint'
@@ -12,7 +12,7 @@ import { getPriceDecimals } from '../../utils/prices'
 import { parseDepth } from '../../utils/order-book'
 import { useChainContext } from '../chain-context'
 import { Chain } from '../../model/chain'
-import { getMarketId, isMarketEqual } from '../../utils/market'
+import { isMarketEqual } from '../../utils/market'
 import { Balances } from '../../model/balances'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 import { WHITELISTED_CURRENCIES } from '../../constants/currency'
@@ -356,16 +356,15 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       if (!isMarketEqual(_selectedMarket, selectedMarket)) {
         setSelectedMarket(_selectedMarket)
       }
-      const { quote, base } = getMarketId(selectedChain.id, [
-        inputCurrency.address,
-        outputCurrency.address,
-      ])
+      const quote = getQuoteToken({
+        chainId: selectedChain.id,
+        token0: inputCurrency.address,
+        token1: outputCurrency.address,
+      })
       if (isAddressEqual(quote, inputCurrency.address)) {
         setIsBid(true)
-      } else if (isAddressEqual(base, inputCurrency.address)) {
-        setIsBid(false)
       } else {
-        setIsBid(true)
+        setIsBid(false)
       }
     } else {
       setIsBid(true)

@@ -3,6 +3,7 @@ import { isAddressEqual, parseUnits } from 'viem'
 import BigNumber from 'bignumber.js'
 import { useWalletClient } from 'wagmi'
 import Link from 'next/link'
+import { getQuoteToken } from '@clober/v2-sdk'
 
 import { LimitForm } from '../components/form/limit-form'
 import OrderBook from '../components/order-book'
@@ -16,7 +17,6 @@ import {
   calculatePriceInputString,
 } from '../utils/order-book'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
-import { getMarketId } from '../utils/market'
 
 export const IframeContainer = () => {
   const { selectedChain } = useChainContext()
@@ -182,10 +182,11 @@ export const IframeContainer = () => {
 
   const [quoteCurrency, baseCurrency] = useMemo(() => {
     if (inputCurrency && outputCurrency) {
-      const { quote } = getMarketId(selectedChain.id, [
-        inputCurrency.address,
-        outputCurrency.address,
-      ])
+      const quote = getQuoteToken({
+        chainId: selectedChain.id,
+        token0: inputCurrency.address,
+        token1: outputCurrency.address,
+      })
       return isAddressEqual(quote, inputCurrency.address)
         ? [inputCurrency, outputCurrency]
         : [outputCurrency, inputCurrency]
