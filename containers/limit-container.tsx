@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { isAddressEqual, parseUnits } from 'viem'
 import BigNumber from 'bignumber.js'
 import { useWalletClient } from 'wagmi'
+import { getQuoteToken } from '@clober/v2-sdk'
 
 import { LimitForm } from '../components/form/limit-form'
 import OrderBook from '../components/order-book'
@@ -19,7 +20,6 @@ import {
 import { ActionButton } from '../components/button/action-button'
 import { OpenOrderCard } from '../components/card/open-order-card'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
-import { getMarketId } from '../utils/market'
 
 import { ChartContainer } from './chart-container'
 
@@ -189,10 +189,11 @@ export const LimitContainer = () => {
 
   const [quoteCurrency, baseCurrency] = useMemo(() => {
     if (inputCurrency && outputCurrency) {
-      const { quote } = getMarketId(selectedChain.id, [
-        inputCurrency.address,
-        outputCurrency.address,
-      ])
+      const quote = getQuoteToken({
+        chainId: selectedChain.id,
+        token0: inputCurrency.address,
+        token1: outputCurrency.address,
+      })
       return isAddressEqual(quote, inputCurrency.address)
         ? [inputCurrency, outputCurrency]
         : [outputCurrency, inputCurrency]

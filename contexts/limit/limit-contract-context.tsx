@@ -4,7 +4,7 @@ import { isAddressEqual, parseUnits, zeroAddress } from 'viem'
 import {
   cancelOrders,
   claimOrders,
-  getMarket,
+  getQuoteToken,
   limitOrder,
   openMarket,
   OpenOrder,
@@ -63,12 +63,14 @@ export const LimitContractProvider = ({
         body: '',
         fields: [],
       })
-      const market = await getMarket({
-        chainId: selectedChain.id,
-        token0: inputCurrency.address,
-        token1: outputCurrency.address,
-      })
-      const isBid = isAddressEqual(inputCurrency.address, market.quote.address)
+      const isBid = isAddressEqual(
+        inputCurrency.address,
+        getQuoteToken({
+          chainId: selectedChain.id,
+          token0: inputCurrency.address,
+          token1: outputCurrency.address,
+        }),
+      )
       try {
         const openTransaction = await openMarket({
           chainId: selectedChain.id,
