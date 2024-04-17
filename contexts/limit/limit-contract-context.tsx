@@ -80,6 +80,7 @@ export const LimitContractProvider = ({
             fields: [],
           })
           await sendTransaction(walletClient, openTransaction)
+          return
         }
 
         const permitAmount = !isAddressEqual(inputCurrency.address, zeroAddress)
