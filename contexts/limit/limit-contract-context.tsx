@@ -92,7 +92,7 @@ export const LimitContractProvider = ({
           fields: [],
         })
 
-        const signature = await signERC20Permit({
+        const erc20PermitParam = await signERC20Permit({
           chainId: selectedChain.id,
           walletClient: walletClient as any,
           token: inputCurrency.address,
@@ -108,7 +108,7 @@ export const LimitContractProvider = ({
           amount: amount,
           price: price,
           options: {
-            signature,
+            erc20PermitParam,
             postOnly,
           },
         })
