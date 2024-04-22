@@ -38,7 +38,6 @@ export const IframeContainer = () => {
     setOutputCurrency,
     outputCurrencyAmount,
     setOutputCurrencyAmount,
-    setClaimBounty,
     isPostOnly,
     setIsPostOnly,
     selectedDecimalPlaces,
@@ -68,20 +67,6 @@ export const IframeContainer = () => {
     availableDecimalPlacesGroups,
     setInputCurrencyAmount,
     setSelectedDecimalPlaces,
-  ])
-
-  // When chain is changed
-  useEffect(() => {
-    setClaimBounty(
-      formatUnits(
-        selectedChain.defaultGasPrice,
-        selectedChain.nativeCurrency.decimals,
-      ),
-    )
-  }, [
-    selectedChain.defaultGasPrice,
-    selectedChain.nativeCurrency.decimals,
-    setClaimBounty,
   ])
 
   // When depth is changed

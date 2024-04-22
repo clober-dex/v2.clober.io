@@ -6,7 +6,6 @@ import { readContracts } from '@wagmi/core'
 import { getMarket, getQuoteToken } from '@clober/v2-sdk'
 
 import { Currency } from '../../model/currency'
-import { formatUnits } from '../../utils/bigint'
 import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
 import { getPriceDecimals } from '../../utils/prices'
 import { parseDepth } from '../../utils/order-book'
@@ -38,8 +37,6 @@ type LimitContext = {
   setOutputCurrency: (currency: Currency | undefined) => void
   outputCurrencyAmount: string
   setOutputCurrencyAmount: (amount: string) => void
-  claimBounty: string
-  setClaimBounty: (amount: string) => void
   isPostOnly: boolean
   setIsPostOnly: (isPostOnly: (prevState: boolean) => boolean) => void
   selectedDecimalPlaces: Decimals | undefined
@@ -75,8 +72,6 @@ const Context = React.createContext<LimitContext>({
   setOutputCurrency: () => {},
   outputCurrencyAmount: '',
   setOutputCurrencyAmount: () => {},
-  claimBounty: '',
-  setClaimBounty: () => {},
   isPostOnly: false,
   setIsPostOnly: () => {},
   selectedDecimalPlaces: undefined,
@@ -143,12 +138,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     undefined,
   )
   const [outputCurrencyAmount, setOutputCurrencyAmount] = useState('')
-  const [claimBounty, setClaimBounty] = useState(
-    formatUnits(
-      selectedChain.defaultGasPrice,
-      selectedChain.nativeCurrency.decimals,
-    ),
-  )
   const [isPostOnly, setIsPostOnly] = useState(false)
   const [selectedDecimalPlaces, setSelectedDecimalPlaces] = useState<
     Decimals | undefined
@@ -398,8 +387,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
         setOutputCurrency,
         outputCurrencyAmount,
         setOutputCurrencyAmount,
-        claimBounty,
-        setClaimBounty,
         isPostOnly,
         setIsPostOnly,
         selectedDecimalPlaces,
