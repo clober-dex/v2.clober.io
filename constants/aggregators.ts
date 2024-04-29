@@ -7,4 +7,5 @@ export const AGGREGATORS: {
 } = {
   [CHAIN_IDS.ARBITRUM_SEPOLIA]: [],
   [CHAIN_IDS.BERA_CHAIN_TESTNET]: [],
+  [CHAIN_IDS.BASE]: [],
 }
