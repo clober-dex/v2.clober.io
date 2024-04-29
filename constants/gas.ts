@@ -1,1 +1,0 @@
-export const GAS_PROTECTION = 3000000n
