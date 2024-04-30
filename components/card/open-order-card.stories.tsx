@@ -1,6 +1,7 @@
+import '../../styles/globals.css'
 import React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
-import '../../styles/globals.css'
+import { zeroAddress } from 'viem'
 
 import { dummyCurrencies } from '../../.storybook/dummy-data/currencies'
 
@@ -25,6 +26,7 @@ export const Bid: Story = {
   args: {
     openOrder: {
       id: '1',
+      user: zeroAddress,
       isBid: true,
       inputCurrency: dummyCurrencies[0],
       outputCurrency: dummyCurrencies[1],
@@ -60,6 +62,7 @@ export const Ask: Story = {
   args: {
     openOrder: {
       id: '1',
+      user: zeroAddress,
       isBid: false,
       inputCurrency: dummyCurrencies[1],
       outputCurrency: dummyCurrencies[0],
