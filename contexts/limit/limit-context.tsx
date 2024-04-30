@@ -1,24 +1,21 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import BigNumber from 'bignumber.js'
+import React, { useCallback, useEffect, useState } from 'react'
 import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 import { useAccount, useBalance, useQuery } from 'wagmi'
 import { readContracts } from '@wagmi/core'
-import { getMarket, getQuoteToken } from '@clober/v2-sdk'
+import { getQuoteToken } from '@clober/v2-sdk'
 
 import { Currency } from '../../model/currency'
 import { formatUnits } from '../../utils/bigint'
-import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
-import { getPriceDecimals } from '../../utils/prices'
-import { parseDepth } from '../../utils/order-book'
 import { useChainContext } from '../chain-context'
-import { Chain } from '../../model/chain'
-import { isMarketEqual } from '../../utils/market'
 import { Balances } from '../../model/balances'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 import { WHITELISTED_CURRENCIES } from '../../constants/currency'
-import { fetchCurrency } from '../../utils/currency'
-
-import { useMarketContext } from './market-context'
+import {
+  fetchCurrency,
+  getCurrencyAddress,
+  LOCAL_STORAGE_INPUT_CURRENCY_KEY,
+  LOCAL_STORAGE_OUTPUT_CURRENCY_KEY,
+} from '../../utils/currency'
 
 type LimitContext = {
   balances: Balances
@@ -38,23 +35,10 @@ type LimitContext = {
   setOutputCurrency: (currency: Currency | undefined) => void
   outputCurrencyAmount: string
   setOutputCurrencyAmount: (amount: string) => void
-  claimBounty: string
-  setClaimBounty: (amount: string) => void
   isPostOnly: boolean
   setIsPostOnly: (isPostOnly: (prevState: boolean) => boolean) => void
-  selectedDecimalPlaces: Decimals | undefined
-  setSelectedDecimalPlaces: (decimalPlaces: Decimals | undefined) => void
   priceInput: string
   setPriceInput: (priceInput: string) => void
-  availableDecimalPlacesGroups: Decimals[]
-  bids: {
-    price: string
-    size: string
-  }[]
-  asks: {
-    price: string
-    size: string
-  }[]
 }
 
 const Context = React.createContext<LimitContext>({
@@ -75,58 +59,15 @@ const Context = React.createContext<LimitContext>({
   setOutputCurrency: () => {},
   outputCurrencyAmount: '',
   setOutputCurrencyAmount: () => {},
-  claimBounty: '',
-  setClaimBounty: () => {},
   isPostOnly: false,
   setIsPostOnly: () => {},
-  selectedDecimalPlaces: undefined,
-  setSelectedDecimalPlaces: () => {},
   priceInput: '',
   setPriceInput: () => {},
-  availableDecimalPlacesGroups: [],
-  bids: [],
-  asks: [],
 })
-
-const LOCAL_STORAGE_INPUT_CURRENCY_KEY = (chain: Chain) =>
-  `${chain.id}-inputCurrency-limit`
-const LOCAL_STORAGE_OUTPUT_CURRENCY_KEY = (chain: Chain) =>
-  `${chain.id}-outputCurrency-limit`
-const QUERY_PARAM_INPUT_CURRENCY_KEY = 'inputCurrency'
-const QUERY_PARAM_OUTPUT_CURRENCY_KEY = 'outputCurrency'
-
-const getCurrencyAddress = (chain: Chain) => {
-  const params = new URLSearchParams(window.location.search)
-  const queryParamInputCurrencyAddress = params.get(
-    QUERY_PARAM_INPUT_CURRENCY_KEY,
-  )
-  const queryParamOutputCurrencyAddress = params.get(
-    QUERY_PARAM_OUTPUT_CURRENCY_KEY,
-  )
-  const localStorageInputCurrencyAddress = localStorage.getItem(
-    LOCAL_STORAGE_INPUT_CURRENCY_KEY(chain),
-  )
-  const localStorageOutputCurrencyAddress = localStorage.getItem(
-    LOCAL_STORAGE_OUTPUT_CURRENCY_KEY(chain),
-  )
-  const inputCurrencyAddress =
-    queryParamInputCurrencyAddress ||
-    localStorageInputCurrencyAddress ||
-    undefined
-  const outputCurrencyAddress =
-    queryParamOutputCurrencyAddress ||
-    localStorageOutputCurrencyAddress ||
-    undefined
-  return {
-    inputCurrencyAddress,
-    outputCurrencyAddress,
-  }
-}
 
 export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { address: userAddress } = useAccount()
   const { data: balance } = useBalance({ address: userAddress, watch: true })
-  const { selectedMarket, setSelectedMarket } = useMarketContext()
   const { selectedChain } = useChainContext()
 
   const [isBid, setIsBid] = useState(true)
@@ -143,29 +84,14 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     undefined,
   )
   const [outputCurrencyAmount, setOutputCurrencyAmount] = useState('')
-  const [claimBounty, setClaimBounty] = useState(
-    formatUnits(
-      selectedChain.defaultGasPrice,
-      selectedChain.nativeCurrency.decimals,
-    ),
-  )
-  const [isPostOnly, setIsPostOnly] = useState(false)
-  const [selectedDecimalPlaces, setSelectedDecimalPlaces] = useState<
-    Decimals | undefined
-  >(undefined)
-  const [priceInput, setPriceInput] = useState('')
-  const { inputCurrencyAddress, outputCurrencyAddress } =
-    getCurrencyAddress(selectedChain)
-  const [mounted, setMounted] = useState(false)
 
+  const [isPostOnly, setIsPostOnly] = useState(false)
+  const [priceInput, setPriceInput] = useState('')
   const { data: _currencies } = useQuery(
-    [
-      'limit-currencies',
-      selectedChain,
-      inputCurrencyAddress,
-      outputCurrencyAddress,
-    ],
+    ['limit-currencies', selectedChain],
     async () => {
+      const { inputCurrencyAddress, outputCurrencyAddress } =
+        getCurrencyAddress(selectedChain)
       const _inputCurrency = inputCurrencyAddress
         ? await fetchCurrency(
             selectedChain.id,
@@ -196,7 +122,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   ) as {
     data: Currency[]
   }
-  const [currencies, setCurrencies] = useState<Currency[]>(_currencies ?? [])
+  const [currencies, setCurrencies] = useState<Currency[]>([])
 
   const { data: balances } = useQuery(
     ['limit-balances', userAddress, balance, selectedChain, currencies],
@@ -241,63 +167,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     data: Balances
   }
 
-  const { data: _selectedMarket } = useQuery(
-    ['limit-selected-market', selectedChain, inputCurrency, outputCurrency],
-    async () => {
-      if (inputCurrency && outputCurrency) {
-        return getMarket({
-          chainId: selectedChain.id,
-          token0: inputCurrency.address,
-          token1: outputCurrency.address,
-        })
-      } else {
-        return undefined
-      }
-    },
-    {
-      initialData: undefined,
-    },
-  )
-
-  const availableDecimalPlacesGroups = useMemo(() => {
-    const availableDecimalPlacesGroups = selectedMarket
-      ? (Array.from(Array(4).keys())
-          .map((i) => {
-            const minPrice = Math.min(
-              selectedMarket.bids.sort((a, b) => b.price - a.price)[0]?.price ??
-                Number.MAX_VALUE,
-              selectedMarket.asks.sort((a, b) => a.price - b.price)[0]?.price ??
-                Number.MAX_VALUE,
-            )
-            const decimalPlaces = getPriceDecimals(minPrice)
-            const label = (10 ** (i - decimalPlaces)).toFixed(
-              Math.max(decimalPlaces - i, 0),
-            )
-            if (new BigNumber(minPrice).gt(label)) {
-              return {
-                label,
-                value: Math.max(decimalPlaces - i, 0),
-              }
-            }
-          })
-          .filter((x) => x) as Decimals[])
-      : []
-    return availableDecimalPlacesGroups.length > 0
-      ? availableDecimalPlacesGroups
-      : DEFAULT_DECIMAL_PLACES_GROUPS
-  }, [selectedMarket])
-
-  const [bids, asks] = useMemo(
-    () =>
-      selectedMarket && selectedDecimalPlaces
-        ? [
-            parseDepth(true, selectedMarket, selectedDecimalPlaces),
-            parseDepth(false, selectedMarket, selectedDecimalPlaces),
-          ]
-        : [[], []],
-    [selectedDecimalPlaces, selectedMarket],
-  )
-
   const setInputCurrency = useCallback(
     (currency: Currency | undefined) => {
       if (currency) {
@@ -325,37 +194,25 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
 
   useEffect(() => {
-    if (!mounted) {
-      const inputCurrency = inputCurrencyAddress
-        ? currencies.find((currency) =>
-            isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
-          )
-        : undefined
-      const outputCurrency = outputCurrencyAddress
-        ? currencies.find((currency) =>
-            isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
-          )
-        : undefined
-      setInputCurrency(inputCurrency)
-      setOutputCurrency(outputCurrency)
-      setMounted(true)
-    }
-  }, [
-    currencies,
-    inputCurrencyAddress,
-    mounted,
-    outputCurrencyAddress,
-    selectedChain,
-    setInputCurrency,
-    setOutputCurrency,
-    setSelectedMarket,
-  ])
+    setCurrencies(_currencies)
 
-  useEffect(() => {
-    if (inputCurrency && outputCurrency && _selectedMarket) {
-      if (!isMarketEqual(_selectedMarket, selectedMarket)) {
-        setSelectedMarket(_selectedMarket)
-      }
+    const { inputCurrencyAddress, outputCurrencyAddress } =
+      getCurrencyAddress(selectedChain)
+    const inputCurrency = inputCurrencyAddress
+      ? _currencies.find((currency) =>
+          isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
+        )
+      : undefined
+    const outputCurrency = outputCurrencyAddress
+      ? _currencies.find((currency) =>
+          isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
+        )
+      : undefined
+
+    setInputCurrency(inputCurrency)
+    setOutputCurrency(outputCurrency)
+
+    if (inputCurrency && outputCurrency) {
       const quote = getQuoteToken({
         chainId: selectedChain.id,
         token0: inputCurrency.address,
@@ -369,14 +226,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     } else {
       setIsBid(true)
     }
-  }, [
-    inputCurrency,
-    _selectedMarket,
-    outputCurrency,
-    selectedChain.id,
-    selectedMarket,
-    setSelectedMarket,
-  ])
+  }, [_currencies, selectedChain, setInputCurrency, setOutputCurrency])
 
   return (
     <Context.Provider
@@ -398,17 +248,10 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
         setOutputCurrency,
         outputCurrencyAmount,
         setOutputCurrencyAmount,
-        claimBounty,
-        setClaimBounty,
         isPostOnly,
         setIsPostOnly,
-        selectedDecimalPlaces,
-        setSelectedDecimalPlaces,
         priceInput,
         setPriceInput,
-        availableDecimalPlacesGroups,
-        bids,
-        asks,
       }}
     >
       {children}

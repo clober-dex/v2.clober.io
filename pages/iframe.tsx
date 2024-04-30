@@ -1,17 +1,26 @@
 import React, { useEffect } from 'react'
 
 import { cleanAndSetQueryParams } from '../utils/url'
-import { useLimitContext } from '../contexts/limit/limit-context'
 import { IframeContainer } from '../containers/iframe-container'
+import { getCurrencyAddress } from '../utils/currency'
+import { useChainContext } from '../contexts/chain-context'
 
 export default function Iframe() {
-  const { inputCurrency, outputCurrency } = useLimitContext()
+  const { selectedChain } = useChainContext()
+  const [mounted, setMounted] = React.useState(false)
 
   useEffect(() => {
-    cleanAndSetQueryParams(['chain'], {
-      inputCurrency: inputCurrency?.address,
-      outputCurrency: outputCurrency?.address,
-    })
-  }, [inputCurrency, outputCurrency])
+    if (mounted) {
+      const { inputCurrencyAddress, outputCurrencyAddress } =
+        getCurrencyAddress(selectedChain)
+      cleanAndSetQueryParams(['chain'], {
+        inputCurrency: inputCurrencyAddress,
+        outputCurrency: outputCurrencyAddress,
+      })
+      setMounted(true)
+    } else {
+      cleanAndSetQueryParams(['chain'], {})
+    }
+  }, [mounted, selectedChain])
   return <IframeContainer />
 }

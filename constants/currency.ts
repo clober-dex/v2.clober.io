@@ -4,20 +4,6 @@ import { Currency } from '../model/currency'
 
 import { CHAIN_IDS } from './chain'
 
-export const WETH_ADDRESSES: {
-  [chain in CHAIN_IDS]: `0x${string}`[]
-} = {
-  [CHAIN_IDS.ARBITRUM_SEPOLIA]: [zeroAddress],
-  [CHAIN_IDS.BERA_CHAIN_TESTNET]: [zeroAddress], // todo
-}
-
-export const STABLE_COIN_ADDRESSES: {
-  [chain in CHAIN_IDS]: `0x${string}`[]
-} = {
-  [CHAIN_IDS.ARBITRUM_SEPOLIA]: ['0x00BFD44e79FB7f6dd5887A9426c8EF85A0CD23e0'],
-  [CHAIN_IDS.BERA_CHAIN_TESTNET]: [zeroAddress], // todo
-}
-
 export const ETH: Currency = {
   address: zeroAddress,
   name: 'Ethereum',
@@ -37,5 +23,33 @@ export const WHITELISTED_CURRENCIES: {
       decimals: 6,
     },
   ],
-  [CHAIN_IDS.BERA_CHAIN_TESTNET]: [], // todo
+  [CHAIN_IDS.BERA_CHAIN_TESTNET]: [
+    {
+      address: zeroAddress,
+      name: 'BERA',
+      symbol: 'BERA',
+      decimals: 18,
+    },
+    {
+      address: '0x7EeCA4205fF31f947EdBd49195a7A88E6A91161B',
+      name: 'Honey',
+      symbol: 'HONEY',
+      decimals: 18,
+    },
+  ],
+  [CHAIN_IDS.BASE]: [
+    ETH,
+    {
+      address: '0x4200000000000000000000000000000000000006',
+      name: 'Wrapped Ether',
+      symbol: 'WETH',
+      decimals: 18,
+    },
+    {
+      address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+      name: 'USD Coin',
+      symbol: 'USDC',
+      decimals: 6,
+    },
+  ],
 }
