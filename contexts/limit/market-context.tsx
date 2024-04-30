@@ -2,14 +2,14 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { getMarket, Market } from '@clober/v2-sdk'
 import { useQuery } from 'wagmi'
 import BigNumber from 'bignumber.js'
+import { getAddress } from 'viem'
 
 import { isMarketEqual } from '../../utils/market'
 import { isOrderBookEqual, parseDepth } from '../../utils/order-book'
 import { getPriceDecimals } from '../../utils/prices'
 import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
 import { useChainContext } from '../chain-context'
-
-import { useLimitContext } from './limit-context'
+import { getCurrencyAddress } from '../../utils/currency'
 
 type MarketContext = {
   selectedMarket?: Market
@@ -39,7 +39,6 @@ const Context = React.createContext<MarketContext>({
 
 export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { selectedChain } = useChainContext()
-  const { inputCurrency, outputCurrency } = useLimitContext()
 
   const [selectedDecimalPlaces, setSelectedDecimalPlaces] = useState<
     Decimals | undefined
@@ -49,13 +48,15 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   >(undefined)
 
   const { data: market } = useQuery(
-    ['updated-market', selectedChain, inputCurrency, outputCurrency],
+    ['updated-market', selectedChain],
     async () => {
-      if (inputCurrency && outputCurrency) {
+      const { inputCurrencyAddress, outputCurrencyAddress } =
+        getCurrencyAddress(selectedChain)
+      if (inputCurrencyAddress && outputCurrencyAddress) {
         return getMarket({
           chainId: selectedChain.id,
-          token0: inputCurrency.address,
-          token1: outputCurrency.address,
+          token0: getAddress(inputCurrencyAddress),
+          token1: getAddress(outputCurrencyAddress),
         })
       } else {
         return null
@@ -71,7 +72,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   useEffect(() => {
     if (!market) {
       setSelectedMarket(undefined)
-    } else if (!selectedMarket && market) {
+    } else if (!isMarketEqual(selectedMarket, market)) {
       setSelectedMarket(market)
     } else if (
       selectedMarket &&
