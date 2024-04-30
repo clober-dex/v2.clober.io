@@ -10,7 +10,12 @@ import { useChainContext } from '../chain-context'
 import { Balances } from '../../model/balances'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 import { WHITELISTED_CURRENCIES } from '../../constants/currency'
-import { fetchCurrency } from '../../utils/currency'
+import {
+  fetchCurrency,
+  getCurrencyAddress,
+  LOCAL_STORAGE_INPUT_CURRENCY_KEY,
+  LOCAL_STORAGE_OUTPUT_CURRENCY_KEY,
+} from '../../utils/currency'
 
 type LimitContext = {
   balances: Balances
@@ -83,6 +88,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     undefined,
   )
   const [outputCurrencyAmount, setOutputCurrencyAmount] = useState('')
+
   const [claimBounty, setClaimBounty] = useState(
     formatUnits(
       selectedChain.defaultGasPrice,
@@ -91,18 +97,11 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
   const [isPostOnly, setIsPostOnly] = useState(false)
   const [priceInput, setPriceInput] = useState('')
-  const { inputCurrencyAddress, outputCurrencyAddress } =
-    getCurrencyAddress(selectedChain)
-  const [mounted, setMounted] = useState(false)
-
   const { data: _currencies } = useQuery(
-    [
-      'limit-currencies',
-      selectedChain,
-      inputCurrencyAddress,
-      outputCurrencyAddress,
-    ],
+    ['limit-currencies', selectedChain],
     async () => {
+      const { inputCurrencyAddress, outputCurrencyAddress } =
+        getCurrencyAddress(selectedChain)
       const _inputCurrency = inputCurrencyAddress
         ? await fetchCurrency(
             selectedChain.id,
@@ -133,7 +132,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   ) as {
     data: Currency[]
   }
-  const [currencies, setCurrencies] = useState<Currency[]>(_currencies ?? [])
+  const [currencies, setCurrencies] = useState<Currency[]>([])
 
   const { data: balances } = useQuery(
     ['limit-balances', userAddress, balance, selectedChain, currencies],
@@ -205,32 +204,24 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
 
   useEffect(() => {
-    if (!mounted) {
-      const inputCurrency = inputCurrencyAddress
-        ? currencies.find((currency) =>
-            isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
-          )
-        : undefined
-      const outputCurrency = outputCurrencyAddress
-        ? currencies.find((currency) =>
-            isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
-          )
-        : undefined
-      setInputCurrency(inputCurrency)
-      setOutputCurrency(outputCurrency)
-      setMounted(true)
-    }
-  }, [
-    currencies,
-    inputCurrencyAddress,
-    mounted,
-    outputCurrencyAddress,
-    selectedChain,
-    setInputCurrency,
-    setOutputCurrency,
-  ])
+    setCurrencies(_currencies)
 
-  useEffect(() => {
+    const { inputCurrencyAddress, outputCurrencyAddress } =
+      getCurrencyAddress(selectedChain)
+    const inputCurrency = inputCurrencyAddress
+      ? _currencies.find((currency) =>
+          isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
+        )
+      : undefined
+    const outputCurrency = outputCurrencyAddress
+      ? _currencies.find((currency) =>
+          isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
+        )
+      : undefined
+
+    setInputCurrency(inputCurrency)
+    setOutputCurrency(outputCurrency)
+
     if (inputCurrency && outputCurrency) {
       const quote = getQuoteToken({
         chainId: selectedChain.id,
@@ -245,7 +236,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     } else {
       setIsBid(true)
     }
-  }, [inputCurrency, outputCurrency, selectedChain.id])
+  }, [_currencies, selectedChain, setInputCurrency, setOutputCurrency])
 
   return (
     <Context.Provider

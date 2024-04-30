@@ -2,16 +2,25 @@ import React, { useEffect } from 'react'
 
 import { LimitContainer } from '../containers/limit-container'
 import { cleanAndSetQueryParams } from '../utils/url'
-import { useLimitContext } from '../contexts/limit/limit-context'
+import { useChainContext } from '../contexts/chain-context'
+import { getCurrencyAddress } from '../utils/currency'
 
 export default function Limit() {
-  const { inputCurrency, outputCurrency } = useLimitContext()
+  const { selectedChain } = useChainContext()
+  const [mounted, setMounted] = React.useState(false)
 
   useEffect(() => {
-    cleanAndSetQueryParams(['chain'], {
-      inputCurrency: inputCurrency?.address,
-      outputCurrency: outputCurrency?.address,
-    })
-  }, [inputCurrency, outputCurrency])
+    if (mounted) {
+      const { inputCurrencyAddress, outputCurrencyAddress } =
+        getCurrencyAddress(selectedChain)
+      cleanAndSetQueryParams(['chain'], {
+        inputCurrency: inputCurrencyAddress,
+        outputCurrency: outputCurrencyAddress,
+      })
+      setMounted(true)
+    } else {
+      cleanAndSetQueryParams(['chain'], {})
+    }
+  }, [mounted, selectedChain])
   return <LimitContainer />
 }
