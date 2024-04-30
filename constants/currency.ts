@@ -4,20 +4,6 @@ import { Currency } from '../model/currency'
 
 import { CHAIN_IDS } from './chain'
 
-export const WETH_ADDRESSES: {
-  [chain in CHAIN_IDS]: `0x${string}`[]
-} = {
-  [CHAIN_IDS.ARBITRUM_SEPOLIA]: [zeroAddress],
-  [CHAIN_IDS.BERA_CHAIN_TESTNET]: [zeroAddress], // todo
-}
-
-export const STABLE_COIN_ADDRESSES: {
-  [chain in CHAIN_IDS]: `0x${string}`[]
-} = {
-  [CHAIN_IDS.ARBITRUM_SEPOLIA]: ['0x00BFD44e79FB7f6dd5887A9426c8EF85A0CD23e0'],
-  [CHAIN_IDS.BERA_CHAIN_TESTNET]: [zeroAddress], // todo
-}
-
 export const ETH: Currency = {
   address: zeroAddress,
   name: 'Ethereum',
@@ -38,4 +24,18 @@ export const WHITELISTED_CURRENCIES: {
     },
   ],
   [CHAIN_IDS.BERA_CHAIN_TESTNET]: [], // todo
+  [CHAIN_IDS.ZKSYNC_SEPOLIA]: [
+    {
+      address: '0x1d32dcf2d957c9973a00d53641aeeb8d671df865',
+      name: 'MockToken',
+      symbol: 'TEST',
+      decimals: 18,
+    },
+    {
+      address: '0xe6b14f66a3ad92edd45960afd1d932fbb7f92d21',
+      name: 'MockUSDT',
+      symbol: 'USDT',
+      decimals: 6,
+    },
+  ],
 }
