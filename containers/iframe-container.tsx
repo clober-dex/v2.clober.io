@@ -9,7 +9,6 @@ import { LimitForm } from '../components/form/limit-form'
 import OrderBook from '../components/order-book'
 import { useChainContext } from '../contexts/chain-context'
 import { useMarketContext } from '../contexts/limit/market-context'
-import { formatUnits } from '../utils/bigint'
 import { toPlacesString } from '../utils/bignumber'
 import { useLimitContext } from '../contexts/limit/limit-context'
 import {
@@ -45,7 +44,6 @@ export const IframeContainer = () => {
     setOutputCurrency,
     outputCurrencyAmount,
     setOutputCurrencyAmount,
-    setClaimBounty,
     isPostOnly,
     setIsPostOnly,
     priceInput,
@@ -70,20 +68,6 @@ export const IframeContainer = () => {
     availableDecimalPlacesGroups,
     setInputCurrencyAmount,
     setSelectedDecimalPlaces,
-  ])
-
-  // When chain is changed
-  useEffect(() => {
-    setClaimBounty(
-      formatUnits(
-        selectedChain.defaultGasPrice,
-        selectedChain.nativeCurrency.decimals,
-      ),
-    )
-  }, [
-    selectedChain.defaultGasPrice,
-    selectedChain.nativeCurrency.decimals,
-    setClaimBounty,
   ])
 
   // When depth is changed

@@ -35,8 +35,6 @@ type LimitContext = {
   setOutputCurrency: (currency: Currency | undefined) => void
   outputCurrencyAmount: string
   setOutputCurrencyAmount: (amount: string) => void
-  claimBounty: string
-  setClaimBounty: (amount: string) => void
   isPostOnly: boolean
   setIsPostOnly: (isPostOnly: (prevState: boolean) => boolean) => void
   priceInput: string
@@ -61,8 +59,6 @@ const Context = React.createContext<LimitContext>({
   setOutputCurrency: () => {},
   outputCurrencyAmount: '',
   setOutputCurrencyAmount: () => {},
-  claimBounty: '',
-  setClaimBounty: () => {},
   isPostOnly: false,
   setIsPostOnly: () => {},
   priceInput: '',
@@ -89,12 +85,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
   const [outputCurrencyAmount, setOutputCurrencyAmount] = useState('')
 
-  const [claimBounty, setClaimBounty] = useState(
-    formatUnits(
-      selectedChain.defaultGasPrice,
-      selectedChain.nativeCurrency.decimals,
-    ),
-  )
   const [isPostOnly, setIsPostOnly] = useState(false)
   const [priceInput, setPriceInput] = useState('')
   const { data: _currencies } = useQuery(
@@ -258,8 +248,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
         setOutputCurrency,
         outputCurrencyAmount,
         setOutputCurrencyAmount,
-        claimBounty,
-        setClaimBounty,
         isPostOnly,
         setIsPostOnly,
         priceInput,
