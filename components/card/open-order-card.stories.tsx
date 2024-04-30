@@ -1,6 +1,7 @@
 import React from 'react'
-import { Meta, StoryObj } from '@storybook/react'
 import '../../styles/globals.css'
+import { Meta, StoryObj } from '@storybook/react'
+import { zeroAddress } from 'viem'
 
 import { dummyCurrencies } from '../../.storybook/dummy-data/currencies'
 
@@ -26,6 +27,7 @@ export const Bid: Story = {
     openOrder: {
       id: '1',
       isBid: true,
+      user: zeroAddress,
       inputCurrency: dummyCurrencies[0],
       outputCurrency: dummyCurrencies[1],
       txHash:
@@ -61,6 +63,7 @@ export const Ask: Story = {
     openOrder: {
       id: '1',
       isBid: false,
+      user: zeroAddress,
       inputCurrency: dummyCurrencies[1],
       outputCurrency: dummyCurrencies[0],
       txHash:

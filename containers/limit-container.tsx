@@ -8,7 +8,6 @@ import { LimitForm } from '../components/form/limit-form'
 import OrderBook from '../components/order-book'
 import { useChainContext } from '../contexts/chain-context'
 import { useMarketContext } from '../contexts/limit/market-context'
-import { formatUnits } from '../utils/bigint'
 import { textStyles } from '../themes/text-styles'
 import { toPlacesString } from '../utils/bignumber'
 import { useOpenOrderContext } from '../contexts/limit/open-order-context'
@@ -25,7 +24,14 @@ import { ChartContainer } from './chart-container'
 
 export const LimitContainer = () => {
   const { selectedChain } = useChainContext()
-  const { selectedMarket } = useMarketContext()
+  const {
+    selectedMarket,
+    availableDecimalPlacesGroups,
+    selectedDecimalPlaces,
+    setSelectedDecimalPlaces,
+    bids,
+    asks,
+  } = useMarketContext()
   const { openOrders } = useOpenOrderContext()
   const { limit, cancels, claims } = useLimitContractContext()
   const { data: walletClient } = useWalletClient()
@@ -44,16 +50,10 @@ export const LimitContainer = () => {
     setOutputCurrency,
     outputCurrencyAmount,
     setOutputCurrencyAmount,
-    setClaimBounty,
     isPostOnly,
     setIsPostOnly,
-    selectedDecimalPlaces,
-    setSelectedDecimalPlaces,
     priceInput,
     setPriceInput,
-    availableDecimalPlacesGroups,
-    bids,
-    asks,
     balances,
     currencies,
     setCurrencies,
@@ -75,20 +75,6 @@ export const LimitContainer = () => {
     availableDecimalPlacesGroups,
     setInputCurrencyAmount,
     setSelectedDecimalPlaces,
-  ])
-
-  // When chain is changed
-  useEffect(() => {
-    setClaimBounty(
-      formatUnits(
-        selectedChain.defaultGasPrice,
-        selectedChain.nativeCurrency.decimals,
-      ),
-    )
-  }, [
-    selectedChain.defaultGasPrice,
-    selectedChain.nativeCurrency.decimals,
-    setClaimBounty,
   ])
 
   // When depth is changed

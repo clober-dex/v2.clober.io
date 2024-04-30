@@ -26,6 +26,7 @@ export default function useDropdown() {
         clearTimeout(clickBufferTimeout.current)
       }
       clickBuffer.current = true
+      // @ts-ignore
       clickBufferTimeout.current = setTimeout(() => {
         clickBuffer.current = false
       }, 100)
