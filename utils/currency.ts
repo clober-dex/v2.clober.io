@@ -8,7 +8,7 @@ import { ETH, WHITELISTED_CURRENCIES } from '../constants/currency'
 export const fetchCurrency = async (
   chainId: number,
   address: `0x${string}`,
-): Promise<Currency> => {
+): Promise<Currency | undefined> => {
   if (isAddressEqual(address, zeroAddress)) {
     return ETH
   }
@@ -43,11 +43,15 @@ export const fetchCurrency = async (
         },
       ],
     })
+  if (!name || !symbol || !decimals) {
+    return undefined
+  }
+
   return {
     address,
-    name: name ?? 'Unknown',
-    symbol: symbol ?? 'Unknown',
-    decimals: decimals ?? 18,
+    name: name,
+    symbol: symbol,
+    decimals: decimals,
   }
 }
 
