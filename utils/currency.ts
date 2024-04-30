@@ -4,6 +4,14 @@ import { supportChains } from '../constants/chain'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { Currency } from '../model/currency'
 import { ETH, WHITELISTED_CURRENCIES } from '../constants/currency'
+import { Chain } from '../model/chain'
+
+export const LOCAL_STORAGE_INPUT_CURRENCY_KEY = (chain: Chain) =>
+  `${chain.id}-inputCurrency-limit`
+export const LOCAL_STORAGE_OUTPUT_CURRENCY_KEY = (chain: Chain) =>
+  `${chain.id}-outputCurrency-limit`
+export const QUERY_PARAM_INPUT_CURRENCY_KEY = 'inputCurrency'
+export const QUERY_PARAM_OUTPUT_CURRENCY_KEY = 'outputCurrency'
 
 export const fetchCurrency = async (
   chainId: number,
@@ -62,4 +70,32 @@ export const isCurrencyEqual = (a: Currency, b: Currency) => {
     a.name === b.name &&
     a.symbol === b.symbol
   )
+}
+
+export const getCurrencyAddress = (chain: Chain) => {
+  const params = new URLSearchParams(window.location.search)
+  const queryParamInputCurrencyAddress = params.get(
+    QUERY_PARAM_INPUT_CURRENCY_KEY,
+  )
+  const queryParamOutputCurrencyAddress = params.get(
+    QUERY_PARAM_OUTPUT_CURRENCY_KEY,
+  )
+  const localStorageInputCurrencyAddress = localStorage.getItem(
+    LOCAL_STORAGE_INPUT_CURRENCY_KEY(chain),
+  )
+  const localStorageOutputCurrencyAddress = localStorage.getItem(
+    LOCAL_STORAGE_OUTPUT_CURRENCY_KEY(chain),
+  )
+  const inputCurrencyAddress =
+    queryParamInputCurrencyAddress ||
+    localStorageInputCurrencyAddress ||
+    undefined
+  const outputCurrencyAddress =
+    queryParamOutputCurrencyAddress ||
+    localStorageOutputCurrencyAddress ||
+    undefined
+  return {
+    inputCurrencyAddress,
+    outputCurrencyAddress,
+  }
 }

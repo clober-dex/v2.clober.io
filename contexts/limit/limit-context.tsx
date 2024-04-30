@@ -7,7 +7,6 @@ import { getQuoteToken } from '@clober/v2-sdk'
 import { Currency } from '../../model/currency'
 import { formatUnits } from '../../utils/bigint'
 import { useChainContext } from '../chain-context'
-import { Chain } from '../../model/chain'
 import { Balances } from '../../model/balances'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 import { WHITELISTED_CURRENCIES } from '../../constants/currency'
@@ -64,41 +63,6 @@ const Context = React.createContext<LimitContext>({
   priceInput: '',
   setPriceInput: () => {},
 })
-
-const LOCAL_STORAGE_INPUT_CURRENCY_KEY = (chain: Chain) =>
-  `${chain.id}-inputCurrency-limit`
-const LOCAL_STORAGE_OUTPUT_CURRENCY_KEY = (chain: Chain) =>
-  `${chain.id}-outputCurrency-limit`
-const QUERY_PARAM_INPUT_CURRENCY_KEY = 'inputCurrency'
-const QUERY_PARAM_OUTPUT_CURRENCY_KEY = 'outputCurrency'
-
-const getCurrencyAddress = (chain: Chain) => {
-  const params = new URLSearchParams(window.location.search)
-  const queryParamInputCurrencyAddress = params.get(
-    QUERY_PARAM_INPUT_CURRENCY_KEY,
-  )
-  const queryParamOutputCurrencyAddress = params.get(
-    QUERY_PARAM_OUTPUT_CURRENCY_KEY,
-  )
-  const localStorageInputCurrencyAddress = localStorage.getItem(
-    LOCAL_STORAGE_INPUT_CURRENCY_KEY(chain),
-  )
-  const localStorageOutputCurrencyAddress = localStorage.getItem(
-    LOCAL_STORAGE_OUTPUT_CURRENCY_KEY(chain),
-  )
-  const inputCurrencyAddress =
-    queryParamInputCurrencyAddress ||
-    localStorageInputCurrencyAddress ||
-    undefined
-  const outputCurrencyAddress =
-    queryParamOutputCurrencyAddress ||
-    localStorageOutputCurrencyAddress ||
-    undefined
-  return {
-    inputCurrencyAddress,
-    outputCurrencyAddress,
-  }
-}
 
 export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { address: userAddress } = useAccount()
