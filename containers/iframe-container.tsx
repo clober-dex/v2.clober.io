@@ -20,7 +20,14 @@ import { useLimitContractContext } from '../contexts/limit/limit-contract-contex
 
 export const IframeContainer = () => {
   const { selectedChain } = useChainContext()
-  const { selectedMarket } = useMarketContext()
+  const {
+    selectedMarket,
+    availableDecimalPlacesGroups,
+    selectedDecimalPlaces,
+    setSelectedDecimalPlaces,
+    bids,
+    asks,
+  } = useMarketContext()
   const { limit } = useLimitContractContext()
   const { data: walletClient } = useWalletClient()
   const {
@@ -41,13 +48,8 @@ export const IframeContainer = () => {
     setClaimBounty,
     isPostOnly,
     setIsPostOnly,
-    selectedDecimalPlaces,
-    setSelectedDecimalPlaces,
     priceInput,
     setPriceInput,
-    availableDecimalPlacesGroups,
-    bids,
-    asks,
     balances,
     currencies,
     setCurrencies,

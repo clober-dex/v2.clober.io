@@ -72,13 +72,13 @@ const Web3AnalyticWrapper = ({ children }: React.PropsWithChildren) => {
 
 const LimitProvidersWrapper = ({ children }: React.PropsWithChildren) => {
   return (
-    <MarketProvider>
-      <OpenOrderProvider>
-        <LimitContractProvider>
-          <LimitProvider>{children}</LimitProvider>
-        </LimitContractProvider>
-      </OpenOrderProvider>
-    </MarketProvider>
+    <OpenOrderProvider>
+      <LimitContractProvider>
+        <LimitProvider>
+          <MarketProvider>{children}</MarketProvider>
+        </LimitProvider>
+      </LimitContractProvider>
+    </OpenOrderProvider>
   )
 }
 

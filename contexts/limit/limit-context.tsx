@@ -1,24 +1,17 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import BigNumber from 'bignumber.js'
+import React, { useCallback, useEffect, useState } from 'react'
 import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 import { useAccount, useBalance, useQuery } from 'wagmi'
 import { readContracts } from '@wagmi/core'
-import { getMarket, getQuoteToken } from '@clober/v2-sdk'
+import { getQuoteToken } from '@clober/v2-sdk'
 
 import { Currency } from '../../model/currency'
 import { formatUnits } from '../../utils/bigint'
-import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
-import { getPriceDecimals } from '../../utils/prices'
-import { parseDepth } from '../../utils/order-book'
 import { useChainContext } from '../chain-context'
 import { Chain } from '../../model/chain'
-import { isMarketEqual } from '../../utils/market'
 import { Balances } from '../../model/balances'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 import { WHITELISTED_CURRENCIES } from '../../constants/currency'
 import { fetchCurrency } from '../../utils/currency'
-
-import { useMarketContext } from './market-context'
 
 type LimitContext = {
   balances: Balances
@@ -42,19 +35,8 @@ type LimitContext = {
   setClaimBounty: (amount: string) => void
   isPostOnly: boolean
   setIsPostOnly: (isPostOnly: (prevState: boolean) => boolean) => void
-  selectedDecimalPlaces: Decimals | undefined
-  setSelectedDecimalPlaces: (decimalPlaces: Decimals | undefined) => void
   priceInput: string
   setPriceInput: (priceInput: string) => void
-  availableDecimalPlacesGroups: Decimals[]
-  bids: {
-    price: string
-    size: string
-  }[]
-  asks: {
-    price: string
-    size: string
-  }[]
 }
 
 const Context = React.createContext<LimitContext>({
@@ -79,13 +61,8 @@ const Context = React.createContext<LimitContext>({
   setClaimBounty: () => {},
   isPostOnly: false,
   setIsPostOnly: () => {},
-  selectedDecimalPlaces: undefined,
-  setSelectedDecimalPlaces: () => {},
   priceInput: '',
   setPriceInput: () => {},
-  availableDecimalPlacesGroups: [],
-  bids: [],
-  asks: [],
 })
 
 const LOCAL_STORAGE_INPUT_CURRENCY_KEY = (chain: Chain) =>
@@ -126,7 +103,6 @@ const getCurrencyAddress = (chain: Chain) => {
 export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { address: userAddress } = useAccount()
   const { data: balance } = useBalance({ address: userAddress, watch: true })
-  const { selectedMarket, setSelectedMarket } = useMarketContext()
   const { selectedChain } = useChainContext()
 
   const [isBid, setIsBid] = useState(true)
@@ -150,9 +126,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     ),
   )
   const [isPostOnly, setIsPostOnly] = useState(false)
-  const [selectedDecimalPlaces, setSelectedDecimalPlaces] = useState<
-    Decimals | undefined
-  >(undefined)
   const [priceInput, setPriceInput] = useState('')
   const { inputCurrencyAddress, outputCurrencyAddress } =
     getCurrencyAddress(selectedChain)
@@ -241,63 +214,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     data: Balances
   }
 
-  const { data: _selectedMarket } = useQuery(
-    ['limit-selected-market', selectedChain, inputCurrency, outputCurrency],
-    async () => {
-      if (inputCurrency && outputCurrency) {
-        return getMarket({
-          chainId: selectedChain.id,
-          token0: inputCurrency.address,
-          token1: outputCurrency.address,
-        })
-      } else {
-        return undefined
-      }
-    },
-    {
-      initialData: undefined,
-    },
-  )
-
-  const availableDecimalPlacesGroups = useMemo(() => {
-    const availableDecimalPlacesGroups = selectedMarket
-      ? (Array.from(Array(4).keys())
-          .map((i) => {
-            const minPrice = Math.min(
-              selectedMarket.bids.sort((a, b) => b.price - a.price)[0]?.price ??
-                Number.MAX_VALUE,
-              selectedMarket.asks.sort((a, b) => a.price - b.price)[0]?.price ??
-                Number.MAX_VALUE,
-            )
-            const decimalPlaces = getPriceDecimals(minPrice)
-            const label = (10 ** (i - decimalPlaces)).toFixed(
-              Math.max(decimalPlaces - i, 0),
-            )
-            if (new BigNumber(minPrice).gt(label)) {
-              return {
-                label,
-                value: Math.max(decimalPlaces - i, 0),
-              }
-            }
-          })
-          .filter((x) => x) as Decimals[])
-      : []
-    return availableDecimalPlacesGroups.length > 0
-      ? availableDecimalPlacesGroups
-      : DEFAULT_DECIMAL_PLACES_GROUPS
-  }, [selectedMarket])
-
-  const [bids, asks] = useMemo(
-    () =>
-      selectedMarket && selectedDecimalPlaces
-        ? [
-            parseDepth(true, selectedMarket, selectedDecimalPlaces),
-            parseDepth(false, selectedMarket, selectedDecimalPlaces),
-          ]
-        : [[], []],
-    [selectedDecimalPlaces, selectedMarket],
-  )
-
   const setInputCurrency = useCallback(
     (currency: Currency | undefined) => {
       if (currency) {
@@ -348,14 +264,10 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     selectedChain,
     setInputCurrency,
     setOutputCurrency,
-    setSelectedMarket,
   ])
 
   useEffect(() => {
-    if (inputCurrency && outputCurrency && _selectedMarket) {
-      if (!isMarketEqual(_selectedMarket, selectedMarket)) {
-        setSelectedMarket(_selectedMarket)
-      }
+    if (inputCurrency && outputCurrency) {
       const quote = getQuoteToken({
         chainId: selectedChain.id,
         token0: inputCurrency.address,
@@ -369,14 +281,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     } else {
       setIsBid(true)
     }
-  }, [
-    inputCurrency,
-    _selectedMarket,
-    outputCurrency,
-    selectedChain.id,
-    selectedMarket,
-    setSelectedMarket,
-  ])
+  }, [inputCurrency, outputCurrency, selectedChain.id])
 
   return (
     <Context.Provider
@@ -402,13 +307,8 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
         setClaimBounty,
         isPostOnly,
         setIsPostOnly,
-        selectedDecimalPlaces,
-        setSelectedDecimalPlaces,
         priceInput,
         setPriceInput,
-        availableDecimalPlacesGroups,
-        bids,
-        asks,
       }}
     >
       {children}

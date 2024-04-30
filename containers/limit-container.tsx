@@ -25,7 +25,14 @@ import { ChartContainer } from './chart-container'
 
 export const LimitContainer = () => {
   const { selectedChain } = useChainContext()
-  const { selectedMarket } = useMarketContext()
+  const {
+    selectedMarket,
+    availableDecimalPlacesGroups,
+    selectedDecimalPlaces,
+    setSelectedDecimalPlaces,
+    bids,
+    asks,
+  } = useMarketContext()
   const { openOrders } = useOpenOrderContext()
   const { limit, cancels, claims } = useLimitContractContext()
   const { data: walletClient } = useWalletClient()
@@ -47,13 +54,8 @@ export const LimitContainer = () => {
     setClaimBounty,
     isPostOnly,
     setIsPostOnly,
-    selectedDecimalPlaces,
-    setSelectedDecimalPlaces,
     priceInput,
     setPriceInput,
-    availableDecimalPlacesGroups,
-    bids,
-    asks,
     balances,
     currencies,
     setCurrencies,
