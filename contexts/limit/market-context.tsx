@@ -1,15 +1,23 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { getMarket, Market } from '@clober/v2-sdk'
 import { useQuery } from 'wagmi'
 import BigNumber from 'bignumber.js'
 import { getAddress } from 'viem'
 
 import { isMarketEqual } from '../../utils/market'
-import { isOrderBookEqual, parseDepth } from '../../utils/order-book'
+import {
+  calculateOutputCurrencyAmountString,
+  calculatePriceInputString,
+  isOrderBookEqual,
+  parseDepth,
+} from '../../utils/order-book'
 import { getPriceDecimals } from '../../utils/prices'
 import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
 import { useChainContext } from '../chain-context'
 import { getCurrencyAddress } from '../../utils/currency'
+import { toPlacesString } from '../../utils/bignumber'
+
+import { useLimitContext } from './limit-context'
 
 type MarketContext = {
   selectedMarket?: Market
@@ -17,6 +25,20 @@ type MarketContext = {
   selectedDecimalPlaces: Decimals | undefined
   setSelectedDecimalPlaces: (decimalPlaces: Decimals | undefined) => void
   availableDecimalPlacesGroups: Decimals[]
+  depthClickedIndex:
+    | {
+        isBid: boolean
+        index: number
+      }
+    | undefined
+  setDepthClickedIndex: (
+    depthClickedIndex:
+      | {
+          isBid: boolean
+          index: number
+        }
+      | undefined,
+  ) => void
   bids: {
     price: string
     size: string
@@ -33,18 +55,36 @@ const Context = React.createContext<MarketContext>({
   selectedDecimalPlaces: undefined,
   setSelectedDecimalPlaces: () => {},
   availableDecimalPlacesGroups: [],
+  depthClickedIndex: undefined,
+  setDepthClickedIndex: () => {},
   bids: [],
   asks: [],
 })
 
 export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { selectedChain } = useChainContext()
+  const {
+    isBid,
+    setPriceInput,
+    priceInput,
+    outputCurrencyAmount,
+    inputCurrencyAmount,
+    outputCurrency,
+    setOutputCurrencyAmount,
+  } = useLimitContext()
 
   const [selectedDecimalPlaces, setSelectedDecimalPlaces] = useState<
     Decimals | undefined
   >(undefined)
   const [selectedMarket, setSelectedMarket] = React.useState<
     Market | undefined
+  >(undefined)
+  const [depthClickedIndex, setDepthClickedIndex] = useState<
+    | {
+        isBid: boolean
+        index: number
+      }
+    | undefined
   >(undefined)
 
   const { data: market } = useQuery(
@@ -124,6 +164,107 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     [selectedDecimalPlaces, selectedMarket],
   )
 
+  // once
+  useEffect(() => {
+    setSelectedDecimalPlaces(availableDecimalPlacesGroups[0])
+  }, [availableDecimalPlacesGroups])
+
+  // When depth is changed
+  useEffect(() => {
+    setDepthClickedIndex(undefined)
+
+    setPriceInput(
+      isBid
+        ? toPlacesString(asks[0]?.price ?? bids[0]?.price ?? '1')
+        : toPlacesString(bids[0]?.price ?? asks[0]?.price ?? '1'),
+    )
+  }, [asks, bids, isBid, setPriceInput])
+
+  // When depthClickedIndex is changed, reset the priceInput
+  useEffect(() => {
+    if (depthClickedIndex) {
+      setPriceInput(
+        depthClickedIndex.isBid
+          ? bids[depthClickedIndex.index]?.price
+          : asks[depthClickedIndex.index]?.price,
+      )
+    }
+  }, [asks, bids, depthClickedIndex, setPriceInput])
+
+  const previousValues = useRef({
+    priceInput,
+    outputCurrencyAmount,
+    inputCurrencyAmount,
+  })
+
+  useEffect(() => {
+    if (
+      new BigNumber(inputCurrencyAmount).isNaN() ||
+      new BigNumber(inputCurrencyAmount).isZero() ||
+      !outputCurrency?.decimals
+    ) {
+      return
+    }
+
+    // `priceInput` is changed -> `outputCurrencyAmount` will be changed
+    if (previousValues.current.priceInput !== priceInput) {
+      const outputCurrencyAmount = calculateOutputCurrencyAmountString(
+        isBid,
+        inputCurrencyAmount,
+        priceInput,
+        outputCurrency.decimals,
+      )
+      setOutputCurrencyAmount(outputCurrencyAmount)
+      previousValues.current = {
+        priceInput,
+        outputCurrencyAmount,
+        inputCurrencyAmount,
+      }
+    }
+    // `outputCurrencyAmount` is changed -> `priceInput` will be changed
+    else if (
+      previousValues.current.outputCurrencyAmount !== outputCurrencyAmount
+    ) {
+      const priceInput = calculatePriceInputString(
+        isBid,
+        inputCurrencyAmount,
+        outputCurrencyAmount,
+        previousValues.current.priceInput,
+      )
+      setPriceInput(priceInput)
+      previousValues.current = {
+        priceInput,
+        outputCurrencyAmount,
+        inputCurrencyAmount,
+      }
+    }
+    // `inputCurrencyAmount` is changed -> `outputCurrencyAmount` will be changed
+    else if (
+      previousValues.current.inputCurrencyAmount !== inputCurrencyAmount
+    ) {
+      const outputCurrencyAmount = calculateOutputCurrencyAmountString(
+        isBid,
+        inputCurrencyAmount,
+        priceInput,
+        outputCurrency.decimals,
+      )
+      setOutputCurrencyAmount(outputCurrencyAmount)
+      previousValues.current = {
+        priceInput,
+        outputCurrencyAmount,
+        inputCurrencyAmount,
+      }
+    }
+  }, [
+    inputCurrencyAmount,
+    isBid,
+    outputCurrency?.decimals,
+    outputCurrencyAmount,
+    priceInput,
+    setOutputCurrencyAmount,
+    setPriceInput,
+  ])
+
   return (
     <Context.Provider
       value={{
@@ -132,6 +273,8 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
         selectedDecimalPlaces,
         setSelectedDecimalPlaces,
         availableDecimalPlacesGroups,
+        depthClickedIndex,
+        setDepthClickedIndex,
         bids,
         asks,
       }}

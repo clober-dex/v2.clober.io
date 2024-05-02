@@ -17,12 +17,11 @@ export const approve20 = async (
   if (!walletClient || allowance >= value) {
     return
   }
-  const hash = await walletClient.writeContract({
+  return walletClient.writeContract({
     address: currency.address,
     abi: ERC20_PERMIT_ABI,
     functionName: 'approve',
     args: [spender, value],
     account: walletClient.account,
   })
-  return hash
 }
