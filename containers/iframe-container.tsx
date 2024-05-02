@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useMemo } from 'react'
 import { isAddressEqual, parseUnits } from 'viem'
-import BigNumber from 'bignumber.js'
 import { useWalletClient } from 'wagmi'
 import Link from 'next/link'
 import { getQuoteToken } from '@clober/v2-sdk'
@@ -9,12 +8,7 @@ import { LimitForm } from '../components/form/limit-form'
 import OrderBook from '../components/order-book'
 import { useChainContext } from '../contexts/chain-context'
 import { useMarketContext } from '../contexts/limit/market-context'
-import { toPlacesString } from '../utils/bignumber'
 import { useLimitContext } from '../contexts/limit/limit-context'
-import {
-  calculateOutputCurrencyAmountString,
-  calculatePriceInputString,
-} from '../utils/order-book'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
 
 export const IframeContainer = () => {
@@ -26,6 +20,8 @@ export const IframeContainer = () => {
     setSelectedDecimalPlaces,
     bids,
     asks,
+    depthClickedIndex,
+    setDepthClickedIndex,
   } = useMarketContext()
   const { limit } = useLimitContractContext()
   const { data: walletClient } = useWalletClient()
@@ -52,119 +48,6 @@ export const IframeContainer = () => {
     currencies,
     setCurrencies,
   } = useLimitContext()
-
-  const [depthClickedIndex, setDepthClickedIndex] = useState<
-    | {
-        isBid: boolean
-        index: number
-      }
-    | undefined
-  >(undefined)
-
-  // once
-  useEffect(() => {
-    setSelectedDecimalPlaces(availableDecimalPlacesGroups[0])
-  }, [
-    availableDecimalPlacesGroups,
-    setInputCurrencyAmount,
-    setSelectedDecimalPlaces,
-  ])
-
-  // When depth is changed
-  useEffect(() => {
-    setDepthClickedIndex(undefined)
-
-    setPriceInput(
-      isBid
-        ? toPlacesString(asks[0]?.price ?? bids[0]?.price ?? '1')
-        : toPlacesString(bids[0]?.price ?? asks[0]?.price ?? '1'),
-    )
-  }, [asks, bids, isBid, setPriceInput])
-
-  // When depthClickedIndex is changed, reset the priceInput
-  useEffect(() => {
-    if (depthClickedIndex) {
-      setPriceInput(
-        depthClickedIndex.isBid
-          ? bids[depthClickedIndex.index]?.price
-          : asks[depthClickedIndex.index]?.price,
-      )
-    }
-  }, [asks, bids, depthClickedIndex, setPriceInput])
-
-  const previousValues = useRef({
-    priceInput,
-    outputCurrencyAmount,
-    inputCurrencyAmount,
-  })
-
-  useEffect(() => {
-    if (
-      new BigNumber(inputCurrencyAmount).isNaN() ||
-      new BigNumber(inputCurrencyAmount).isZero() ||
-      !outputCurrency?.decimals
-    ) {
-      return
-    }
-
-    // `priceInput` is changed -> `outputCurrencyAmount` will be changed
-    if (previousValues.current.priceInput !== priceInput) {
-      const outputCurrencyAmount = calculateOutputCurrencyAmountString(
-        isBid,
-        inputCurrencyAmount,
-        priceInput,
-        outputCurrency.decimals,
-      )
-      setOutputCurrencyAmount(outputCurrencyAmount)
-      previousValues.current = {
-        priceInput,
-        outputCurrencyAmount,
-        inputCurrencyAmount,
-      }
-    }
-    // `outputCurrencyAmount` is changed -> `priceInput` will be changed
-    else if (
-      previousValues.current.outputCurrencyAmount !== outputCurrencyAmount
-    ) {
-      const priceInput = calculatePriceInputString(
-        isBid,
-        inputCurrencyAmount,
-        outputCurrencyAmount,
-        previousValues.current.priceInput,
-      )
-      setPriceInput(priceInput)
-      previousValues.current = {
-        priceInput,
-        outputCurrencyAmount,
-        inputCurrencyAmount,
-      }
-    }
-    // `inputCurrencyAmount` is changed -> `outputCurrencyAmount` will be changed
-    else if (
-      previousValues.current.inputCurrencyAmount !== inputCurrencyAmount
-    ) {
-      const outputCurrencyAmount = calculateOutputCurrencyAmountString(
-        isBid,
-        inputCurrencyAmount,
-        priceInput,
-        outputCurrency.decimals,
-      )
-      setOutputCurrencyAmount(outputCurrencyAmount)
-      previousValues.current = {
-        priceInput,
-        outputCurrencyAmount,
-        inputCurrencyAmount,
-      }
-    }
-  }, [
-    priceInput,
-    inputCurrencyAmount,
-    outputCurrencyAmount,
-    isBid,
-    outputCurrency?.decimals,
-    setOutputCurrencyAmount,
-    setPriceInput,
-  ])
 
   const [quoteCurrency, baseCurrency] = useMemo(() => {
     if (inputCurrency && outputCurrency) {
