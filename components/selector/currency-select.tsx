@@ -94,11 +94,11 @@ const CurrencySelect = ({
           )
           .sort((a, b) => {
             const aValue =
-              Number(balances[a.address] ?? 0n) *
-              (prices[a.address] ?? 0.000000000000001)
+              Number(balances[getAddress(a.address)] ?? 0n) *
+              (prices[getAddress(a.address)] ?? 0.000000000000001)
             const bValue =
-              Number(balances[b.address] ?? 0n) *
-              (prices[b.address] ?? 0.000000000000001)
+              Number(balances[getAddress(b.address)] ?? 0n) *
+              (prices[getAddress(b.address)] ?? 0.000000000000001)
             return aValue > bValue ? -1 : aValue < bValue ? 1 : 0
           })
           .map((currency) => (
@@ -122,17 +122,17 @@ const CurrencySelect = ({
               <div className="flex-1 text-sm text-end text-white">
                 <div>
                   {formatUnits(
-                    balances[currency.address] ?? 0n,
+                    balances[getAddress(currency.address)] ?? 0n,
                     currency.decimals,
-                    prices[currency.address] ?? 0,
+                    prices[getAddress(currency.address)] ?? 0,
                   )}
                 </div>
-                {prices[currency.address] ? (
+                {prices[getAddress(currency.address)] ? (
                   <div className="text-gray-500 text-xs">
                     {formatDollarValue(
-                      balances[currency.address] ?? 0n,
+                      balances[getAddress(currency.address)] ?? 0n,
                       currency.decimals,
-                      prices[currency.address] ?? 0,
+                      prices[getAddress(currency.address)] ?? 0,
                     )}
                   </div>
                 ) : (

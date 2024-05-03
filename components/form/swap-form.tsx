@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { isAddressEqual, parseUnits } from 'viem'
+import { getAddress, isAddressEqual, parseUnits } from 'viem'
 import BigNumber from 'bignumber.js'
 
 import CurrencyAmountInput from '../input/currency-amount-input'
@@ -135,7 +135,11 @@ export const SwapForm = ({
           onValueChange={setInputCurrencyAmount}
           availableAmount={availableInputCurrencyBalance}
           onCurrencyClick={() => setShowInputCurrencySelect(true)}
-          price={inputCurrency ? prices[inputCurrency.address] : undefined}
+          price={
+            inputCurrency
+              ? prices[getAddress(inputCurrency.address)]
+              : undefined
+          }
         />
         <CurrencyAmountInput
           currency={outputCurrency}
@@ -143,7 +147,11 @@ export const SwapForm = ({
           onValueChange={() => {}}
           availableAmount={0n}
           onCurrencyClick={() => setShowOutputCurrencySelect(true)}
-          price={outputCurrency ? prices[outputCurrency.address] : undefined}
+          price={
+            outputCurrency
+              ? prices[getAddress(outputCurrency.address)]
+              : undefined
+          }
           disabled={true}
         />
         <div className="absolute flex items-center justify-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gray-900 p-1 sm:p-1.5">
@@ -174,7 +182,7 @@ export const SwapForm = ({
                 {toPlacesString(
                   exchangeRate && outputCurrency
                     ? exchangeRate.multipliedBy(
-                        prices[outputCurrency.address] ?? 0,
+                        prices[getAddress(outputCurrency.address)] ?? 0,
                       )
                     : 0,
                 )}
