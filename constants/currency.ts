@@ -52,4 +52,18 @@ export const WHITELISTED_CURRENCIES: {
       decimals: 6,
     },
   ],
+  [CHAIN_IDS.ZKSYNC_SEPOLIA_TESTNET]: [
+    {
+      address: '0x1d32dcf2d957c9973a00d53641aeeb8d671df865',
+      name: 'MockToken',
+      symbol: 'TEST',
+      decimals: 18,
+    },
+    {
+      address: '0xe6b14f66a3ad92edd45960afd1d932fbb7f92d21',
+      name: 'MockUSDT',
+      symbol: 'USDT',
+      decimals: 6,
+    },
+  ],
 }
