@@ -10,6 +10,7 @@ import {
   OpenOrder,
   signERC20Permit,
 } from '@clober/v2-sdk'
+import { zkSyncSepoliaTestnet } from 'viem/chains'
 
 import { useChainContext } from '../chain-context'
 import { Currency } from '../../model/currency'
@@ -76,6 +77,9 @@ export const LimitContractProvider = ({
           chainId: selectedChain.id,
           inputToken: inputCurrency.address,
           outputToken: outputCurrency.address,
+          options: {
+            useSubgraph: selectedChain.id !== zkSyncSepoliaTestnet.id,
+          },
         })
         if (openTransaction) {
           setConfirmation({
@@ -99,6 +103,9 @@ export const LimitContractProvider = ({
           amount: !isAddressEqual(inputCurrency.address, zeroAddress)
             ? amount
             : '0',
+          options: {
+            useSubgraph: selectedChain.id !== zkSyncSepoliaTestnet.id,
+          },
         })
         const { transaction, result } = await limitOrder({
           chainId: selectedChain.id,
@@ -110,6 +117,7 @@ export const LimitContractProvider = ({
           options: {
             erc20PermitParam,
             postOnly,
+            useSubgraph: selectedChain.id !== zkSyncSepoliaTestnet.id,
           },
         })
 
@@ -162,6 +170,9 @@ export const LimitContractProvider = ({
           chainId: selectedChain.id,
           userAddress: walletClient.account.address,
           ids: openOrders.map((order) => String(order.id)),
+          options: {
+            useSubgraph: selectedChain.id !== zkSyncSepoliaTestnet.id,
+          },
         })
 
         setConfirmation({
@@ -207,6 +218,9 @@ export const LimitContractProvider = ({
           chainId: selectedChain.id,
           userAddress: walletClient.account.address,
           ids: openOrders.map((order) => String(order.id)),
+          options: {
+            useSubgraph: selectedChain.id !== zkSyncSepoliaTestnet.id,
+          },
         })
 
         setConfirmation({

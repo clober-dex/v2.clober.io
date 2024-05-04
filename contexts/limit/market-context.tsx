@@ -3,6 +3,7 @@ import { getMarket, Market } from '@clober/v2-sdk'
 import { useQuery } from 'wagmi'
 import BigNumber from 'bignumber.js'
 import { getAddress } from 'viem'
+import { zkSyncSepoliaTestnet } from 'viem/chains'
 
 import { isMarketEqual } from '../../utils/market'
 import {
@@ -97,6 +98,9 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
           chainId: selectedChain.id,
           token0: getAddress(inputCurrencyAddress),
           token1: getAddress(outputCurrencyAddress),
+          options: {
+            useSubgraph: selectedChain.id !== zkSyncSepoliaTestnet.id,
+          },
         })
       } else {
         return null
