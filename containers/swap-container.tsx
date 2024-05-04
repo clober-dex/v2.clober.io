@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { parseUnits, zeroAddress } from 'viem'
+import { getAddress, parseUnits, zeroAddress } from 'viem'
 import { useAccount, useFeeData, useQuery } from 'wagmi'
 
 import { SwapForm } from '../components/form/swap-form'
@@ -87,7 +87,9 @@ export const SwapContainer = () => {
             inputCurrencyAmount={inputCurrencyAmount}
             setInputCurrencyAmount={setInputCurrencyAmount}
             availableInputCurrencyBalance={
-              inputCurrency ? balances[inputCurrency.address] ?? 0n : 0n
+              inputCurrency
+                ? balances[getAddress(inputCurrency.address)] ?? 0n
+                : 0n
             }
             showOutputCurrencySelect={showOutputCurrencySelect}
             setShowOutputCurrencySelect={setShowOutputCurrencySelect}
@@ -106,7 +108,7 @@ export const SwapContainer = () => {
                     BigInt(feeData?.gasPrice ?? 0n),
                   selectedChain.nativeCurrency.decimals,
                 ),
-              ) * prices[zeroAddress]
+              ) * prices[getAddress(zeroAddress)]
             }
             actionButtonProps={{
               disabled:

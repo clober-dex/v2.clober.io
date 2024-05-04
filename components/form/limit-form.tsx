@@ -1,5 +1,5 @@
 import React from 'react'
-import { isAddressEqual } from 'viem'
+import { getAddress, isAddressEqual } from 'viem'
 import { Market } from '@clober/v2-sdk'
 
 import NumberInput from '../input/number-input'
@@ -138,7 +138,11 @@ export const LimitForm = ({
           onValueChange={setInputCurrencyAmount}
           availableAmount={availableInputCurrencyBalance}
           onCurrencyClick={() => setShowInputCurrencySelect(true)}
-          price={inputCurrency ? prices[inputCurrency.address] : undefined}
+          price={
+            inputCurrency
+              ? prices[getAddress(inputCurrency.address)]
+              : undefined
+          }
         />
         <CurrencyAmountInput
           currency={outputCurrency}
@@ -146,7 +150,11 @@ export const LimitForm = ({
           onValueChange={setOutputCurrencyAmount}
           availableAmount={availableOutputCurrencyBalance}
           onCurrencyClick={() => setShowOutputCurrencySelect(true)}
-          price={outputCurrency ? prices[outputCurrency.address] : undefined}
+          price={
+            outputCurrency
+              ? prices[getAddress(outputCurrency.address)]
+              : undefined
+          }
         />
         <div className="absolute flex items-center justify-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gray-900 p-1 sm:p-1.5">
           <button

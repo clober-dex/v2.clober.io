@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { isAddressEqual, parseUnits } from 'viem'
+import { getAddress, isAddressEqual, parseUnits } from 'viem'
 import { useWalletClient } from 'wagmi'
 import Link from 'next/link'
 import { getQuoteToken } from '@clober/v2-sdk'
@@ -116,7 +116,9 @@ export const IframeContainer = () => {
             inputCurrencyAmount={inputCurrencyAmount}
             setInputCurrencyAmount={setInputCurrencyAmount}
             availableInputCurrencyBalance={
-              inputCurrency ? balances[inputCurrency.address] ?? 0n : 0n
+              inputCurrency
+                ? balances[getAddress(inputCurrency.address)] ?? 0n
+                : 0n
             }
             showOutputCurrencySelect={showOutputCurrencySelect}
             setShowOutputCurrencySelect={setShowOutputCurrencySelect}
@@ -125,7 +127,9 @@ export const IframeContainer = () => {
             outputCurrencyAmount={outputCurrencyAmount}
             setOutputCurrencyAmount={setOutputCurrencyAmount}
             availableOutputCurrencyBalance={
-              outputCurrency ? balances[outputCurrency.address] ?? 0n : 0n
+              outputCurrency
+                ? balances[getAddress(outputCurrency.address)] ?? 0n
+                : 0n
             }
             swapInputCurrencyAndOutputCurrency={() => {
               setIsBid((prevState) =>
@@ -145,7 +149,7 @@ export const IframeContainer = () => {
                   !inputCurrency ||
                   !outputCurrency ||
                   amount === 0n ||
-                  amount > balances[inputCurrency.address]) ??
+                  amount > balances[getAddress(inputCurrency.address)]) ??
                 0n,
               onClick: async () => {
                 if (!inputCurrency || !outputCurrency) {
@@ -167,7 +171,7 @@ export const IframeContainer = () => {
                 ? 'Select output currency'
                 : amount === 0n
                 ? 'Enter amount'
-                : amount > balances[inputCurrency.address]
+                : amount > balances[getAddress(inputCurrency.address)]
                 ? 'Insufficient balance'
                 : `Limit ${isBid ? 'Bid' : 'Ask'}`,
             }}
