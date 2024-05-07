@@ -75,6 +75,7 @@ export const LimitContractProvider = ({
       try {
         const openTransaction = await openMarket({
           chainId: selectedChain.id,
+          userAddress: walletClient.account.address,
           inputToken: inputCurrency.address,
           outputToken: outputCurrency.address,
           options: {
