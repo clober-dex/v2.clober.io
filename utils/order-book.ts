@@ -4,7 +4,6 @@ import { Depth, Market } from '@clober/v2-sdk'
 import { Decimals } from '../model/decimals'
 
 import { toPlacesString } from './bignumber'
-import { formatUnits } from './bigint'
 
 export function calculateOutputCurrencyAmountString(
   isBid: boolean,
@@ -47,11 +46,15 @@ export function parseDepth(
 }[] {
   return Array.from(
     [...(isBid ? market.bids : market.asks).map((depth) => ({ ...depth }))]
-      .sort((a, b) => (isBid ? b.price - a.price : a.price - b.price))
+      .sort((a, b) =>
+        isBid
+          ? Number(b.price) - Number(a.price)
+          : Number(a.price) - Number(b.price),
+      )
       .map((x) => {
         return {
           price: x.price,
-          size: new BigNumber(formatUnits(x.baseAmount, market.base.decimals)),
+          size: new BigNumber(x.baseAmount),
         }
       })
       .reduce(
@@ -96,8 +99,8 @@ export const isOrderBookEqual = (a: Depth[], b: Depth[]) => {
   if (a.length !== b.length) {
     return false
   }
-  const sortedA = a.sort((x, y) => x.price - y.price)
-  const sortedB = b.sort((x, y) => x.price - y.price)
+  const sortedA = a.sort((x, y) => Number(x.price) - Number(y.price))
+  const sortedB = b.sort((x, y) => Number(x.price) - Number(y.price))
   return sortedA.every((x, i) => {
     return (
       x.price === sortedB[i].price && x.baseAmount === sortedB[i].baseAmount

@@ -134,10 +134,16 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
       ? (Array.from(Array(4).keys())
           .map((i) => {
             const minPrice = Math.min(
-              selectedMarket.bids.sort((a, b) => b.price - a.price)[0]?.price ??
-                Number.MAX_VALUE,
-              selectedMarket.asks.sort((a, b) => a.price - b.price)[0]?.price ??
-                Number.MAX_VALUE,
+              Number(
+                selectedMarket.bids.sort(
+                  (a, b) => Number(b.price) - Number(a.price),
+                )[0]?.price ?? Number.MAX_VALUE,
+              ),
+              Number(
+                selectedMarket.asks.sort(
+                  (a, b) => Number(a.price) - Number(b.price),
+                )[0]?.price ?? Number.MAX_VALUE,
+              ),
             )
             const decimalPlaces = getPriceDecimals(minPrice)
             const label = (10 ** (i - decimalPlaces)).toFixed(
