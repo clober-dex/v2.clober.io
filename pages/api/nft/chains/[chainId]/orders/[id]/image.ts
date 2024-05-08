@@ -50,7 +50,7 @@ export default async function handler(
       .replace(/TOKEN_PAIR_TEXT/g, `${baseToken.symbol}/${quoteToken.symbol}`)
       .replace(
         /QUOTE_PRICE_TEXT/g,
-        `${openOrder.price.toFixed(2)} ${quoteToken.symbol}`,
+        `${Number(openOrder.price).toFixed(2)} ${quoteToken.symbol}`,
       )
       .replace(
         /BASE_AMOUNT_TEXT/g,
