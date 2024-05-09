@@ -125,10 +125,10 @@ export const LimitContractProvider = ({
         setConfirmation({
           title: `Limit ${isBid ? 'Bid' : 'Ask'}`,
           body: 'Please confirm in your wallet.',
-          fields: [result.make, result.taken]
+          fields: [result.make, result.taken, result.spent]
             .filter(
-              ({ amount }) =>
-                parseUnits(amount, result.make.currency.decimals) > 0n,
+              ({ amount, currency }) =>
+                parseUnits(amount, currency.decimals) > 0n,
             )
             .map(({ amount, currency, direction }) => ({
               currency,
