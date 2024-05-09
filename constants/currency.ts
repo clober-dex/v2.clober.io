@@ -36,6 +36,18 @@ export const WHITELISTED_CURRENCIES: {
       symbol: 'HONEY',
       decimals: 18,
     },
+    {
+      address: '0x7588AFc469d95300C2206Bf8a6Ee9bf5d2719314',
+      name: 'MockUSDT',
+      symbol: 'USDT',
+      decimals: 6,
+    },
+    {
+      address: '0x7d06c636bA86BD1fc2C38B11F1e5701145CABc30',
+      name: 'MockToken',
+      symbol: 'TEST',
+      decimals: 18,
+    },
   ],
   [CHAIN_IDS.BASE]: [
     ETH,
