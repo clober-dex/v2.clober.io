@@ -1,4 +1,9 @@
-import { arbitrumSepolia, base, zkSyncSepoliaTestnet } from 'viem/chains'
+import {
+  arbitrumSepolia,
+  base,
+  zkSync,
+  zkSyncSepoliaTestnet,
+} from 'viem/chains'
 
 import { Chain } from '../model/chain'
 
@@ -21,6 +26,11 @@ export const supportChains: Chain[] = [
     expireIn: 240,
   },
   {
+    ...zkSync,
+    defaultGasPrice: 0n,
+    expireIn: 240,
+  },
+  {
     ...zkSyncSepoliaTestnet,
     defaultGasPrice: 0n,
     expireIn: 240,
@@ -34,5 +44,6 @@ export enum CHAIN_IDS {
   ARBITRUM_SEPOLIA = arbitrumSepolia.id,
   BERA_CHAIN_TESTNET = beraTestnetChain.id,
   BASE = base.id,
+  ZKSYNC = zkSync.id,
   ZKSYNC_SEPOLIA_TESTNET = zkSyncSepoliaTestnet.id,
 }
