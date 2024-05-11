@@ -4,13 +4,14 @@ import { isAddressEqual, parseUnits, zeroAddress } from 'viem'
 import {
   cancelOrders,
   claimOrders,
+  CurrencyFlow,
   getQuoteToken,
   limitOrder,
   openMarket,
   OpenOrder,
   signERC20Permit,
 } from '@clober/v2-sdk'
-import { zkSyncSepoliaTestnet } from 'viem/chains'
+import BigNumber from 'bignumber.js'
 
 import { useChainContext } from '../chain-context'
 import { Currency } from '../../model/currency'
@@ -78,9 +79,6 @@ export const LimitContractProvider = ({
           userAddress: walletClient.account.address,
           inputToken: inputCurrency.address,
           outputToken: outputCurrency.address,
-          options: {
-            useSubgraph: selectedChain.id !== zkSyncSepoliaTestnet.id,
-          },
         })
         if (openTransaction) {
           setConfirmation({
@@ -104,9 +102,6 @@ export const LimitContractProvider = ({
           amount: !isAddressEqual(inputCurrency.address, zeroAddress)
             ? amount
             : '0',
-          options: {
-            useSubgraph: selectedChain.id !== zkSyncSepoliaTestnet.id,
-          },
         })
         const { transaction, result } = await limitOrder({
           chainId: selectedChain.id,
@@ -118,7 +113,6 @@ export const LimitContractProvider = ({
           options: {
             erc20PermitParam,
             postOnly,
-            useSubgraph: selectedChain.id !== zkSyncSepoliaTestnet.id,
           },
         })
 
@@ -126,6 +120,21 @@ export const LimitContractProvider = ({
           title: `Limit ${isBid ? 'Bid' : 'Ask'}`,
           body: 'Please confirm in your wallet.',
           fields: [result.make, result.taken, result.spent]
+            .reduce((acc, currencyFlow) => {
+              const index = acc.findIndex(
+                (cf) =>
+                  cf.currency.address === currencyFlow.currency.address &&
+                  cf.direction === currencyFlow.direction,
+              )
+              if (index === -1) {
+                acc.push(currencyFlow)
+              } else {
+                acc[index].amount = new BigNumber(acc[index].amount)
+                  .plus(currencyFlow.amount)
+                  .toString()
+              }
+              return acc
+            }, [] as CurrencyFlow[])
             .filter(
               ({ amount, currency }) =>
                 parseUnits(amount, currency.decimals) > 0n,
@@ -171,9 +180,6 @@ export const LimitContractProvider = ({
           chainId: selectedChain.id,
           userAddress: walletClient.account.address,
           ids: openOrders.map((order) => String(order.id)),
-          options: {
-            useSubgraph: selectedChain.id !== zkSyncSepoliaTestnet.id,
-          },
         })
 
         setConfirmation({
@@ -219,9 +225,6 @@ export const LimitContractProvider = ({
           chainId: selectedChain.id,
           userAddress: walletClient.account.address,
           ids: openOrders.map((order) => String(order.id)),
-          options: {
-            useSubgraph: selectedChain.id !== zkSyncSepoliaTestnet.id,
-          },
         })
 
         setConfirmation({

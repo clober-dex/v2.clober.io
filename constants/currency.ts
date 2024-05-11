@@ -64,6 +64,21 @@ export const WHITELISTED_CURRENCIES: {
       decimals: 6,
     },
   ],
+  [CHAIN_IDS.ZKSYNC]: [
+    ETH,
+    {
+      address: '0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91',
+      name: 'Wrapped Ether',
+      symbol: 'WETH',
+      decimals: 18,
+    },
+    {
+      address: '0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4',
+      name: 'USD Coin',
+      symbol: 'USDC',
+      decimals: 6,
+    },
+  ],
   [CHAIN_IDS.ZKSYNC_SEPOLIA_TESTNET]: [
     {
       address: '0x1d32dcf2d957c9973a00d53641aeeb8d671df865',
