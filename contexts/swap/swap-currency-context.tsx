@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useAccount, useBalance, useQuery } from 'wagmi'
 import { readContracts } from '@wagmi/core'
 import { getAddress, isAddressEqual, zeroAddress } from 'viem'
@@ -44,6 +44,10 @@ export const SwapCurrencyProvider = ({
   const [currencies, setCurrencies] = React.useState<Currency[] | undefined>(
     _currencies,
   )
+
+  useEffect(() => {
+    setCurrencies(_currencies)
+  }, [_currencies])
 
   const { data: prices } = useQuery(
     ['swap-prices', selectedChain],
