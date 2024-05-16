@@ -5,7 +5,6 @@ import {
   cancelOrders,
   claimOrders,
   CurrencyFlow,
-  getQuoteToken,
   limitOrder,
   openMarket,
   OpenOrder,
@@ -18,6 +17,7 @@ import { Currency } from '../../model/currency'
 import { Confirmation, useTransactionContext } from '../transaction-context'
 import { toPlacesString } from '../../utils/bignumber'
 import {
+  approve20,
   sendTransaction,
   setApprovalOfOpenOrdersForAll,
 } from '../../utils/wallet'
@@ -65,14 +65,6 @@ export const LimitContractProvider = ({
         body: '',
         fields: [],
       })
-      const isBid = isAddressEqual(
-        inputCurrency.address,
-        getQuoteToken({
-          chainId: selectedChain.id,
-          token0: inputCurrency.address,
-          token1: outputCurrency.address,
-        }),
-      )
       try {
         const openTransaction = await openMarket({
           chainId: selectedChain.id,
@@ -90,7 +82,7 @@ export const LimitContractProvider = ({
         }
 
         setConfirmation({
-          title: `Limit ${isBid ? 'Bid' : 'Ask'}`,
+          title: `Place Order`,
           body: 'Please confirm in your wallet.',
           fields: [],
         })
@@ -103,6 +95,23 @@ export const LimitContractProvider = ({
             ? amount
             : '0',
         })
+        if (
+          erc20PermitParam === undefined &&
+          !isAddressEqual(inputCurrency.address, zeroAddress)
+        ) {
+          setConfirmation({
+            title: 'Approve',
+            body: 'Please confirm in your wallet.',
+            fields: [
+              {
+                currency: inputCurrency,
+                label: inputCurrency.symbol,
+                value: amount,
+              },
+            ],
+          })
+          await approve20(walletClient, inputCurrency, amount)
+        }
         const { transaction, result } = await limitOrder({
           chainId: selectedChain.id,
           userAddress: walletClient.account.address,
@@ -117,7 +126,7 @@ export const LimitContractProvider = ({
         })
 
         setConfirmation({
-          title: `Limit ${isBid ? 'Bid' : 'Ask'}`,
+          title: `Place Order`,
           body: 'Please confirm in your wallet.',
           fields: [result.make, result.taken, result.spent]
             .reduce((acc, currencyFlow) => {
