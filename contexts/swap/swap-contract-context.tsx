@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 import { isAddressEqual, zeroAddress } from 'viem'
 import { useQueryClient, useWalletClient } from 'wagmi'
+import { Transaction } from '@clober/v2-sdk'
 
 import { Currency } from '../../model/currency'
 import { formatUnits } from '../../utils/bigint'
@@ -11,6 +12,7 @@ import { approve20 } from '../../utils/approve20'
 import { useChainContext } from '../chain-context'
 import { useTransactionContext } from '../transaction-context'
 import { toPlacesString } from '../../utils/bignumber'
+import { sendTransaction } from '../../utils/wallet'
 
 type SwapContractContext = {
   swap: (
@@ -64,7 +66,7 @@ export const SwapContractProvider = ({
           ],
         })
 
-        const transaction = await fetchSwapData(
+        let transaction = await fetchSwapData(
           AGGREGATORS[selectedChain.id as CHAIN_IDS],
           inputCurrency,
           amountIn,
@@ -96,6 +98,16 @@ export const SwapContractProvider = ({
             transaction.to,
             amountIn,
           )
+
+          transaction = await fetchSwapData(
+            AGGREGATORS[selectedChain.id as CHAIN_IDS],
+            inputCurrency,
+            amountIn,
+            outputCurrency,
+            slippageLimitPercent,
+            gasPrice,
+            userAddress,
+          )
         }
 
         setConfirmation({
@@ -111,12 +123,7 @@ export const SwapContractProvider = ({
             },
           ],
         })
-        await walletClient.sendTransaction({
-          data: transaction.data,
-          to: transaction.to,
-          value: transaction.value,
-          gas: transaction.gas,
-        })
+        await sendTransaction(walletClient, transaction as Transaction)
       } catch (e) {
         console.error(e)
       } finally {
