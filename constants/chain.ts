@@ -19,6 +19,7 @@ export const supportChains: Chain[] = [
     ...beraTestnetChain,
     defaultGasPrice: 0n,
     expireIn: 240,
+    icon: 'https://img.cryptorank.io/coins/berachain1681996075164.png',
   },
   {
     ...base,

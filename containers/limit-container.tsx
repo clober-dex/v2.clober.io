@@ -204,7 +204,7 @@ export const LimitContainer = () => {
                 ? 'Enter amount'
                 : amount > balances[getAddress(inputCurrency.address)]
                 ? 'Insufficient balance'
-                : `Limit ${isBid ? 'Bid' : 'Ask'}`,
+                : `Place Order`,
             }}
           />
         </div>
