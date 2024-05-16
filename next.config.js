@@ -12,7 +12,7 @@ const nextConfig = {
     BUILD,
   },
   images: {
-    domains: ['assets.odos.xyz', 'coupon.finance'],
+    domains: ['assets.odos.xyz', 'coupon.finance', 'img.cryptorank.io'],
   },
 }
 
