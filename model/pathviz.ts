@@ -5,6 +5,7 @@ export type PathViz = {
     decimals: number
     visible: boolean
     width: number
+    icon?: string
   }[]
   links: {
     source: number

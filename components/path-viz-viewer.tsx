@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import ReactFlow, {
-  Position,
   Handle,
+  Node as NodeType,
+  Position,
   ReactFlowProvider,
   useReactFlow,
-  Node as NodeType,
 } from 'reactflow'
 
 import 'reactflow/dist/base.css'
@@ -178,26 +178,26 @@ const _PathViz = ({ pathVizData }: { pathVizData?: PathViz }) => {
 }
 
 const Node = ({
-  data: { id, symbol, targetConnected, targetHandle, sourceHandle },
+  data: { id, symbol, icon, targetConnected, targetHandle, sourceHandle },
 }: {
   data: {
     id: string
     symbol: string
+    icon?: string
     targetConnected: { label: string; in_value: string; out_value: string }[]
     targetHandle: boolean
     sourceHandle: boolean
   }
 }) => {
+  const imgSrc =
+    icon !== undefined ? icon : `https://assets.odos.xyz/tokens/${symbol}.webp`
   return (
     <div
       className="flex items-center p-1 lg:px-2 bg-gray-700 rounded-full gap-2"
       data-tooltip-id={id}
     >
       <div className="flex items-center rounded-full gap-2">
-        <img
-          src={`https://assets.odos.xyz/tokens/${symbol}.webp`}
-          className="rounded-full w-5 h-5"
-        />
+        <img src={imgSrc} className="rounded-full w-5 h-5" />
         <div
           className="text-sm text-white hidden lg:flex w-12"
           style={{
