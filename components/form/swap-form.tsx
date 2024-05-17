@@ -175,8 +175,8 @@ export const SwapForm = ({
             <span className="w-[100px] mx-1 rounded animate-pulse bg-gray-500" />
           ) : (
             <>
-              {exchangeRate ? toPlacesString(exchangeRate) : '? '}
-              {outputCurrency?.symbol ?? 'OUT'}
+              {(exchangeRate ? toPlacesString(exchangeRate) : '?') + ' '}
+              {(outputCurrency?.symbol ?? 'OUT') + ' '}
               <span className="text-gray-500">
                 (~$
                 {toPlacesString(
