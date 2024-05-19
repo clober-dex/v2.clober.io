@@ -38,6 +38,12 @@ export const supportChains: Chain[] = [
   },
 ]
 
+export const testnetChainIds = [
+  arbitrumSepolia.id,
+  zkSyncSepoliaTestnet.id,
+  beraTestnetChain.id,
+]
+
 export const findSupportChain = (chainId: number): Chain | undefined =>
   supportChains.find((chain) => chain.id === chainId)
 

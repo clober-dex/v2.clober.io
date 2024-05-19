@@ -1,7 +1,19 @@
 import { Meta, StoryObj } from '@storybook/react'
-import { arbitrum, base, fantom, mainnet, polygon } from 'viem/chains'
+import {
+  arbitrum,
+  arbitrumSepolia,
+  base,
+  fantom,
+  mainnet,
+  polygon,
+  zkSync,
+  zkSyncSepoliaTestnet,
+} from 'viem/chains'
+
+import { beraTestnetChain } from '../../constants/dev-chain'
 
 import ChainSelector from './chain-selector'
+
 import '../../styles/globals.css'
 
 export default {
@@ -14,6 +26,45 @@ export default {
 
 type Story = StoryObj<typeof ChainSelector>
 export const Default: Story = {
+  args: {
+    chain: {
+      ...arbitrumSepolia,
+      defaultGasPrice: 0n,
+      expireIn: 0,
+    },
+    setChain: () => {},
+    chains: [
+      {
+        ...arbitrumSepolia,
+        defaultGasPrice: 0n,
+        expireIn: 240,
+      },
+      {
+        ...beraTestnetChain,
+        defaultGasPrice: 0n,
+        expireIn: 240,
+        icon: 'https://img.cryptorank.io/coins/berachain1681996075164.png',
+      },
+      {
+        ...base,
+        defaultGasPrice: 0n,
+        expireIn: 240,
+      },
+      {
+        ...zkSync,
+        defaultGasPrice: 0n,
+        expireIn: 240,
+      },
+      {
+        ...zkSyncSepoliaTestnet,
+        defaultGasPrice: 0n,
+        expireIn: 240,
+      },
+    ],
+  },
+}
+
+export const OnlyMainnet: Story = {
   args: {
     chain: {
       ...mainnet,
@@ -49,4 +100,38 @@ export const Default: Story = {
       },
     ],
   },
+}
+
+export const OnlyTestnet: Story = {
+  args: {
+    chain: {
+      ...zkSyncSepoliaTestnet,
+      defaultGasPrice: 0n,
+      expireIn: 0,
+    },
+    setChain: () => {},
+    chains: [
+      {
+        ...arbitrumSepolia,
+        defaultGasPrice: 0n,
+        expireIn: 0,
+      },
+      {
+        ...zkSyncSepoliaTestnet,
+        defaultGasPrice: 0n,
+        expireIn: 0,
+      },
+      {
+        ...beraTestnetChain,
+        defaultGasPrice: 0n,
+        expireIn: 240,
+        icon: 'https://img.cryptorank.io/coins/berachain1681996075164.png',
+      },
+    ],
+  },
+}
+
+// @ts-ignore
+BigInt.prototype.toJSON = function () {
+  return this.toString()
 }
