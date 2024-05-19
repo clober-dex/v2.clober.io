@@ -41,7 +41,59 @@ export default function ChainSelector({
         <TriangleDownSvg className="hidden lg:block" />
       </button>
       {showDropdown ? (
-        <div className="absolute right-1 md:right-[-5rem] top-10 md:top-12 z-[1500] flex flex-col w-48 bg-gray-800 border border-solid border-gray-700 rounded-xl p-4 items-start gap-4 shadow-[4px_4px_12px_12px_rgba(0,0,0,0.15)]">
+        <ChainsDropDown
+          mainnetChains={mainnetChains}
+          testnetChains={testnetChains}
+          chain={chain}
+          setChain={setChain}
+          setShowDropdown={setShowDropdown}
+        />
+      ) : (
+        <></>
+      )}
+    </div>
+  ) : (
+    <></>
+  )
+}
+
+function ChainsDropDown({
+  mainnetChains,
+  testnetChains,
+  chain,
+  setChain,
+  setShowDropdown,
+}: {
+  mainnetChains: Chain[]
+  testnetChains: Chain[]
+  chain: Chain
+  setChain: (chain: Chain) => void
+  setShowDropdown: (showDropdown: boolean) => void
+}) {
+  if (mainnetChains.length === 0 && testnetChains.length === 0) {
+    return <></>
+  }
+
+  return (
+    <div className="absolute right-1 md:right-[-5rem] top-10 md:top-12 z-[1500] flex flex-col w-48 bg-gray-800 border border-solid border-gray-700 rounded-xl p-4 items-start gap-4 shadow-[4px_4px_12px_12px_rgba(0,0,0,0.15)]">
+      {testnetChains.length === 0 ? (
+        <ChainList
+          title={'Mainnet'}
+          chain={chain}
+          setChain={setChain}
+          chains={mainnetChains}
+          setShowDropdown={setShowDropdown}
+        />
+      ) : mainnetChains.length === 0 ? (
+        <ChainList
+          title={'Testnet'}
+          chain={chain}
+          setChain={setChain}
+          chains={testnetChains}
+          setShowDropdown={setShowDropdown}
+        />
+      ) : (
+        <>
           <ChainList
             title={'Mainnet'}
             chain={chain}
@@ -68,13 +120,9 @@ export default function ChainSelector({
             chains={testnetChains}
             setShowDropdown={setShowDropdown}
           />
-        </div>
-      ) : (
-        <></>
+        </>
       )}
     </div>
-  ) : (
-    <></>
   )
 }
 
