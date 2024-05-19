@@ -93,7 +93,7 @@ function ChainList({
 }) {
   return (
     <div className="flex flex-col items-start gap-4 self-stretch rounded-none">
-      <div className="self-stretch text-gray-400 font-['Inter'] text-sm not-italic font-semibold leading-5">
+      <div className={`self-stretch text-gray-400 ${textStyles.body3Bold}`}>
         {title}
       </div>
       <div className="flex flex-col items-start gap-4 self-stretch rounded-none">
@@ -102,7 +102,7 @@ function ChainList({
             .sort((a, b) => a.id - b.id)
             .map((_chain) => (
               <div
-                className={`flex items-center gap-2 self-stretch cursor-pointer text-white font-['Inter'] text-sm not-italic font-semibold leading-5 hover:bg-gray-600 rounded-xl`}
+                className={`flex items-center gap-2 self-stretch cursor-pointer text-white ${textStyles.body3Bold} hover:bg-gray-600 rounded-xl`}
                 key={_chain.name}
                 onClick={() => {
                   try {
