@@ -17,6 +17,12 @@ export const WHITELISTED_CURRENCIES: {
   [CHAIN_IDS.ARBITRUM_SEPOLIA]: [
     ETH,
     {
+      address: '0xF2e615A933825De4B39b497f6e6991418Fb31b78',
+      name: 'Wrapped Ether',
+      symbol: 'WETH',
+      decimals: 18,
+    },
+    {
       address: '0x00BFD44e79FB7f6dd5887A9426c8EF85A0CD23e0',
       name: 'USD Coin',
       symbol: 'USDC',
