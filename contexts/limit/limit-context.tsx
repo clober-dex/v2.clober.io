@@ -86,11 +86,17 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
   const [isPostOnly, setIsPostOnly] = useState(false)
   const [priceInput, setPriceInput] = useState('')
+
+  const { inputCurrencyAddress, outputCurrencyAddress } =
+    getCurrencyAddress(selectedChain)
   const { data: _currencies } = useQuery(
-    ['limit-currencies', selectedChain],
+    [
+      'limit-currencies',
+      selectedChain,
+      inputCurrencyAddress,
+      outputCurrencyAddress,
+    ],
     async () => {
-      const { inputCurrencyAddress, outputCurrencyAddress } =
-        getCurrencyAddress(selectedChain)
       const _inputCurrency = inputCurrencyAddress
         ? await fetchCurrency(
             selectedChain.id,
@@ -195,8 +201,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   useEffect(() => {
     setCurrencies(_currencies)
 
-    const { inputCurrencyAddress, outputCurrencyAddress } =
-      getCurrencyAddress(selectedChain)
     const inputCurrency = inputCurrencyAddress
       ? _currencies.find((currency) =>
           isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
