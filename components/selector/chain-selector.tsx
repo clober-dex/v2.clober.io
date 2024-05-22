@@ -75,7 +75,7 @@ function ChainsDropDown({
   }
 
   return (
-    <div className="absolute right-1 md:right-[-5rem] top-10 md:top-12 z-[1500] flex flex-col w-48 bg-gray-800 border border-solid border-gray-700 rounded-xl py-4 items-start gap-4 shadow-[4px_4px_12px_12px_rgba(0,0,0,0.15)]">
+    <div className="absolute right-1 md:right-[-5rem] top-10 md:top-12 z-[1500] flex flex-col w-48 bg-gray-800 border border-solid border-gray-700 rounded-xl py-3 items-start gap-4 shadow-[4px_4px_12px_12px_rgba(0,0,0,0.15)]">
       {testnetChains.length === 0 ? (
         <ChainList
           title={'Mainnet'}
@@ -140,7 +140,7 @@ function ChainList({
   setShowDropdown: (showDropdown: boolean) => void
 }) {
   return (
-    <div className="flex flex-col items-start gap-4 self-stretch rounded-none">
+    <div className="flex flex-col items-start gap-1 self-stretch rounded-none">
       <div
         className={`self-stretch px-4 text-gray-400 ${textStyles.body3Bold}`}
       >
