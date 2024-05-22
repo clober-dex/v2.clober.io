@@ -21,6 +21,7 @@ import {
   sendTransaction,
   setApprovalOfOpenOrdersForAll,
 } from '../../utils/wallet'
+import { RPC_URL } from '../../constants/rpc-urls'
 
 type LimitContractContext = {
   limit: (
@@ -71,6 +72,9 @@ export const LimitContractProvider = ({
           userAddress: walletClient.account.address,
           inputToken: inputCurrency.address,
           outputToken: outputCurrency.address,
+          options: {
+            rpcUrl: RPC_URL[selectedChain.id],
+          },
         })
         if (openTransaction) {
           setConfirmation({
@@ -94,6 +98,9 @@ export const LimitContractProvider = ({
           amount: !isAddressEqual(inputCurrency.address, zeroAddress)
             ? amount
             : '0',
+          options: {
+            rpcUrl: RPC_URL[selectedChain.id],
+          },
         })
         if (
           erc20PermitParam === undefined &&
@@ -122,6 +129,7 @@ export const LimitContractProvider = ({
           options: {
             erc20PermitParam,
             postOnly,
+            rpcUrl: RPC_URL[selectedChain.id],
           },
         })
 
@@ -189,6 +197,9 @@ export const LimitContractProvider = ({
           chainId: selectedChain.id,
           userAddress: walletClient.account.address,
           ids: openOrders.map((order) => String(order.id)),
+          options: {
+            rpcUrl: RPC_URL[selectedChain.id],
+          },
         })
 
         setConfirmation({
@@ -234,6 +245,9 @@ export const LimitContractProvider = ({
           chainId: selectedChain.id,
           userAddress: walletClient.account.address,
           ids: openOrders.map((order) => String(order.id)),
+          options: {
+            rpcUrl: RPC_URL[selectedChain.id],
+          },
         })
 
         setConfirmation({

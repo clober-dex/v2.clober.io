@@ -1,4 +1,9 @@
-import { getChartLogs, getLatestChartLog, Market } from '@clober/v2-sdk'
+import {
+  CHAIN_IDS,
+  getChartLogs,
+  getLatestChartLog,
+  Market,
+} from '@clober/v2-sdk'
 
 import {
   Bar,
@@ -14,7 +19,6 @@ import {
   SearchSymbolsCallback,
   SubscribeBarsCallback,
 } from '../public/static/charting_library'
-import { CHAIN_IDS } from '../constants/chain'
 
 import { SUPPORTED_INTERVALS } from './chart'
 

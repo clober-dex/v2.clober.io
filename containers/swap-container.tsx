@@ -9,7 +9,6 @@ import PathVizViewer from '../components/path-viz-viewer'
 import { useSwapContext } from '../contexts/swap/swap-context'
 import { fetchQuotes } from '../apis/swap/quotes'
 import { AGGREGATORS } from '../constants/aggregators'
-import { CHAIN_IDS } from '../constants/chain'
 import { useSwapCurrencyContext } from '../contexts/swap/swap-currency-context'
 import { useSwapContractContext } from '../contexts/swap/swap-contract-context'
 
@@ -54,7 +53,7 @@ export const SwapContainer = () => {
         parseUnits(inputCurrencyAmount, inputCurrency?.decimals ?? 18) > 0n
       ) {
         return fetchQuotes(
-          AGGREGATORS[selectedChain.id as CHAIN_IDS],
+          AGGREGATORS[selectedChain.id],
           inputCurrency,
           parseUnits(inputCurrencyAmount, inputCurrency?.decimals ?? 18),
           outputCurrency,

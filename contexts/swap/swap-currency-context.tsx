@@ -8,7 +8,6 @@ import { Currency } from '../../model/currency'
 import { Prices } from '../../model/prices'
 import { fetchCurrencies } from '../../apis/swap/currencies'
 import { AGGREGATORS } from '../../constants/aggregators'
-import { CHAIN_IDS } from '../../constants/chain'
 import { fetchPrices } from '../../apis/swap/prices'
 import { useChainContext } from '../chain-context'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
@@ -39,7 +38,7 @@ export const SwapCurrencyProvider = ({
 
   const { data: _currencies } = useQuery(
     ['swap-currencies', selectedChain],
-    async () => fetchCurrencies(AGGREGATORS[selectedChain.id as CHAIN_IDS]),
+    async () => fetchCurrencies(AGGREGATORS[selectedChain.id]),
   )
   const [currencies, setCurrencies] = React.useState<Currency[] | undefined>(
     _currencies,
@@ -52,7 +51,7 @@ export const SwapCurrencyProvider = ({
   const { data: prices } = useQuery(
     ['swap-prices', selectedChain],
     async () => {
-      return fetchPrices(AGGREGATORS[selectedChain.id as CHAIN_IDS])
+      return fetchPrices(AGGREGATORS[selectedChain.id])
     },
     {
       refetchInterval: 10 * 1000,

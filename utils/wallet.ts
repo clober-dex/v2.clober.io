@@ -8,6 +8,7 @@ import {
 
 import { supportChains } from '../constants/chain'
 import { Currency } from '../model/currency'
+import { RPC_URL } from '../constants/rpc-urls'
 
 export const approve20 = async (
   walletClient: GetWalletClientResult,
@@ -26,6 +27,9 @@ export const approve20 = async (
     walletClient: walletClient as any,
     token: currency.address,
     amount,
+    options: {
+      rpcUrl: RPC_URL[walletClient.chain.id],
+    },
   })
   if (hash) {
     await publicClient.waitForTransactionReceipt({ hash })
@@ -67,6 +71,9 @@ export async function setApprovalOfOpenOrdersForAll(
   const hash = await setApprovalOfOpenOrdersForAllInSdk({
     chainId: walletClient.chain.id,
     walletClient: walletClient as any,
+    options: {
+      rpcUrl: RPC_URL[walletClient.chain.id],
+    },
   })
   if (hash) {
     await publicClient.waitForTransactionReceipt({
