@@ -55,18 +55,10 @@ export const SwapContractProvider = ({
         setConfirmation({
           title: 'Swap',
           body: 'Please confirm in your wallet.',
-          fields: [
-            {
-              currency: inputCurrency,
-              label: inputCurrency.symbol,
-              value: toPlacesString(
-                formatUnits(amountIn, inputCurrency.decimals),
-              ),
-            },
-          ],
+          fields: [],
         })
 
-        let transaction = await fetchSwapData(
+        let swapData = await fetchSwapData(
           AGGREGATORS[selectedChain.id as CHAIN_IDS],
           inputCurrency,
           amountIn,
@@ -95,11 +87,11 @@ export const SwapContractProvider = ({
             walletClient,
             inputCurrency,
             userAddress,
-            transaction.to,
+            swapData.transaction.to,
             amountIn,
           )
 
-          transaction = await fetchSwapData(
+          swapData = await fetchSwapData(
             AGGREGATORS[selectedChain.id as CHAIN_IDS],
             inputCurrency,
             amountIn,
@@ -117,13 +109,22 @@ export const SwapContractProvider = ({
             {
               currency: inputCurrency,
               label: inputCurrency.symbol,
+              direction: 'in',
               value: toPlacesString(
                 formatUnits(amountIn, inputCurrency.decimals),
               ),
             },
+            {
+              currency: outputCurrency,
+              label: outputCurrency.symbol,
+              direction: 'out',
+              value: toPlacesString(
+                formatUnits(swapData.amountOut, outputCurrency.decimals),
+              ),
+            },
           ],
         })
-        await sendTransaction(walletClient, transaction as Transaction)
+        await sendTransaction(walletClient, swapData.transaction as Transaction)
       } catch (e) {
         console.error(e)
       } finally {

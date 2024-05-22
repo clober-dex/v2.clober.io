@@ -12,14 +12,17 @@ export async function fetchSwapData(
   gasPrice: bigint,
   userAddress?: `0x${string}`,
 ): Promise<{
-  data: `0x${string}`
-  gas: bigint
-  value: bigint
-  to: `0x${string}`
-  nonce?: number
-  gasPrice?: bigint
+  transaction: {
+    data: `0x${string}`
+    gas: bigint
+    value: bigint
+    to: `0x${string}`
+    nonce?: number
+    gasPrice?: bigint
+  }
+  amountOut: bigint
 }> {
-  const { aggregator } = await fetchQuotes(
+  const { aggregator, amountOut } = await fetchQuotes(
     aggregators,
     inputCurrency,
     amountIn,
@@ -28,7 +31,7 @@ export async function fetchSwapData(
     gasPrice,
     userAddress,
   )
-  return aggregator.buildCallData(
+  const transaction = await aggregator.buildCallData(
     inputCurrency,
     amountIn,
     outputCurrency,
@@ -36,4 +39,8 @@ export async function fetchSwapData(
     gasPrice,
     userAddress,
   )
+  return {
+    transaction,
+    amountOut,
+  }
 }
