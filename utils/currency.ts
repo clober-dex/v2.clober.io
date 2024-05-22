@@ -3,7 +3,7 @@ import { createPublicClient, http, isAddressEqual, zeroAddress } from 'viem'
 import { supportChains } from '../constants/chain'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { Currency } from '../model/currency'
-import { ETH, WHITELISTED_CURRENCIES } from '../constants/currency'
+import { ETH } from '../constants/currency'
 import { Chain } from '../model/chain'
 
 export const LOCAL_STORAGE_INPUT_CURRENCY_KEY = (chain: Chain) =>
@@ -19,12 +19,6 @@ export const fetchCurrency = async (
 ): Promise<Currency | undefined> => {
   if (isAddressEqual(address, zeroAddress)) {
     return ETH
-  }
-  const currency = WHITELISTED_CURRENCIES[chainId].find((c) =>
-    isAddressEqual(c.address, address),
-  )
-  if (currency) {
-    return currency
   }
 
   const publicClient = createPublicClient({
