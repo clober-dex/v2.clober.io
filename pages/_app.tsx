@@ -9,7 +9,7 @@ import {
 import Head from 'next/head'
 import type { AppProps } from 'next/app'
 import { configureChains, createConfig, useAccount, WagmiConfig } from 'wagmi'
-import { publicProvider } from 'wagmi/providers/public'
+import { jsonRpcProvider } from '@wagmi/core/providers/jsonRpc'
 import { identify } from '@web3analytic/funnel-sdk'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
@@ -28,10 +28,18 @@ import { SwapCurrencyProvider } from '../contexts/swap/swap-currency-context'
 import { LimitContractProvider } from '../contexts/limit/limit-contract-context'
 import { SwapContractProvider } from '../contexts/swap/swap-contract-context'
 import Panel from '../components/panel'
+import { RPC_URL } from '../constants/rpc-urls'
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   supportChains.map((chain) => toWagmiChain(chain)),
-  [publicProvider()],
+  [
+    jsonRpcProvider({
+      rpc: (chain) => ({
+        http: RPC_URL[chain.id],
+      }),
+    }),
+  ],
+  { rank: true },
 )
 
 const { connectors } = getDefaultWallets({

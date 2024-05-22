@@ -16,6 +16,7 @@ import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
 import { useChainContext } from '../chain-context'
 import { getCurrencyAddress } from '../../utils/currency'
 import { toPlacesString } from '../../utils/bignumber'
+import { RPC_URL } from '../../constants/rpc-urls'
 
 import { useLimitContext } from './limit-context'
 
@@ -102,6 +103,10 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
           chainId: selectedChain.id,
           token0: getAddress(inputCurrencyAddress),
           token1: getAddress(outputCurrencyAddress),
+          options: {
+            rpcUrl: RPC_URL[selectedChain.id],
+            useSubgraph: false,
+          },
         })
       } else {
         return null
