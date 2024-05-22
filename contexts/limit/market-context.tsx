@@ -87,11 +87,16 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     | undefined
   >(undefined)
 
+  const { inputCurrencyAddress, outputCurrencyAddress } =
+    getCurrencyAddress(selectedChain)
   const { data: market } = useQuery(
-    ['updated-market', selectedChain],
+    [
+      'updated-market',
+      selectedChain,
+      inputCurrencyAddress,
+      outputCurrencyAddress,
+    ],
     async () => {
-      const { inputCurrencyAddress, outputCurrencyAddress } =
-        getCurrencyAddress(selectedChain)
       if (inputCurrencyAddress && outputCurrencyAddress) {
         return getMarket({
           chainId: selectedChain.id,
