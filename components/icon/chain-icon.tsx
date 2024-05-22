@@ -15,7 +15,8 @@ export default function ChainIcon({
       <Image
         src={chain.icon || `https://assets.odos.xyz/chains/${name}.png`}
         alt="ChainIcon"
-        fill
+        width={16}
+        height={16}
       />
     </div>
   )

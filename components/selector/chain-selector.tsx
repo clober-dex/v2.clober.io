@@ -34,7 +34,7 @@ export default function ChainSelector({
         }}
         className="flex items-center justify-center lg:justify-start h-8 w-8 lg:w-auto p-0 lg:px-2 lg:gap-2 rounded bg-gray-800 hover:bg-gray-700 text-white"
       >
-        <ChainIcon className="relative w-4 h-4" chain={chain} />
+        <ChainIcon chain={chain} />
         <p className={`hidden lg:block ${textStyles.body3Bold}`}>
           {chain.name}
         </p>
@@ -75,7 +75,7 @@ function ChainsDropDown({
   }
 
   return (
-    <div className="absolute right-1 md:right-[-5rem] top-10 md:top-12 z-[1500] flex flex-col w-48 bg-gray-800 border border-solid border-gray-700 rounded-xl p-4 items-start gap-4 shadow-[4px_4px_12px_12px_rgba(0,0,0,0.15)]">
+    <div className="absolute right-1 md:right-[-5rem] top-10 md:top-12 z-[1500] flex flex-col w-48 bg-gray-800 border border-solid border-gray-700 rounded-xl py-3 items-start gap-4 shadow-[4px_4px_12px_12px_rgba(0,0,0,0.15)]">
       {testnetChains.length === 0 ? (
         <ChainList
           title={'Mainnet'}
@@ -140,17 +140,19 @@ function ChainList({
   setShowDropdown: (showDropdown: boolean) => void
 }) {
   return (
-    <div className="flex flex-col items-start gap-4 self-stretch rounded-none">
-      <div className={`self-stretch text-gray-400 ${textStyles.body3Bold}`}>
+    <div className="flex flex-col items-start gap-1 self-stretch rounded-none">
+      <div
+        className={`self-stretch px-4 text-gray-400 ${textStyles.body3Bold}`}
+      >
         {title}
       </div>
-      <div className="flex flex-col items-start gap-4 self-stretch rounded-none">
-        <div className="flex flex-col items-start gap-4 self-stretch rounded-none">
+      <div className="flex flex-col items-start self-stretch rounded-none">
+        <div className="flex flex-col items-start self-stretch rounded-none">
           {chains
             .sort((a, b) => a.id - b.id)
             .map((_chain) => (
               <div
-                className={`flex items-center gap-2 self-stretch cursor-pointer text-white ${textStyles.body3Bold} hover:bg-gray-600 rounded-xl`}
+                className={`flex items-center gap-2 px-3 py-2 self-stretch cursor-pointer text-white ${textStyles.body3Bold} hover:bg-gray-600`}
                 key={_chain.name}
                 onClick={() => {
                   try {
@@ -162,7 +164,7 @@ function ChainList({
                   }
                 }}
               >
-                <ChainIcon className="relative w-4 h-4" chain={_chain} />
+                <ChainIcon chain={_chain} />
                 <span>{_chain.name}</span>
                 {_chain.id === chain.id ? (
                   <CheckSvg className="ml-auto" />

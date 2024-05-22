@@ -8,13 +8,13 @@ import { Currency } from '../../model/currency'
 import { useChainContext } from '../chain-context'
 import { Balances } from '../../model/balances'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
-import { WHITELISTED_CURRENCIES } from '../../constants/currency'
 import {
   fetchCurrency,
   getCurrencyAddress,
   LOCAL_STORAGE_INPUT_CURRENCY_KEY,
   LOCAL_STORAGE_OUTPUT_CURRENCY_KEY,
 } from '../../utils/currency'
+import { fetchWhitelistCurrencies } from '../../apis/currencies'
 
 type LimitContext = {
   balances: Balances
@@ -97,19 +97,28 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       outputCurrencyAddress,
     ],
     async () => {
+      const whitelistedCurrencies = await fetchWhitelistCurrencies(
+        selectedChain.id,
+      )
       const _inputCurrency = inputCurrencyAddress
-        ? await fetchCurrency(
+        ? whitelistedCurrencies.find((currency) =>
+            isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
+          ) ??
+          (await fetchCurrency(
             selectedChain.id,
             getAddress(inputCurrencyAddress),
-          )
+          ))
         : undefined
       const _outputCurrency = outputCurrencyAddress
-        ? await fetchCurrency(
+        ? whitelistedCurrencies.find((currency) =>
+            isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
+          ) ??
+          (await fetchCurrency(
             selectedChain.id,
             getAddress(outputCurrencyAddress),
-          )
+          ))
         : undefined
-      return [...WHITELISTED_CURRENCIES[selectedChain.id]]
+      return [...whitelistedCurrencies]
         .concat(
           _inputCurrency ? [_inputCurrency] : [],
           _outputCurrency ? [_outputCurrency] : [],
@@ -122,7 +131,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
         )
     },
     {
-      initialData: WHITELISTED_CURRENCIES[selectedChain.id],
+      initialData: [],
     },
   ) as {
     data: Currency[]
@@ -229,7 +238,14 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     } else {
       setIsBid(true)
     }
-  }, [_currencies, selectedChain, setInputCurrency, setOutputCurrency])
+  }, [
+    _currencies,
+    inputCurrencyAddress,
+    outputCurrencyAddress,
+    selectedChain,
+    setInputCurrency,
+    setOutputCurrency,
+  ])
 
   return (
     <Context.Provider
