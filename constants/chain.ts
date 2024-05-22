@@ -46,11 +46,3 @@ export const testnetChainIds = [
 
 export const findSupportChain = (chainId: number): Chain | undefined =>
   supportChains.find((chain) => chain.id === chainId)
-
-export enum CHAIN_IDS {
-  ARBITRUM_SEPOLIA = arbitrumSepolia.id,
-  BERA_CHAIN_TESTNET = beraTestnetChain.id,
-  BASE = base.id,
-  ZKSYNC = zkSync.id,
-  ZKSYNC_SEPOLIA_TESTNET = zkSyncSepoliaTestnet.id,
-}

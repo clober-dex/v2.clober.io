@@ -1,7 +1,8 @@
 import { createPublicClient, http } from 'viem'
+import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Currency } from '../model/currency'
-import { CHAIN_IDS, supportChains } from '../constants/chain'
+import { supportChains } from '../constants/chain'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 
 export async function fetchAllowance(

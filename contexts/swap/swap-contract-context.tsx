@@ -7,7 +7,6 @@ import { Currency } from '../../model/currency'
 import { formatUnits } from '../../utils/bigint'
 import { fetchSwapData } from '../../apis/swap/data'
 import { AGGREGATORS } from '../../constants/aggregators'
-import { CHAIN_IDS } from '../../constants/chain'
 import { approve20 } from '../../utils/approve20'
 import { useChainContext } from '../chain-context'
 import { useTransactionContext } from '../transaction-context'
@@ -59,7 +58,7 @@ export const SwapContractProvider = ({
         })
 
         let swapData = await fetchSwapData(
-          AGGREGATORS[selectedChain.id as CHAIN_IDS],
+          AGGREGATORS[selectedChain.id],
           inputCurrency,
           amountIn,
           outputCurrency,
@@ -92,7 +91,7 @@ export const SwapContractProvider = ({
           )
 
           swapData = await fetchSwapData(
-            AGGREGATORS[selectedChain.id as CHAIN_IDS],
+            AGGREGATORS[selectedChain.id],
             inputCurrency,
             amountIn,
             outputCurrency,

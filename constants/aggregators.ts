@@ -1,19 +1,20 @@
 import { zeroAddress } from 'viem'
+import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Aggregator } from '../model/aggregator'
 import { OdosAggregator } from '../model/aggregator/odos'
 import { OogaBoogaAggregator } from '../model/aggregator/ooga-booga'
 
-import { CHAIN_IDS, findSupportChain } from './chain'
+import { findSupportChain } from './chain'
 
 export const AGGREGATORS: {
   [chain in CHAIN_IDS]: Aggregator[]
 } = {
   [CHAIN_IDS.ARBITRUM_SEPOLIA]: [],
-  [CHAIN_IDS.BERA_CHAIN_TESTNET]: [
+  [CHAIN_IDS.BERACHAIN_TESTNET]: [
     new OogaBoogaAggregator(
       zeroAddress,
-      findSupportChain(CHAIN_IDS.BERA_CHAIN_TESTNET.valueOf())!,
+      findSupportChain(CHAIN_IDS.BERACHAIN_TESTNET.valueOf())!,
     ),
   ],
   [CHAIN_IDS.BASE]: [
@@ -28,5 +29,5 @@ export const AGGREGATORS: {
       findSupportChain(CHAIN_IDS.ZKSYNC.valueOf())!,
     ),
   ],
-  [CHAIN_IDS.ZKSYNC_SEPOLIA_TESTNET]: [],
+  [CHAIN_IDS.ZKSYNC_SEPOLIA]: [],
 }

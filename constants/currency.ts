@@ -1,8 +1,7 @@
 import { zeroAddress } from 'viem'
+import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Currency } from '../model/currency'
-
-import { CHAIN_IDS } from './chain'
 
 export const ETH: Currency = {
   address: zeroAddress,
@@ -29,7 +28,7 @@ export const WHITELISTED_CURRENCIES: {
       decimals: 6,
     },
   ],
-  [CHAIN_IDS.BERA_CHAIN_TESTNET]: [
+  [CHAIN_IDS.BERACHAIN_TESTNET]: [
     {
       address: zeroAddress,
       name: 'BERA',
@@ -91,7 +90,7 @@ export const WHITELISTED_CURRENCIES: {
       decimals: 6,
     },
   ],
-  [CHAIN_IDS.ZKSYNC_SEPOLIA_TESTNET]: [
+  [CHAIN_IDS.ZKSYNC_SEPOLIA]: [
     {
       address: '0x1d32dcf2d957c9973a00d53641aeeb8d671df865',
       name: 'MockToken',
