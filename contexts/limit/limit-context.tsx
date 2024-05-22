@@ -8,7 +8,6 @@ import { Currency } from '../../model/currency'
 import { useChainContext } from '../chain-context'
 import { Balances } from '../../model/balances'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
-import { WHITELISTED_CURRENCIES } from '../../constants/currency'
 import {
   fetchCurrency,
   getCurrencyAddress,

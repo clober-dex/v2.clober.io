@@ -1,5 +1,5 @@
 import { CHAIN_IDS } from '@clober/v2-sdk'
-import { getAddress, isAddressEqual } from 'viem'
+import { getAddress } from 'viem'
 
 import { Currency } from '../model/currency'
 import { WHITELISTED_CURRENCIES } from '../constants/currency'
