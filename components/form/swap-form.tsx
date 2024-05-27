@@ -199,7 +199,7 @@ export const SwapForm = ({
             <span className="w-[50px] h-[20px] mx-1 rounded animate-pulse bg-gray-500" />
           ) : (
             <div className="flex text-xs sm:text-sm text-white">
-              {toPlacesString(gasEstimateValue)}
+              ${toPlacesString(gasEstimateValue)}
             </div>
           )}
         </div>

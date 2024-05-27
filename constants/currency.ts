@@ -54,42 +54,8 @@ export const WHITELISTED_CURRENCIES: {
       decimals: 18,
     },
   ],
-  [CHAIN_IDS.BASE]: [
-    ETH,
-    {
-      address: '0x4200000000000000000000000000000000000006',
-      name: 'Wrapped Ether',
-      symbol: 'WETH',
-      decimals: 18,
-    },
-    {
-      address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
-      name: 'USD Coin',
-      symbol: 'USDC',
-      decimals: 6,
-    },
-    {
-      address: '0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA',
-      name: 'USD Base Coin',
-      symbol: 'USDbC',
-      decimals: 6,
-    },
-  ],
-  [CHAIN_IDS.ZKSYNC]: [
-    ETH,
-    {
-      address: '0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91',
-      name: 'Wrapped Ether',
-      symbol: 'WETH',
-      decimals: 18,
-    },
-    {
-      address: '0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4',
-      name: 'USD Coin',
-      symbol: 'USDC',
-      decimals: 6,
-    },
-  ],
+  [CHAIN_IDS.BASE]: [],
+  [CHAIN_IDS.ZKSYNC]: [],
   [CHAIN_IDS.ZKSYNC_SEPOLIA]: [
     {
       address: '0x1d32dcf2d957c9973a00d53641aeeb8d671df865',
@@ -104,4 +70,59 @@ export const WHITELISTED_CURRENCIES: {
       decimals: 6,
     },
   ],
+}
+
+export const DEFAULT_INPUT_CURRENCY: {
+  [chain in CHAIN_IDS]: Currency
+} = {
+  [CHAIN_IDS.ARBITRUM_SEPOLIA]: {
+    address: '0xF2e615A933825De4B39b497f6e6991418Fb31b78',
+    name: 'Wrapped Ether',
+    symbol: 'WETH',
+    decimals: 18,
+  },
+  [CHAIN_IDS.BERACHAIN_TESTNET]: ETH,
+  [CHAIN_IDS.BASE]: {
+    address: '0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA',
+    name: 'USD Base Coin',
+    symbol: 'USDbC',
+    decimals: 6,
+  },
+  [CHAIN_IDS.ZKSYNC]: ETH,
+  [CHAIN_IDS.ZKSYNC_SEPOLIA]: ETH,
+}
+
+export const DEFAULT_OUTPUT_CURRENCY: {
+  [chain in CHAIN_IDS]: Currency
+} = {
+  [CHAIN_IDS.ARBITRUM_SEPOLIA]: {
+    address: '0x00BFD44e79FB7f6dd5887A9426c8EF85A0CD23e0',
+    name: 'USD Coin',
+    symbol: 'USDC',
+    decimals: 6,
+  },
+  [CHAIN_IDS.BERACHAIN_TESTNET]: {
+    address: '0x7588AFc469d95300C2206Bf8a6Ee9bf5d2719314',
+    name: 'MockUSDT',
+    symbol: 'USDT',
+    decimals: 6,
+  },
+  [CHAIN_IDS.BASE]: {
+    address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+    name: 'USD Coin',
+    symbol: 'USDC',
+    decimals: 6,
+  },
+  [CHAIN_IDS.ZKSYNC]: {
+    address: '0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4',
+    name: 'USD Coin',
+    symbol: 'USDC',
+    decimals: 6,
+  },
+  [CHAIN_IDS.ZKSYNC_SEPOLIA]: {
+    address: '0xe6b14f66a3ad92edd45960afd1d932fbb7f92d21',
+    name: 'MockUSDT',
+    symbol: 'USDT',
+    decimals: 6,
+  },
 }
