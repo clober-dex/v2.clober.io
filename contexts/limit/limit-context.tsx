@@ -15,6 +15,10 @@ import {
   LOCAL_STORAGE_OUTPUT_CURRENCY_KEY,
 } from '../../utils/currency'
 import { fetchWhitelistCurrencies } from '../../apis/currencies'
+import {
+  DEFAULT_INPUT_CURRENCY,
+  DEFAULT_OUTPUT_CURRENCY,
+} from '../../constants/currency'
 
 type LimitContext = {
   balances: Balances
@@ -214,12 +218,12 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       ? _currencies.find((currency) =>
           isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
         )
-      : undefined
+      : DEFAULT_INPUT_CURRENCY[selectedChain.id]
     const outputCurrency = outputCurrencyAddress
       ? _currencies.find((currency) =>
           isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
         )
-      : undefined
+      : DEFAULT_OUTPUT_CURRENCY[selectedChain.id]
 
     setInputCurrency(inputCurrency)
     setOutputCurrency(outputCurrency)
