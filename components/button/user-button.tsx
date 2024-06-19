@@ -13,7 +13,7 @@ export const UserButton = ({
 }) => {
   return (
     <button
-      className="flex items-center justify-center gap-2 md:justify-start w-8 rounded md:w-full py-0 px-3 md:px-4 cursor-pointer h-8 bg-gray-800 md:bg-gray-950 hover:bg-gray-600 active::bg-gray-600"
+      className="flex items-center justify-center gap-2 md:justify-start rounded md:w-full py-0 px-2 md:px-4 cursor-pointer h-8 bg-gray-800 md:bg-gray-950 hover:bg-gray-600 active::bg-gray-600"
       onClick={() => openAccountModal && openAccountModal()}
     >
       <UserIcon
