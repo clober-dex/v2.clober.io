@@ -17,6 +17,7 @@ const CurrencySelect = ({
   prices,
   onBack,
   onCurrencySelect,
+  defaultBlacklistedCurrency,
 }: {
   chainId: number
   currencies: Currency[]
@@ -24,6 +25,7 @@ const CurrencySelect = ({
   prices: Prices
   onBack: () => void
   onCurrencySelect: (currency: Currency) => void
+  defaultBlacklistedCurrency?: Currency
 } & React.HTMLAttributes<HTMLDivElement>) => {
   const [customizedCurrency, setCustomizedCurrency] = React.useState<
     Currency | undefined
@@ -35,7 +37,9 @@ const CurrencySelect = ({
         isAddress(value) &&
         !currencies.find((currency) =>
           isAddressEqual(currency.address, getAddress(value)),
-        )
+        ) &&
+        defaultBlacklistedCurrency &&
+        !isAddressEqual(defaultBlacklistedCurrency.address, getAddress(value))
       ) {
         const currency = await fetchCurrency(chainId, value)
         if (currency) {
