@@ -25,7 +25,7 @@ const CurrencySelect = ({
   onBack: () => void
   onCurrencySelect: (currency: Currency) => void
 } & React.HTMLAttributes<HTMLDivElement>) => {
-  const [notWhitelistedCurrency, setNotWhitelistedCurrency] = React.useState<
+  const [customizedCurrency, setCustomizedCurrency] = React.useState<
     Currency | undefined
   >()
   const [value, _setValue] = React.useState('')
@@ -39,9 +39,9 @@ const CurrencySelect = ({
       ) {
         const currency = await fetchCurrency(chainId, value)
         if (currency) {
-          setNotWhitelistedCurrency(currency)
+          setCustomizedCurrency(currency)
         } else {
-          setNotWhitelistedCurrency(undefined)
+          setCustomizedCurrency(undefined)
         }
       }
       _setValue(value)
@@ -81,10 +81,7 @@ const CurrencySelect = ({
         </div>
       </div>
       <div className="flex flex-col h-72 overflow-y-auto bg-gray-900 rounded-b-xl sm:rounded-b-3xl">
-        {(notWhitelistedCurrency
-          ? [...currencies, notWhitelistedCurrency]
-          : currencies
-        )
+        {(customizedCurrency ? [...currencies, customizedCurrency] : currencies)
           .filter(
             (currency) =>
               (isAddress(value) &&
