@@ -10,6 +10,7 @@ export const CurrencyIcon = ({
 } & React.ImgHTMLAttributes<HTMLImageElement>) => {
   return (
     <img
+      className="rounded-full"
       src={getLogo(currency)}
       onError={(e) => {
         e.currentTarget.src = '/unknown.svg'
