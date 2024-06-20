@@ -92,6 +92,7 @@ export const LimitForm = ({
         setInputCurrency(currency)
         setShowInputCurrencySelect(false)
       }}
+      defaultBlacklistedCurrency={outputCurrency}
     />
   ) : showOutputCurrencySelect ? (
     <CurrencySelect
@@ -116,6 +117,7 @@ export const LimitForm = ({
         setOutputCurrency(currency)
         setShowOutputCurrencySelect(false)
       }}
+      defaultBlacklistedCurrency={inputCurrency}
     />
   ) : (
     <>
