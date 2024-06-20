@@ -19,6 +19,7 @@ import {
   DEFAULT_INPUT_CURRENCY,
   DEFAULT_OUTPUT_CURRENCY,
 } from '../../constants/currency'
+import { setQueryParams } from '../../utils/url'
 
 type LimitContext = {
   balances: Balances
@@ -192,6 +193,9 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
           LOCAL_STORAGE_INPUT_CURRENCY_KEY(selectedChain),
           currency.address,
         )
+        setQueryParams({
+          inputCurrency: currency.address,
+        })
       }
       _setInputCurrency(currency)
     },
@@ -205,6 +209,9 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
           LOCAL_STORAGE_OUTPUT_CURRENCY_KEY(selectedChain),
           currency.address,
         )
+        setQueryParams({
+          outputCurrency: currency.address,
+        })
       }
       _setOutputCurrency(currency)
     },
