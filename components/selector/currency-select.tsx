@@ -111,7 +111,7 @@ const CurrencySelect = ({
               <div className="flex items-center gap-3">
                 <CurrencyIcon
                   currency={currency}
-                  className="w-6 h-6 sm:w-8 sm:h-8"
+                  className="w-6 h-6 sm:w-8 sm:h-8 rounded-full"
                 />
                 <div>
                   <div className="text-sm sm:text-base font-bold text-white">

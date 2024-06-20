@@ -53,7 +53,7 @@ const ConfirmationModal = ({
                   {field.currency ? (
                     <CurrencyIcon
                       currency={field.currency}
-                      className="w-5 h-5"
+                      className="w-5 h-5 rounded-full"
                     />
                   ) : (
                     <></>
