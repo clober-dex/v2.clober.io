@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { getMarket, Market } from '@clober/v2-sdk'
+import { getMarket, Market, getPriceNeighborhood } from '@clober/v2-sdk'
 import { useQuery } from 'wagmi'
 import BigNumber from 'bignumber.js'
 import { getAddress } from 'viem'
@@ -70,6 +70,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     priceInput,
     outputCurrencyAmount,
     inputCurrencyAmount,
+    inputCurrency,
     outputCurrency,
     setOutputCurrencyAmount,
   } = useLimitContext()
@@ -198,14 +199,42 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
   // When depthClickedIndex is changed, reset the priceInput
   useEffect(() => {
-    if (depthClickedIndex) {
-      setPriceInput(
-        depthClickedIndex.isBid
-          ? bids[depthClickedIndex.index]?.price
-          : asks[depthClickedIndex.index]?.price,
-      )
+    if (depthClickedIndex && inputCurrency && outputCurrency) {
+      if (depthClickedIndex.isBid && bids[depthClickedIndex.index]) {
+        const {
+          normal: {
+            now: { price },
+          },
+        } = getPriceNeighborhood({
+          chainId: selectedChain.id,
+          price: bids[depthClickedIndex.index].price,
+          currency0: inputCurrency,
+          currency1: outputCurrency,
+        })
+        setPriceInput(price)
+      } else if (!depthClickedIndex.isBid && asks[depthClickedIndex.index]) {
+        const {
+          normal: {
+            up: { price },
+          },
+        } = getPriceNeighborhood({
+          chainId: selectedChain.id,
+          price: asks[depthClickedIndex.index].price,
+          currency0: inputCurrency,
+          currency1: outputCurrency,
+        })
+        setPriceInput(price)
+      }
     }
-  }, [asks, bids, depthClickedIndex, setPriceInput])
+  }, [
+    asks,
+    bids,
+    depthClickedIndex,
+    setPriceInput,
+    inputCurrency,
+    outputCurrency,
+    selectedChain.id,
+  ])
 
   const previousValues = useRef({
     priceInput,
