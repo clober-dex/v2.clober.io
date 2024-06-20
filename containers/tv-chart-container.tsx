@@ -29,7 +29,7 @@ export const TvChartContainer = ({
   market: Market
 }) => {
   const [mounted, setMounted] = useState(false)
-  const [interval, setInterval] = useState('1D' as ResolutionString)
+  const [interval, setInterval] = useState('15m' as ResolutionString)
   const [fullscreen, setFullscreen] = useState(false)
 
   const ref = useRef<any>()
