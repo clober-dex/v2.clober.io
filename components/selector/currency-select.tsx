@@ -50,7 +50,7 @@ const CurrencySelect = ({
       }
       _setValue(value)
     },
-    [chainId, currencies],
+    [chainId, currencies, defaultBlacklistedCurrency],
   )
 
   return (
