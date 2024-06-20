@@ -25,6 +25,7 @@
     "react-dom": "^18.2.0",
     "react-google-recaptcha-v3": "^1.10.1",
     "react-select": "^5.7.5",
+    "react-tooltip": "^5.27.0",
     "reactflow": "^11.9.4",
     "viem": "^1.20.1",
     "wagmi": "^1.4.12"

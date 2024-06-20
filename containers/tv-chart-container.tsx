@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { CHAIN_IDS, Market } from '@clober/v2-sdk'
+import { Tooltip } from 'react-tooltip'
 
 import {
   CustomTimezones,
@@ -10,6 +11,7 @@ import {
 } from '../public/static/charting_library'
 import DataFeed from '../utils/datafeed'
 import { SUPPORTED_INTERVALS } from '../utils/chart'
+import { QuestionMarkSvg } from '../components/svg/question-mark-svg'
 
 function getLanguageFromURL(): LanguageCode | null {
   const regex = new RegExp('[\\?&]lang=([^&#]*)')
@@ -139,6 +141,24 @@ export const TvChartContainer = ({
         }`}
       >
         <div className="left-0 top-0 right-20 z-20 flex items-center justify-end gap-2 px-4 py-2">
+          <div className="flex mr-auto">
+            <QuestionMarkSvg
+              data-tooltip-id="trading-view-info"
+              data-tooltip-place="bottom-end"
+              data-tooltip-html={
+                'CLOBBER&lsquo;s charting solution is powered by TradingView, a charting platform for the global community. In addition to a wide range of charts, advanced analytical tools such as the <a href="https://tradingview.com/economic-calendar/" target="_blank" class="text-blue-500 underline">Economic Calendar</a> or <a href="https://tradingview.com/screener/" target="_blank" class="text-blue-500 underline">Stock Screener</a> allow you to make trades based on comprehensive market analysis.'
+                // 'Powered by <a href="https://www.tradingview.com/" target="_blank" class="text-blue-500 underline">TradingView</a>'
+              }
+              className="w-3 h-3"
+            />
+            <Tooltip
+              id="trading-view-info"
+              style={{
+                width: '300px',
+              }}
+              clickable
+            />
+          </div>
           {SUPPORTED_INTERVALS.map(([key, label]) => (
             <button
               key={key}

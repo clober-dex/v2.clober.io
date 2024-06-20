@@ -191,18 +191,22 @@ export const SwapForm = ({
             </>
           )}
         </div>
-        <div className="flex relative items-center text-xs sm:text-sm text-white">
-          <div className="flex items-center h-full mr-0.5">
-            <GasSvg />
-          </div>
-          {isLoadingResults ? (
-            <span className="w-[50px] h-[20px] mx-1 rounded animate-pulse bg-gray-500" />
-          ) : (
-            <div className="flex text-xs sm:text-sm text-white">
-              ${toPlacesString(gasEstimateValue)}
+        {!Number.isNaN(gasEstimateValue) ? (
+          <div className="flex relative items-center text-xs sm:text-sm text-white">
+            <div className="flex items-center h-full mr-0.5">
+              <GasSvg />
             </div>
-          )}
-        </div>
+            {isLoadingResults ? (
+              <span className="w-[50px] h-[20px] mx-1 rounded animate-pulse bg-gray-500" />
+            ) : (
+              <div className="flex text-xs sm:text-sm text-white">
+                ${toPlacesString(gasEstimateValue)}
+              </div>
+            )}
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
       <div className="flex justify-between items-center mt-4 mb-4 h-7 gap-2">
         <button

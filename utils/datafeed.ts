@@ -131,6 +131,13 @@ export default class DataFeed implements IBasicDataFeed {
         from,
         to,
       })
+      console.log('getBars', {
+        resolution,
+        resolutionKey,
+        from,
+        to,
+        chartLogs,
+      })
       if (chartLogs.length === 0) {
         onResult([], {
           noData: false,
