@@ -1,9 +1,4 @@
-import {
-  arbitrumSepolia,
-  base,
-  zkSync,
-  zkSyncSepoliaTestnet,
-} from 'viem/chains'
+import { arbitrumSepolia, base, zkSync } from 'viem/chains'
 
 import { Chain } from '../model/chain'
 
@@ -31,18 +26,9 @@ export const supportChains: Chain[] = [
     defaultGasPrice: 0n,
     expireIn: 240,
   },
-  {
-    ...zkSyncSepoliaTestnet,
-    defaultGasPrice: 0n,
-    expireIn: 240,
-  },
 ]
 
-export const testnetChainIds = [
-  arbitrumSepolia.id,
-  zkSyncSepoliaTestnet.id,
-  beraTestnetChain.id,
-]
+export const testnetChainIds = [arbitrumSepolia.id, beraTestnetChain.id]
 
 export const findSupportChain = (chainId: number): Chain | undefined =>
   supportChains.find((chain) => chain.id === chainId)
