@@ -1,9 +1,19 @@
-import { createPublicClient, http, isAddressEqual, zeroAddress } from 'viem'
+import {
+  createPublicClient,
+  getAddress,
+  http,
+  isAddressEqual,
+  zeroAddress,
+} from 'viem'
 
 import { supportChains } from '../constants/chain'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { Currency } from '../model/currency'
-import { ETH } from '../constants/currency'
+import {
+  DEFAULT_INPUT_CURRENCY,
+  DEFAULT_OUTPUT_CURRENCY,
+  ETH,
+} from '../constants/currency'
 import { Chain } from '../model/chain'
 
 export const LOCAL_STORAGE_INPUT_CURRENCY_KEY = (
@@ -67,6 +77,23 @@ export const isCurrencyEqual = (a: Currency, b: Currency) => {
     a.decimals === b.decimals &&
     a.name === b.name &&
     a.symbol === b.symbol
+  )
+}
+
+export const fetchCurrenciesDone = (currencies: Currency[], chain: Chain) => {
+  return (
+    currencies.find((currency) =>
+      isAddressEqual(
+        currency.address,
+        getAddress(DEFAULT_INPUT_CURRENCY[chain.id].address),
+      ),
+    ) &&
+    currencies.find((currency) =>
+      isAddressEqual(
+        currency.address,
+        getAddress(DEFAULT_OUTPUT_CURRENCY[chain.id].address),
+      ),
+    )
   )
 }
 
