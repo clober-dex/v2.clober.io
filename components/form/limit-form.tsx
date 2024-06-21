@@ -140,21 +140,11 @@ export const LimitForm = ({
               if (inputCurrency && outputCurrency) {
                 const {
                   normal: {
-                    up: { price: price1 },
-                  },
-                } = getPriceNeighborhood({
-                  chainId,
-                  price: priceInput,
-                  currency0: inputCurrency,
-                  currency1: outputCurrency,
-                })
-                const {
-                  normal: {
                     up: { price },
                   },
                 } = getPriceNeighborhood({
                   chainId,
-                  price: new BigNumber(price1).times(1.000001).toString(),
+                  price: new BigNumber(priceInput).times(1.00001).toString(),
                   currency0: inputCurrency,
                   currency1: outputCurrency,
                 })
@@ -182,11 +172,11 @@ export const LimitForm = ({
               if (inputCurrency && outputCurrency) {
                 const {
                   normal: {
-                    down: { price },
+                    now: { price },
                   },
                 } = getPriceNeighborhood({
                   chainId,
-                  price: priceInput,
+                  price: new BigNumber(priceInput).times(0.99999).toString(),
                   currency0: inputCurrency,
                   currency1: outputCurrency,
                 })
