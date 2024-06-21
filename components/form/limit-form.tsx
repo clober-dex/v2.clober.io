@@ -121,7 +121,7 @@ export const LimitForm = ({
     />
   ) : (
     <>
-      <div className="group hover:ring-1 hover:ring-gray-700 flex rounded-lg border-solid border-[1.5px] border-gray-700 p-4 mb-3 sm:mb-4 bg-gray-800">
+      <div className="hover:ring-1 hover:ring-gray-700 flex rounded-lg border-solid border-[1.5px] border-gray-700 p-4 mb-3 sm:mb-4">
         <div className="flex flex-col flex-1 gap-2">
           <div className="text-gray-500 text-xs sm:text-sm">
             {isBid ? 'Buy' : 'Sell'} {selectedMarket?.base.symbol} at rate
@@ -131,6 +131,38 @@ export const LimitForm = ({
             onValueChange={setPriceInput}
             className="text-xl w-full sm:text-2xl bg-transparent placeholder-gray-500 text-white outline-none"
           />
+        </div>
+        <div className="flex w-[34px] sm:w-11 h-12 sm:h-[60px] flex-col gap-[6px] md:gap-2">
+          <div className="cursor-pointer group group-hover:ring-1 group-hover:ring-gray-700 flex w-full h-[21px] sm:h-[26px] bg-gray-800 rounded flex-col items-center justify-center gap-1">
+            <svg
+              className="group-hover:stroke-white stroke-[#9CA3AF] w-[12px] h-[7px] sm:w-[14px] sm:h-[8px]"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 12 7"
+              fill="none"
+            >
+              <path
+                d="M11 6L6 1L1 6"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <div className="cursor-pointer group group-hover:ring-1 group-hover:ring-gray-700 flex w-full h-[21px] sm:h-[26px] bg-gray-800 rounded flex-col items-center justify-center gap-1">
+            <svg
+              className="group-hover:stroke-white stroke-[#9CA3AF] w-[12px] h-[7px] sm:w-[14px] sm:h-[8px]"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 12 7"
+              fill="none"
+            >
+              <path
+                d="M1 1L6 6L11 1"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
         </div>
       </div>
       <div className="flex flex-col relative gap-2 sm:gap-4 mb-3 sm:mb-4">
