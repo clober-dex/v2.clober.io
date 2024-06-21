@@ -121,7 +121,7 @@ export const LimitForm = ({
     />
   ) : (
     <>
-      <div className="flex rounded-lg border-solid border-[1.5px] border-gray-700 p-4 mb-3 sm:mb-4 bg-gray-800">
+      <div className="group hover:ring-1 hover:ring-gray-700 flex rounded-lg border-solid border-[1.5px] border-gray-700 p-4 mb-3 sm:mb-4 bg-gray-800">
         <div className="flex flex-col flex-1 gap-2">
           <div className="text-gray-500 text-xs sm:text-sm">
             {isBid ? 'Buy' : 'Sell'} {selectedMarket?.base.symbol} at rate
