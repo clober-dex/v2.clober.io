@@ -101,6 +101,7 @@ export const SwapForm = ({
         setInputCurrency(currency)
         setShowInputCurrencySelect(false)
       }}
+      defaultBlacklistedCurrency={outputCurrency}
     />
   ) : showOutputCurrencySelect ? (
     <CurrencySelect
@@ -125,6 +126,7 @@ export const SwapForm = ({
         setOutputCurrency(currency)
         setShowOutputCurrencySelect(false)
       }}
+      defaultBlacklistedCurrency={inputCurrency}
     />
   ) : (
     <>

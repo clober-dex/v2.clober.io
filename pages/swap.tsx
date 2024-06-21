@@ -2,15 +2,23 @@ import React, { useEffect } from 'react'
 
 import { SwapContainer } from '../containers/swap-container'
 import { cleanAndSetQueryParams } from '../utils/url'
-import { useSwapContext } from '../contexts/swap/swap-context'
+import { useChainContext } from '../contexts/chain-context'
+import { getCurrencyAddress } from '../utils/currency'
 
 export default function Swap() {
-  const { inputCurrency, outputCurrency } = useSwapContext()
+  const { selectedChain } = useChainContext()
+  const [mounted, setMounted] = React.useState(false)
+
   useEffect(() => {
-    cleanAndSetQueryParams(['chain'], {
-      inputCurrency: inputCurrency?.address,
-      outputCurrency: outputCurrency?.address,
-    })
-  }, [inputCurrency, outputCurrency])
+    if (!mounted) {
+      const { inputCurrencyAddress, outputCurrencyAddress } =
+        getCurrencyAddress('swap', selectedChain)
+      cleanAndSetQueryParams(['chain'], {
+        inputCurrency: inputCurrencyAddress,
+        outputCurrency: outputCurrencyAddress,
+      })
+      setMounted(true)
+    }
+  }, [mounted, selectedChain])
   return <SwapContainer />
 }

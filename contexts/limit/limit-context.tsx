@@ -9,8 +9,8 @@ import { useChainContext } from '../chain-context'
 import { Balances } from '../../model/balances'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 import {
+  fetchCurrenciesDone,
   fetchCurrency,
-  getCurrencyAddress,
   LOCAL_STORAGE_INPUT_CURRENCY_KEY,
   LOCAL_STORAGE_OUTPUT_CURRENCY_KEY,
 } from '../../utils/currency'
@@ -92,48 +92,10 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [isPostOnly, setIsPostOnly] = useState(false)
   const [priceInput, setPriceInput] = useState('')
 
-  const { inputCurrencyAddress, outputCurrencyAddress } =
-    getCurrencyAddress(selectedChain)
   const { data: _currencies } = useQuery(
-    [
-      'limit-currencies',
-      selectedChain,
-      inputCurrencyAddress,
-      outputCurrencyAddress,
-    ],
+    ['limit-currencies', selectedChain],
     async () => {
-      const whitelistedCurrencies = await fetchWhitelistCurrencies(
-        selectedChain.id,
-      )
-      const _inputCurrency = inputCurrencyAddress
-        ? whitelistedCurrencies.find((currency) =>
-            isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
-          ) ??
-          (await fetchCurrency(
-            selectedChain.id,
-            getAddress(inputCurrencyAddress),
-          ))
-        : undefined
-      const _outputCurrency = outputCurrencyAddress
-        ? whitelistedCurrencies.find((currency) =>
-            isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
-          ) ??
-          (await fetchCurrency(
-            selectedChain.id,
-            getAddress(outputCurrencyAddress),
-          ))
-        : undefined
-      return [...whitelistedCurrencies]
-        .concat(
-          _inputCurrency ? [_inputCurrency] : [],
-          _outputCurrency ? [_outputCurrency] : [],
-        )
-        .filter(
-          (currency, index, self) =>
-            self.findIndex((c) =>
-              isAddressEqual(c.address, currency.address),
-            ) === index,
-        )
+      return fetchWhitelistCurrencies(selectedChain.id)
     },
     {
       initialData: [],
@@ -190,12 +152,16 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     (currency: Currency | undefined) => {
       if (currency) {
         localStorage.setItem(
-          LOCAL_STORAGE_INPUT_CURRENCY_KEY(selectedChain),
+          LOCAL_STORAGE_INPUT_CURRENCY_KEY('limit', selectedChain),
           currency.address,
         )
         setQueryParams({
           inputCurrency: currency.address,
         })
+      } else {
+        localStorage.removeItem(
+          LOCAL_STORAGE_INPUT_CURRENCY_KEY('limit', selectedChain),
+        )
       }
       _setInputCurrency(currency)
     },
@@ -206,12 +172,16 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     (currency: Currency | undefined) => {
       if (currency) {
         localStorage.setItem(
-          LOCAL_STORAGE_OUTPUT_CURRENCY_KEY(selectedChain),
+          LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('limit', selectedChain),
           currency.address,
         )
         setQueryParams({
           outputCurrency: currency.address,
         })
+      } else {
+        localStorage.removeItem(
+          LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('limit', selectedChain),
+        )
       }
       _setOutputCurrency(currency)
     },
@@ -219,44 +189,70 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
 
   useEffect(() => {
-    setCurrencies(_currencies)
-
-    const inputCurrency = inputCurrencyAddress
-      ? _currencies.find((currency) =>
-          isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
-        )
-      : DEFAULT_INPUT_CURRENCY[selectedChain.id]
-    const outputCurrency = outputCurrencyAddress
-      ? _currencies.find((currency) =>
-          isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
-        )
-      : DEFAULT_OUTPUT_CURRENCY[selectedChain.id]
-
-    setInputCurrency(inputCurrency)
-    setOutputCurrency(outputCurrency)
-
-    if (inputCurrency && outputCurrency) {
-      const quote = getQuoteToken({
-        chainId: selectedChain.id,
-        token0: inputCurrency.address,
-        token1: outputCurrency.address,
-      })
-      if (isAddressEqual(quote, inputCurrency.address)) {
-        setIsBid(true)
-      } else {
-        setIsBid(false)
-      }
-    } else {
-      setIsBid(true)
+    if (!fetchCurrenciesDone(_currencies, selectedChain)) {
+      return
     }
-  }, [
-    _currencies,
-    inputCurrencyAddress,
-    outputCurrencyAddress,
-    selectedChain,
-    setInputCurrency,
-    setOutputCurrency,
-  ])
+
+    const action = async () => {
+      const inputCurrencyAddress = localStorage.getItem(
+        LOCAL_STORAGE_INPUT_CURRENCY_KEY('limit', selectedChain),
+      )
+      const outputCurrencyAddress = localStorage.getItem(
+        LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('limit', selectedChain),
+      )
+
+      const _inputCurrency = inputCurrencyAddress
+        ? _currencies.find((currency) =>
+            isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
+          ) ??
+          (await fetchCurrency(
+            selectedChain.id,
+            getAddress(inputCurrencyAddress),
+          ))
+        : DEFAULT_INPUT_CURRENCY[selectedChain.id]
+      const _outputCurrency = outputCurrencyAddress
+        ? _currencies.find((currency) =>
+            isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
+          ) ??
+          (await fetchCurrency(
+            selectedChain.id,
+            getAddress(outputCurrencyAddress),
+          ))
+        : DEFAULT_OUTPUT_CURRENCY[selectedChain.id]
+
+      setCurrencies(
+        [..._currencies]
+          .concat(
+            _inputCurrency ? [_inputCurrency] : [],
+            _outputCurrency ? [_outputCurrency] : [],
+          )
+          .filter(
+            (currency, index, self) =>
+              self.findIndex((c) =>
+                isAddressEqual(c.address, currency.address),
+              ) === index,
+          ),
+      )
+      setInputCurrency(_inputCurrency)
+      setOutputCurrency(_outputCurrency)
+
+      if (_inputCurrency && _outputCurrency) {
+        const quote = getQuoteToken({
+          chainId: selectedChain.id,
+          token0: _inputCurrency.address,
+          token1: _outputCurrency.address,
+        })
+        if (isAddressEqual(quote, _inputCurrency.address)) {
+          setIsBid(true)
+        } else {
+          setIsBid(false)
+        }
+      } else {
+        setIsBid(true)
+      }
+    }
+    action()
+  }, [_currencies, selectedChain, setInputCurrency, setOutputCurrency])
 
   return (
     <Context.Provider

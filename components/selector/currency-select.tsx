@@ -37,15 +37,20 @@ const CurrencySelect = ({
         isAddress(value) &&
         !currencies.find((currency) =>
           isAddressEqual(currency.address, getAddress(value)),
-        ) &&
-        defaultBlacklistedCurrency &&
-        !isAddressEqual(defaultBlacklistedCurrency.address, getAddress(value))
+        )
       ) {
-        const currency = await fetchCurrency(chainId, value)
-        if (currency) {
-          setCustomizedCurrency(currency)
-        } else {
+        if (
+          defaultBlacklistedCurrency &&
+          isAddressEqual(defaultBlacklistedCurrency.address, getAddress(value))
+        ) {
           setCustomizedCurrency(undefined)
+        } else {
+          const currency = await fetchCurrency(chainId, value)
+          if (currency) {
+            setCustomizedCurrency(currency)
+          } else {
+            setCustomizedCurrency(undefined)
+          }
         }
       }
       _setValue(value)

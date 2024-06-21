@@ -10,16 +10,14 @@ export default function Limit() {
   const [mounted, setMounted] = React.useState(false)
 
   useEffect(() => {
-    if (mounted) {
+    if (!mounted) {
       const { inputCurrencyAddress, outputCurrencyAddress } =
-        getCurrencyAddress(selectedChain)
+        getCurrencyAddress('limit', selectedChain)
       cleanAndSetQueryParams(['chain'], {
         inputCurrency: inputCurrencyAddress,
         outputCurrency: outputCurrencyAddress,
       })
       setMounted(true)
-    } else {
-      cleanAndSetQueryParams(['chain'], {})
     }
   }, [mounted, selectedChain])
   return <LimitContainer />
