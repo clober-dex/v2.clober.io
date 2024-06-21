@@ -92,8 +92,10 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [isPostOnly, setIsPostOnly] = useState(false)
   const [priceInput, setPriceInput] = useState('')
 
-  const { inputCurrencyAddress, outputCurrencyAddress } =
-    getCurrencyAddress(selectedChain)
+  const { inputCurrencyAddress, outputCurrencyAddress } = getCurrencyAddress(
+    'limit',
+    selectedChain,
+  )
   const { data: _currencies } = useQuery(
     [
       'limit-currencies',
@@ -190,7 +192,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     (currency: Currency | undefined) => {
       if (currency) {
         localStorage.setItem(
-          LOCAL_STORAGE_INPUT_CURRENCY_KEY(selectedChain),
+          LOCAL_STORAGE_INPUT_CURRENCY_KEY('limit', selectedChain),
           currency.address,
         )
         setQueryParams({
@@ -206,7 +208,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     (currency: Currency | undefined) => {
       if (currency) {
         localStorage.setItem(
-          LOCAL_STORAGE_OUTPUT_CURRENCY_KEY(selectedChain),
+          LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('limit', selectedChain),
           currency.address,
         )
         setQueryParams({

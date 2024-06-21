@@ -89,8 +89,10 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     | undefined
   >(undefined)
 
-  const { inputCurrencyAddress, outputCurrencyAddress } =
-    getCurrencyAddress(selectedChain)
+  const { inputCurrencyAddress, outputCurrencyAddress } = getCurrencyAddress(
+    'limit',
+    selectedChain,
+  )
   const { data: market } = useQuery(
     [
       'updated-market',

@@ -6,10 +6,14 @@ import { Currency } from '../model/currency'
 import { ETH } from '../constants/currency'
 import { Chain } from '../model/chain'
 
-export const LOCAL_STORAGE_INPUT_CURRENCY_KEY = (chain: Chain) =>
-  `${chain.id}-inputCurrency-limit`
-export const LOCAL_STORAGE_OUTPUT_CURRENCY_KEY = (chain: Chain) =>
-  `${chain.id}-outputCurrency-limit`
+export const LOCAL_STORAGE_INPUT_CURRENCY_KEY = (
+  context: string,
+  chain: Chain,
+) => `${chain.id}-inputCurrency-${context}`
+export const LOCAL_STORAGE_OUTPUT_CURRENCY_KEY = (
+  context: string,
+  chain: Chain,
+) => `${chain.id}-outputCurrency-${context}`
 export const QUERY_PARAM_INPUT_CURRENCY_KEY = 'inputCurrency'
 export const QUERY_PARAM_OUTPUT_CURRENCY_KEY = 'outputCurrency'
 
@@ -66,7 +70,7 @@ export const isCurrencyEqual = (a: Currency, b: Currency) => {
   )
 }
 
-export const getCurrencyAddress = (chain: Chain) => {
+export const getCurrencyAddress = (context: string, chain: Chain) => {
   const params = new URLSearchParams(window.location.search)
   const queryParamInputCurrencyAddress = params.get(
     QUERY_PARAM_INPUT_CURRENCY_KEY,
@@ -75,10 +79,10 @@ export const getCurrencyAddress = (chain: Chain) => {
     QUERY_PARAM_OUTPUT_CURRENCY_KEY,
   )
   const localStorageInputCurrencyAddress = localStorage.getItem(
-    LOCAL_STORAGE_INPUT_CURRENCY_KEY(chain),
+    LOCAL_STORAGE_INPUT_CURRENCY_KEY(context, chain),
   )
   const localStorageOutputCurrencyAddress = localStorage.getItem(
-    LOCAL_STORAGE_OUTPUT_CURRENCY_KEY(chain),
+    LOCAL_STORAGE_OUTPUT_CURRENCY_KEY(context, chain),
   )
   const inputCurrencyAddress =
     queryParamInputCurrencyAddress ||

@@ -12,7 +12,7 @@ export default function Limit() {
   useEffect(() => {
     if (mounted) {
       const { inputCurrencyAddress, outputCurrencyAddress } =
-        getCurrencyAddress(selectedChain)
+        getCurrencyAddress('limit', selectedChain)
       cleanAndSetQueryParams(['chain'], {
         inputCurrency: inputCurrencyAddress,
         outputCurrency: outputCurrencyAddress,

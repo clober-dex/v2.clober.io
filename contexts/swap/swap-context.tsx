@@ -69,8 +69,10 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
   const [slippageInput, setSlippageInput] = useState('1')
 
-  const { inputCurrencyAddress, outputCurrencyAddress } =
-    getCurrencyAddress(selectedChain)
+  const { inputCurrencyAddress, outputCurrencyAddress } = getCurrencyAddress(
+    'swap',
+    selectedChain,
+  )
   const { data: _currencies } = useQuery(
     ['swap-currencies', selectedChain],
     async () => {
@@ -112,10 +114,6 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
     data: Currency[]
   }
   const [currencies, setCurrencies] = useState<Currency[]>([])
-
-  useEffect(() => {
-    setCurrencies(_currencies)
-  }, [_currencies])
 
   const { data: prices } = useQuery(
     ['swap-prices', selectedChain],
@@ -173,7 +171,7 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
     (currency: Currency | undefined) => {
       if (currency) {
         localStorage.setItem(
-          LOCAL_STORAGE_INPUT_CURRENCY_KEY(selectedChain),
+          LOCAL_STORAGE_INPUT_CURRENCY_KEY('swap', selectedChain),
           currency.address,
         )
         setQueryParams({
@@ -189,7 +187,7 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
     (currency: Currency | undefined) => {
       if (currency) {
         localStorage.setItem(
-          LOCAL_STORAGE_OUTPUT_CURRENCY_KEY(selectedChain),
+          LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('swap', selectedChain),
           currency.address,
         )
         setQueryParams({
@@ -221,7 +219,7 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
     _currencies,
     inputCurrencyAddress,
     outputCurrencyAddress,
-    selectedChain.id,
+    selectedChain,
     setInputCurrency,
     setOutputCurrency,
   ])

@@ -12,7 +12,7 @@ export default function Iframe() {
   useEffect(() => {
     if (mounted) {
       const { inputCurrencyAddress, outputCurrencyAddress } =
-        getCurrencyAddress(selectedChain)
+        getCurrencyAddress('iframe', selectedChain)
       cleanAndSetQueryParams(['chain'], {
         inputCurrency: inputCurrencyAddress,
         outputCurrency: outputCurrencyAddress,
