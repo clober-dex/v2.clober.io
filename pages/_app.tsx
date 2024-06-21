@@ -28,6 +28,7 @@ import { LimitContractProvider } from '../contexts/limit/limit-contract-context'
 import { SwapContractProvider } from '../contexts/swap/swap-contract-context'
 import Panel from '../components/panel'
 import { RPC_URL } from '../constants/rpc-urls'
+import ErrorBoundary from '../components/error-boundary'
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   supportChains.map((chain) => toWagmiChain(chain)),
@@ -142,45 +143,47 @@ function App({ Component, pageProps }: AppProps) {
   console.log(router.pathname)
   return (
     <>
-      <Head>
-        <meta
-          content="Join Clober DEX and Start Trading on a Fully On-chain Order Book. Eliminate Counterparty Risk. Place Limit Orders. Low Transaction Costs Powered by LOBSTER."
-          name="description"
-        />
-        <link href="/favicon.svg" rel="icon" />
-      </Head>
-      <WalletProvider>
-        <Web3AnalyticWrapper>
-          <TransactionProvider>
-            <ChainProvider>
-              <LimitProvidersWrapper>
-                {router.pathname === '/iframe' ? (
-                  <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
-                    <HeaderContainer onMenuClick={() => setOpen(true)} />
+      <ErrorBoundary>
+        <Head>
+          <meta
+            content="Join Clober DEX and Start Trading on a Fully On-chain Order Book. Eliminate Counterparty Risk. Place Limit Orders. Low Transaction Costs Powered by LOBSTER."
+            name="description"
+          />
+          <link href="/favicon.svg" rel="icon" />
+        </Head>
+        <WalletProvider>
+          <Web3AnalyticWrapper>
+            <TransactionProvider>
+              <ChainProvider>
+                <LimitProvidersWrapper>
+                  {router.pathname === '/iframe' ? (
+                    <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
+                      <HeaderContainer onMenuClick={() => setOpen(true)} />
 
-                    <div className="flex flex-1 relative justify-center bg-gray-950">
-                      <div className="flex w-full flex-col items-center gap-4 sm:gap-6 p-4 pb-0">
-                        <Component {...pageProps} />
+                      <div className="flex flex-1 relative justify-center bg-gray-950">
+                        <div className="flex w-full flex-col items-center gap-4 sm:gap-6 p-4 pb-0">
+                          <Component {...pageProps} />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <SwapProvidersWrapper>
-                    <div className="flex flex-col w-[100vw] min-h-[100vh] bg-gray-950">
-                      <Panel open={open} setOpen={setOpen} />
-                      <HeaderContainer onMenuClick={() => setOpen(true)} />
-                      <MainComponentWrapper>
-                        <Component {...pageProps} />
-                      </MainComponentWrapper>
-                      <Footer />
-                    </div>
-                  </SwapProvidersWrapper>
-                )}
-              </LimitProvidersWrapper>
-            </ChainProvider>
-          </TransactionProvider>
-        </Web3AnalyticWrapper>
-      </WalletProvider>
+                  ) : (
+                    <SwapProvidersWrapper>
+                      <div className="flex flex-col w-[100vw] min-h-[100vh] bg-gray-950">
+                        <Panel open={open} setOpen={setOpen} />
+                        <HeaderContainer onMenuClick={() => setOpen(true)} />
+                        <MainComponentWrapper>
+                          <Component {...pageProps} />
+                        </MainComponentWrapper>
+                        <Footer />
+                      </div>
+                    </SwapProvidersWrapper>
+                  )}
+                </LimitProvidersWrapper>
+              </ChainProvider>
+            </TransactionProvider>
+          </Web3AnalyticWrapper>
+        </WalletProvider>
+      </ErrorBoundary>
     </>
   )
 }
