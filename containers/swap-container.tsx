@@ -11,6 +11,8 @@ import { AGGREGATORS } from '../constants/aggregators'
 import { useSwapContext } from '../contexts/swap/swap-context'
 import { useSwapContractContext } from '../contexts/swap/swap-contract-context'
 import { OdosLogoSvg } from '../components/svg/odos-logo-svg'
+import { testnetChainIds } from '../constants/chain'
+import { beraTestnetChain } from '../constants/dev-chain'
 
 export const SwapContainer = () => {
   const {
@@ -154,12 +156,16 @@ export const SwapContainer = () => {
             <PathVizViewer pathVizData={data?.pathViz} />
           </div>
         </div>
-        <div className="flex ml-auto text-white items-center gap-2">
-          <div className="text-gray-400 text-xs font-medium">Powered by</div>
-          <a target="_blank" href="https://www.odos.xyz/" rel="noreferrer">
-            <OdosLogoSvg />
-          </a>
-        </div>
+        {!testnetChainIds.includes(selectedChain.id) ? (
+          <div className="flex ml-auto text-white items-center gap-2">
+            <div className="text-gray-400 text-xs font-medium">Powered by</div>
+            <a target="_blank" href="https://www.odos.xyz/" rel="noreferrer">
+              <OdosLogoSvg />
+            </a>
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   )
