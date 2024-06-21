@@ -12,8 +12,8 @@ import { fetchPrices } from '../../apis/swap/prices'
 import { useChainContext } from '../chain-context'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 import {
+  fetchCurrenciesDone,
   fetchCurrency,
-  getCurrencyAddress,
   LOCAL_STORAGE_INPUT_CURRENCY_KEY,
   LOCAL_STORAGE_OUTPUT_CURRENCY_KEY,
 } from '../../utils/currency'
@@ -69,43 +69,10 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
   const [slippageInput, setSlippageInput] = useState('1')
 
-  const { inputCurrencyAddress, outputCurrencyAddress } = getCurrencyAddress(
-    'swap',
-    selectedChain,
-  )
   const { data: _currencies } = useQuery(
     ['swap-currencies', selectedChain],
     async () => {
-      const _currencies = await fetchCurrencies(AGGREGATORS[selectedChain.id])
-      const _inputCurrency = inputCurrencyAddress
-        ? _currencies.find((currency) =>
-            isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
-          ) ??
-          (await fetchCurrency(
-            selectedChain.id,
-            getAddress(inputCurrencyAddress),
-          ))
-        : undefined
-      const _outputCurrency = outputCurrencyAddress
-        ? _currencies.find((currency) =>
-            isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
-          ) ??
-          (await fetchCurrency(
-            selectedChain.id,
-            getAddress(outputCurrencyAddress),
-          ))
-        : undefined
-      return [..._currencies]
-        .concat(
-          _inputCurrency ? [_inputCurrency] : [],
-          _outputCurrency ? [_outputCurrency] : [],
-        )
-        .filter(
-          (currency, index, self) =>
-            self.findIndex((c) =>
-              isAddressEqual(c.address, currency.address),
-            ) === index,
-        )
+      return fetchCurrencies(AGGREGATORS[selectedChain.id])
     },
     {
       initialData: [],
@@ -177,6 +144,10 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
         setQueryParams({
           inputCurrency: currency.address,
         })
+      } else {
+        localStorage.removeItem(
+          LOCAL_STORAGE_INPUT_CURRENCY_KEY('swap', selectedChain),
+        )
       }
       _setInputCurrency(currency)
     },
@@ -193,6 +164,10 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
         setQueryParams({
           outputCurrency: currency.address,
         })
+      } else {
+        localStorage.removeItem(
+          LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('swap', selectedChain),
+        )
       }
       _setOutputCurrency(currency)
     },
@@ -200,29 +175,55 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
 
   useEffect(() => {
-    setCurrencies(_currencies)
+    if (!fetchCurrenciesDone(_currencies, selectedChain)) {
+      return
+    }
 
-    const inputCurrency = inputCurrencyAddress
-      ? _currencies.find((currency) =>
-          isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
-        )
-      : DEFAULT_INPUT_CURRENCY[selectedChain.id]
-    const outputCurrency = outputCurrencyAddress
-      ? _currencies.find((currency) =>
-          isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
-        )
-      : DEFAULT_OUTPUT_CURRENCY[selectedChain.id]
+    const action = async () => {
+      const inputCurrencyAddress = localStorage.getItem(
+        LOCAL_STORAGE_INPUT_CURRENCY_KEY('swap', selectedChain),
+      )
+      const outputCurrencyAddress = localStorage.getItem(
+        LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('swap', selectedChain),
+      )
 
-    setInputCurrency(inputCurrency)
-    setOutputCurrency(outputCurrency)
-  }, [
-    _currencies,
-    inputCurrencyAddress,
-    outputCurrencyAddress,
-    selectedChain,
-    setInputCurrency,
-    setOutputCurrency,
-  ])
+      const _inputCurrency = inputCurrencyAddress
+        ? _currencies.find((currency) =>
+            isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
+          ) ??
+          (await fetchCurrency(
+            selectedChain.id,
+            getAddress(inputCurrencyAddress),
+          ))
+        : DEFAULT_INPUT_CURRENCY[selectedChain.id]
+      const _outputCurrency = outputCurrencyAddress
+        ? _currencies.find((currency) =>
+            isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
+          ) ??
+          (await fetchCurrency(
+            selectedChain.id,
+            getAddress(outputCurrencyAddress),
+          ))
+        : DEFAULT_OUTPUT_CURRENCY[selectedChain.id]
+
+      setCurrencies(
+        [..._currencies]
+          .concat(
+            _inputCurrency ? [_inputCurrency] : [],
+            _outputCurrency ? [_outputCurrency] : [],
+          )
+          .filter(
+            (currency, index, self) =>
+              self.findIndex((c) =>
+                isAddressEqual(c.address, currency.address),
+              ) === index,
+          ),
+      )
+      setInputCurrency(_inputCurrency)
+      setOutputCurrency(_outputCurrency)
+    }
+    action()
+  }, [_currencies, selectedChain, setInputCurrency, setOutputCurrency])
 
   return (
     <Context.Provider

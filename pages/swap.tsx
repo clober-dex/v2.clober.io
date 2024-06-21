@@ -10,7 +10,7 @@ export default function Swap() {
   const [mounted, setMounted] = React.useState(false)
 
   useEffect(() => {
-    if (mounted) {
+    if (!mounted) {
       const { inputCurrencyAddress, outputCurrencyAddress } =
         getCurrencyAddress('swap', selectedChain)
       cleanAndSetQueryParams(['chain'], {
@@ -18,8 +18,6 @@ export default function Swap() {
         outputCurrency: outputCurrencyAddress,
       })
       setMounted(true)
-    } else {
-      cleanAndSetQueryParams(['chain'], {})
     }
   }, [mounted, selectedChain])
   return <SwapContainer />
