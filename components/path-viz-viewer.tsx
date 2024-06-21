@@ -6,10 +6,13 @@ import ReactFlow, {
   ReactFlowProvider,
   useReactFlow,
 } from 'reactflow'
-
 import 'reactflow/dist/base.css'
+import { zeroAddress } from 'viem'
+
 import { PathViz } from '../model/pathviz'
 import { toPlacesString } from '../utils/bignumber'
+
+import { CurrencyIcon } from './icon/currency-icon'
 
 const stringToColor = (str: string) => {
   let hash = 0
@@ -178,7 +181,7 @@ const _PathViz = ({ pathVizData }: { pathVizData?: PathViz }) => {
 }
 
 const Node = ({
-  data: { id, symbol, icon, targetConnected, targetHandle, sourceHandle },
+  data: { id, symbol, targetConnected, targetHandle, sourceHandle },
 }: {
   data: {
     id: string
@@ -189,15 +192,21 @@ const Node = ({
     sourceHandle: boolean
   }
 }) => {
-  const imgSrc =
-    icon !== undefined ? icon : `https://assets.odos.xyz/tokens/${symbol}.webp`
   return (
     <div
       className="flex items-center p-1 lg:px-2 bg-gray-700 rounded-full gap-2"
       data-tooltip-id={id}
     >
       <div className="flex items-center rounded-full gap-2">
-        <img src={imgSrc} className="rounded-full w-5 h-5" />
+        <CurrencyIcon
+          currency={{
+            symbol,
+            decimals: 18,
+            address: zeroAddress,
+            name: '',
+          }}
+          className="rounded-full w-5 h-5"
+        />
         <div
           className="text-sm text-white hidden lg:flex w-12"
           style={{
