@@ -29,6 +29,6 @@ export default function Swap() {
       })
       setMounted(true)
     }
-  }, [mounted, selectedChain])
+  }, [mounted, router, selectedChain])
   return <SwapContainer />
 }
