@@ -63,6 +63,7 @@ export const SwapContainer = () => {
           userAddress,
         )
       }
+      return null
     },
   )
 
