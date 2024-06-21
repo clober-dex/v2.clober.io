@@ -1,6 +1,7 @@
 import React from 'react'
 import { getAddress, isAddressEqual } from 'viem'
-import { Market } from '@clober/v2-sdk'
+import { getPriceNeighborhood, Market } from '@clober/v2-sdk'
+import BigNumber from 'bignumber.js'
 
 import NumberInput from '../input/number-input'
 import CurrencyAmountInput from '../input/currency-amount-input'
@@ -11,6 +12,7 @@ import CurrencySelect from '../selector/currency-select'
 import { Balances } from '../../model/balances'
 import { Prices } from '../../model/prices'
 import CheckIcon from '../icon/check-icon'
+import { toPlacesString } from '../../utils/bignumber'
 
 export const LimitForm = ({
   chainId,
@@ -133,7 +135,34 @@ export const LimitForm = ({
           />
         </div>
         <div className="flex w-[34px] sm:w-11 h-12 sm:h-[60px] flex-col gap-[6px] md:gap-2">
-          <div className="cursor-pointer group group-hover:ring-1 group-hover:ring-gray-700 flex w-full h-[21px] sm:h-[26px] bg-gray-800 rounded flex-col items-center justify-center gap-1">
+          <button
+            onClick={() => {
+              if (inputCurrency && outputCurrency) {
+                const {
+                  normal: {
+                    up: { price: price1 },
+                  },
+                } = getPriceNeighborhood({
+                  chainId,
+                  price: priceInput,
+                  currency0: inputCurrency,
+                  currency1: outputCurrency,
+                })
+                const {
+                  normal: {
+                    up: { price },
+                  },
+                } = getPriceNeighborhood({
+                  chainId,
+                  price: new BigNumber(price1).times(1.000001).toString(),
+                  currency0: inputCurrency,
+                  currency1: outputCurrency,
+                })
+                setPriceInput(toPlacesString(price))
+              }
+            }}
+            className="cursor-pointer group group-hover:ring-1 group-hover:ring-gray-700 flex w-full h-[21px] sm:h-[26px] bg-gray-800 rounded flex-col items-center justify-center gap-1"
+          >
             <svg
               className="group-hover:stroke-white stroke-[#9CA3AF] w-[12px] h-[7px] sm:w-[14px] sm:h-[8px]"
               xmlns="http://www.w3.org/2000/svg"
@@ -147,8 +176,25 @@ export const LimitForm = ({
                 strokeLinejoin="round"
               />
             </svg>
-          </div>
-          <div className="cursor-pointer group group-hover:ring-1 group-hover:ring-gray-700 flex w-full h-[21px] sm:h-[26px] bg-gray-800 rounded flex-col items-center justify-center gap-1">
+          </button>
+          <button
+            onClick={() => {
+              if (inputCurrency && outputCurrency) {
+                const {
+                  normal: {
+                    down: { price },
+                  },
+                } = getPriceNeighborhood({
+                  chainId,
+                  price: priceInput,
+                  currency0: inputCurrency,
+                  currency1: outputCurrency,
+                })
+                setPriceInput(toPlacesString(price))
+              }
+            }}
+            className="cursor-pointer group group-hover:ring-1 group-hover:ring-gray-700 flex w-full h-[21px] sm:h-[26px] bg-gray-800 rounded flex-col items-center justify-center gap-1"
+          >
             <svg
               className="group-hover:stroke-white stroke-[#9CA3AF] w-[12px] h-[7px] sm:w-[14px] sm:h-[8px]"
               xmlns="http://www.w3.org/2000/svg"
@@ -162,7 +208,7 @@ export const LimitForm = ({
                 strokeLinejoin="round"
               />
             </svg>
-          </div>
+          </button>
         </div>
       </div>
       <div className="flex flex-col relative gap-2 sm:gap-4 mb-3 sm:mb-4">
