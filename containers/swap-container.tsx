@@ -10,6 +10,7 @@ import { fetchQuotes } from '../apis/swap/quotes'
 import { AGGREGATORS } from '../constants/aggregators'
 import { useSwapContext } from '../contexts/swap/swap-context'
 import { useSwapContractContext } from '../contexts/swap/swap-contract-context'
+import { OdosLogoSvg } from '../components/svg/odos-logo-svg'
 
 export const SwapContainer = () => {
   const {
@@ -73,83 +74,91 @@ export const SwapContainer = () => {
 
   return (
     <div className="flex flex-col w-fit mb-4 sm:mb-6">
-      <div className="flex flex-col w-full lg:flex-row gap-4">
-        <div className="flex flex-col rounded-2xl bg-gray-900 p-6 sm:w-[528px] lg:w-[480px]">
-          <SwapForm
-            chainId={selectedChain.id}
-            currencies={currencies}
-            setCurrencies={setCurrencies}
-            balances={balances}
-            prices={prices}
-            showInputCurrencySelect={showInputCurrencySelect}
-            setShowInputCurrencySelect={setShowInputCurrencySelect}
-            inputCurrency={inputCurrency}
-            setInputCurrency={setInputCurrency}
-            inputCurrencyAmount={inputCurrencyAmount}
-            setInputCurrencyAmount={setInputCurrencyAmount}
-            availableInputCurrencyBalance={
-              inputCurrency
-                ? balances[getAddress(inputCurrency.address)] ?? 0n
-                : 0n
-            }
-            showOutputCurrencySelect={showOutputCurrencySelect}
-            setShowOutputCurrencySelect={setShowOutputCurrencySelect}
-            outputCurrency={outputCurrency}
-            setOutputCurrency={setOutputCurrency}
-            outputCurrencyAmount={formatUnits(
-              data?.amountOut ?? 0n,
-              outputCurrency?.decimals ?? 18,
-            )}
-            slippageInput={slippageInput}
-            setSlippageInput={setSlippageInput}
-            gasEstimateValue={
-              parseFloat(
-                formatUnits(
-                  BigInt(data?.gasLimit ?? 0n) *
-                    BigInt(feeData?.gasPrice ?? 0n),
-                  selectedChain.nativeCurrency.decimals,
-                ),
-              ) * prices[getAddress(zeroAddress)]
-            }
-            actionButtonProps={{
-              disabled:
-                !userAddress ||
-                !inputCurrency ||
-                !outputCurrency ||
-                !inputCurrencyAmount ||
-                !feeData ||
-                !feeData.gasPrice ||
-                !data,
-              onClick: async () => {
-                if (
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col w-full lg:flex-row gap-4">
+          <div className="flex flex-col rounded-2xl bg-gray-900 p-6 sm:w-[528px] lg:w-[480px]">
+            <SwapForm
+              chainId={selectedChain.id}
+              currencies={currencies}
+              setCurrencies={setCurrencies}
+              balances={balances}
+              prices={prices}
+              showInputCurrencySelect={showInputCurrencySelect}
+              setShowInputCurrencySelect={setShowInputCurrencySelect}
+              inputCurrency={inputCurrency}
+              setInputCurrency={setInputCurrency}
+              inputCurrencyAmount={inputCurrencyAmount}
+              setInputCurrencyAmount={setInputCurrencyAmount}
+              availableInputCurrencyBalance={
+                inputCurrency
+                  ? balances[getAddress(inputCurrency.address)] ?? 0n
+                  : 0n
+              }
+              showOutputCurrencySelect={showOutputCurrencySelect}
+              setShowOutputCurrencySelect={setShowOutputCurrencySelect}
+              outputCurrency={outputCurrency}
+              setOutputCurrency={setOutputCurrency}
+              outputCurrencyAmount={formatUnits(
+                data?.amountOut ?? 0n,
+                outputCurrency?.decimals ?? 18,
+              )}
+              slippageInput={slippageInput}
+              setSlippageInput={setSlippageInput}
+              gasEstimateValue={
+                parseFloat(
+                  formatUnits(
+                    BigInt(data?.gasLimit ?? 0n) *
+                      BigInt(feeData?.gasPrice ?? 0n),
+                    selectedChain.nativeCurrency.decimals,
+                  ),
+                ) * prices[getAddress(zeroAddress)]
+              }
+              actionButtonProps={{
+                disabled:
                   !userAddress ||
                   !inputCurrency ||
                   !outputCurrency ||
                   !inputCurrencyAmount ||
                   !feeData ||
                   !feeData.gasPrice ||
-                  !data
-                ) {
-                  return
-                }
-                await swap(
-                  inputCurrency,
-                  parseUnits(
-                    inputCurrencyAmount,
-                    inputCurrency?.decimals ?? 18,
-                  ),
-                  outputCurrency,
-                  parseFloat(slippageInput),
-                  feeData.gasPrice,
-                  userAddress,
-                )
-              },
-              text: 'Swap',
-            }}
-          />
+                  !data,
+                onClick: async () => {
+                  if (
+                    !userAddress ||
+                    !inputCurrency ||
+                    !outputCurrency ||
+                    !inputCurrencyAmount ||
+                    !feeData ||
+                    !feeData.gasPrice ||
+                    !data
+                  ) {
+                    return
+                  }
+                  await swap(
+                    inputCurrency,
+                    parseUnits(
+                      inputCurrencyAmount,
+                      inputCurrency?.decimals ?? 18,
+                    ),
+                    outputCurrency,
+                    parseFloat(slippageInput),
+                    feeData.gasPrice,
+                    userAddress,
+                  )
+                },
+                text: 'Swap',
+              }}
+            />
+          </div>
+          <div className="flex flex-col rounded-2xl bg-gray-900 p-6">
+            <PathVizViewer pathVizData={data?.pathViz} />
+          </div>
         </div>
-        <div className="flex flex-col rounded-2xl bg-gray-900 p-6">
-          <PathVizViewer pathVizData={data?.pathViz} />
+        <div className="flex ml-auto text-white items-center gap-2">
+          <div className="text-gray-400 text-xs font-medium">Powered by</div>
+          <a target="_blank" href="https://www.odos.xyz/" rel="noreferrer">
+            <OdosLogoSvg />
+          </a>
         </div>
       </div>
     </div>
