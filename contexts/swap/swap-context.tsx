@@ -176,6 +176,8 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
   useEffect(() => {
     if (!fetchCurrenciesDone(_currencies, selectedChain)) {
+      setInputCurrency(DEFAULT_INPUT_CURRENCY[selectedChain.id])
+      setOutputCurrency(DEFAULT_OUTPUT_CURRENCY[selectedChain.id])
       return
     }
 
