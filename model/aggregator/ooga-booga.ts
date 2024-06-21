@@ -9,7 +9,7 @@ import { PathViz } from '../pathviz'
 import { Aggregator } from './index'
 
 export class OogaBoogaAggregator implements Aggregator {
-  public readonly baseUrl = 'https://ooga-booga-proxy.clober.io/'
+  public readonly baseUrl = 'https://ooga-booga-proxy.clober.io'
   public readonly contract: `0x${string}`
   public readonly chain: Chain
 
