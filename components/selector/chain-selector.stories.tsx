@@ -7,7 +7,6 @@ import {
   mainnet,
   polygon,
   zkSync,
-  zkSyncSepoliaTestnet,
 } from 'viem/chains'
 
 import { beraTestnetChain } from '../../constants/dev-chain'
@@ -52,11 +51,6 @@ export const Default: Story = {
       },
       {
         ...zkSync,
-        defaultGasPrice: 0n,
-        expireIn: 240,
-      },
-      {
-        ...zkSyncSepoliaTestnet,
         defaultGasPrice: 0n,
         expireIn: 240,
       },
@@ -105,7 +99,7 @@ export const OnlyMainnet: Story = {
 export const OnlyTestnet: Story = {
   args: {
     chain: {
-      ...zkSyncSepoliaTestnet,
+      ...arbitrumSepolia,
       defaultGasPrice: 0n,
       expireIn: 0,
     },
@@ -113,11 +107,6 @@ export const OnlyTestnet: Story = {
     chains: [
       {
         ...arbitrumSepolia,
-        defaultGasPrice: 0n,
-        expireIn: 0,
-      },
-      {
-        ...zkSyncSepoliaTestnet,
         defaultGasPrice: 0n,
         expireIn: 0,
       },
