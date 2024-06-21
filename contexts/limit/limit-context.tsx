@@ -236,13 +236,13 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       setInputCurrency(_inputCurrency)
       setOutputCurrency(_outputCurrency)
 
-      if (inputCurrency && outputCurrency) {
+      if (_inputCurrency && _outputCurrency) {
         const quote = getQuoteToken({
           chainId: selectedChain.id,
-          token0: inputCurrency.address,
-          token1: outputCurrency.address,
+          token0: _inputCurrency.address,
+          token1: _outputCurrency.address,
         })
-        if (isAddressEqual(quote, inputCurrency.address)) {
+        if (isAddressEqual(quote, _inputCurrency.address)) {
           setIsBid(true)
         } else {
           setIsBid(false)
@@ -252,14 +252,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       }
     }
     action()
-  }, [
-    _currencies,
-    inputCurrency,
-    outputCurrency,
-    selectedChain,
-    setInputCurrency,
-    setOutputCurrency,
-  ])
+  }, [_currencies, selectedChain, setInputCurrency, setOutputCurrency])
 
   return (
     <Context.Provider
