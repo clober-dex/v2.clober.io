@@ -213,7 +213,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
           currency0: inputCurrency,
           currency1: outputCurrency,
         })
-        setPriceInput(price)
+        setPriceInput(toPlacesString(price))
       } else if (!depthClickedIndex.isBid && asks[depthClickedIndex.index]) {
         const {
           normal: {
@@ -225,7 +225,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
           currency0: inputCurrency,
           currency1: outputCurrency,
         })
-        setPriceInput(price)
+        setPriceInput(toPlacesString(price))
       }
     }
   }, [
