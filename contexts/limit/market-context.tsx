@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { getMarket, Market } from '@clober/v2-sdk'
+import { getMarket, getQuoteToken, Market } from '@clober/v2-sdk'
 import { useQuery } from 'wagmi'
 import BigNumber from 'bignumber.js'
-import { getAddress } from 'viem'
+import { getAddress, isAddressEqual } from 'viem'
 
 import { isMarketEqual } from '../../utils/market'
 import {
@@ -86,6 +86,8 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     inputCurrency,
     outputCurrency,
     setOutputCurrencyAmount,
+    setInputCurrency,
+    setOutputCurrency,
   } = useLimitContext()
 
   const [selectedDecimalPlaces, setSelectedDecimalPlaces] = useState<
@@ -220,12 +222,27 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   // When depthClickedIndex is changed, reset the priceInput
   useEffect(() => {
     if (depthClickedIndex && inputCurrency && outputCurrency) {
+      const quote = getQuoteToken({
+        chainId: selectedChain.id,
+        token0: inputCurrency.address,
+        token1: outputCurrency.address,
+      })
+      const [quoteCurrency, baseCurrency] = isAddressEqual(
+        quote,
+        inputCurrency.address,
+      )
+        ? [inputCurrency, outputCurrency]
+        : [outputCurrency, inputCurrency]
       if (depthClickedIndex.isBid && bids[depthClickedIndex.index]) {
         setPriceInput(toPlacesString(bids[depthClickedIndex.index].price))
         setIsBid(() => false)
+        setInputCurrency(baseCurrency)
+        setOutputCurrency(quoteCurrency)
       } else if (!depthClickedIndex.isBid && asks[depthClickedIndex.index]) {
         setPriceInput(toPlacesString(asks[depthClickedIndex.index].price))
         setIsBid(() => true)
+        setInputCurrency(quoteCurrency)
+        setOutputCurrency(baseCurrency)
       }
     }
   }, [
@@ -237,6 +254,8 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     outputCurrency,
     selectedChain.id,
     setIsBid,
+    setInputCurrency,
+    setOutputCurrency,
   ])
 
   const previousValues = useRef({
