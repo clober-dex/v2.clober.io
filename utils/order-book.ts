@@ -42,6 +42,7 @@ export function parseDepth(
   decimalPlaces: Decimals,
 ): {
   price: string
+  rawPrice: string
   size: string
   tick: number
 }[] {
@@ -71,11 +72,13 @@ export function parseDepth(
             prev.has(key)
               ? {
                   price: key,
+                  rawPrice: price.toFixed(),
                   tick: curr.tick,
                   size: curr.size.plus(prev.get(key)?.size || 0),
                 }
               : {
                   price: key,
+                  rawPrice: price.toFixed(),
                   tick: curr.tick,
                   size: curr.size,
                 },
@@ -86,6 +89,7 @@ export function parseDepth(
           string,
           {
             price: string
+            rawPrice: string
             tick: number
             size: BigNumber
           }
@@ -95,6 +99,7 @@ export function parseDepth(
   ).map((x) => {
     return {
       price: x.price,
+      rawPrice: x.rawPrice,
       tick: x.tick,
       size: toPlacesString(x.size, market.base.decimals),
     }

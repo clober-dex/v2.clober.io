@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { getMarket, getQuoteToken, Market } from '@clober/v2-sdk'
+import { getMarket, Market } from '@clober/v2-sdk'
 import { useQuery } from 'wagmi'
 import BigNumber from 'bignumber.js'
-import { getAddress, isAddressEqual } from 'viem'
+import { getAddress } from 'viem'
 
 import { isMarketEqual } from '../../utils/market'
 import {
@@ -15,7 +15,6 @@ import { getPriceDecimals } from '../../utils/prices'
 import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
 import { useChainContext } from '../chain-context'
 import { getCurrencyAddress } from '../../utils/currency'
-import { toPlacesString } from '../../utils/bignumber'
 import { RPC_URL } from '../../constants/rpc-urls'
 
 import { useLimitContext } from './limit-context'
@@ -32,6 +31,7 @@ type MarketContext = {
         index: number
         depth: {
           price: string
+          rawPrice: string
           tick: number
           size: string
         }
@@ -44,6 +44,7 @@ type MarketContext = {
           index: number
           depth: {
             price: string
+            rawPrice: string
             tick: number
             size: string
           }
@@ -52,11 +53,13 @@ type MarketContext = {
   ) => void
   bids: {
     price: string
+    rawPrice: string
     tick: number
     size: string
   }[]
   asks: {
     price: string
+    rawPrice: string
     tick: number
     size: string
   }[]
@@ -78,7 +81,6 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { selectedChain } = useChainContext()
   const {
     isBid,
-    setIsBid,
     setPriceInput,
     priceInput,
     outputCurrencyAmount,
@@ -86,8 +88,6 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     inputCurrency,
     outputCurrency,
     setOutputCurrencyAmount,
-    setInputCurrency,
-    setOutputCurrency,
   } = useLimitContext()
 
   const [selectedDecimalPlaces, setSelectedDecimalPlaces] = useState<
@@ -102,6 +102,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
         index: number
         depth: {
           price: string
+          rawPrice: string
           tick: number
           size: string
         }
@@ -214,28 +215,17 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
     setPriceInput(
       isBid
-        ? toPlacesString(asks[0]?.price ?? bids[0]?.price ?? '1')
-        : toPlacesString(bids[0]?.price ?? asks[0]?.price ?? '1'),
+        ? asks[0]?.rawPrice ?? bids[0]?.rawPrice ?? '1'
+        : bids[0]?.rawPrice ?? asks[0]?.rawPrice ?? '1',
     )
   }, [asks, bids, isBid, setPriceInput])
 
   // When depthClickedIndex is changed, reset the priceInput
   useEffect(() => {
     if (depthClickedIndex && inputCurrency && outputCurrency) {
-      if (depthClickedIndex.isBid && bids[depthClickedIndex.index]) {
-        setPriceInput(toPlacesString(bids[depthClickedIndex.index].price))
-      } else if (!depthClickedIndex.isBid && asks[depthClickedIndex.index]) {
-        setPriceInput(toPlacesString(asks[depthClickedIndex.index].price))
-      }
+      setPriceInput(depthClickedIndex.depth.rawPrice)
     }
-  }, [
-    asks,
-    bids,
-    depthClickedIndex,
-    inputCurrency,
-    outputCurrency,
-    setPriceInput,
-  ])
+  }, [depthClickedIndex, inputCurrency, outputCurrency, setPriceInput])
 
   const previousValues = useRef({
     priceInput,
