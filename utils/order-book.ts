@@ -43,6 +43,7 @@ export function parseDepth(
 ): {
   price: string
   size: string
+  tick: number
 }[] {
   return Array.from(
     [...(isBid ? market.bids : market.asks).map((depth) => ({ ...depth }))]
@@ -54,6 +55,7 @@ export function parseDepth(
       .map((x) => {
         return {
           price: x.price,
+          tick: x.tick,
           size: new BigNumber(x.baseAmount),
         }
       })
@@ -69,10 +71,12 @@ export function parseDepth(
             prev.has(key)
               ? {
                   price: key,
+                  tick: curr.tick,
                   size: curr.size.plus(prev.get(key)?.size || 0),
                 }
               : {
                   price: key,
+                  tick: curr.tick,
                   size: curr.size,
                 },
           )
@@ -82,6 +86,7 @@ export function parseDepth(
           string,
           {
             price: string
+            tick: number
             size: BigNumber
           }
         >(),
@@ -90,6 +95,7 @@ export function parseDepth(
   ).map((x) => {
     return {
       price: x.price,
+      tick: x.tick,
       size: toPlacesString(x.size, market.base.decimals),
     }
   })
