@@ -129,7 +129,7 @@ export const LimitForm = ({
             {isBid ? 'Buy' : 'Sell'} {selectedMarket?.base.symbol} at rate
           </div>
           <NumberInput
-            value={toPlacesString(priceInput)}
+            value={priceInput}
             onValueChange={setPriceInput}
             className="text-xl w-full sm:text-2xl bg-transparent placeholder-gray-500 text-white outline-none"
           />
