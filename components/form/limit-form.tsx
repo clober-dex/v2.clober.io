@@ -12,7 +12,6 @@ import CurrencySelect from '../selector/currency-select'
 import { Balances } from '../../model/balances'
 import { Prices } from '../../model/prices'
 import CheckIcon from '../icon/check-icon'
-import { toPlacesString } from '../../utils/bignumber'
 
 export const LimitForm = ({
   chainId,
