@@ -32,7 +32,6 @@ type MarketContext = {
         depth: {
           price: string
           rawPrice: string
-          tick: number
           size: string
         }
       }
@@ -45,7 +44,6 @@ type MarketContext = {
           depth: {
             price: string
             rawPrice: string
-            tick: number
             size: string
           }
         }
@@ -54,13 +52,11 @@ type MarketContext = {
   bids: {
     price: string
     rawPrice: string
-    tick: number
     size: string
   }[]
   asks: {
     price: string
     rawPrice: string
-    tick: number
     size: string
   }[]
 }
@@ -103,7 +99,6 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
         depth: {
           price: string
           rawPrice: string
-          tick: number
           size: string
         }
       }

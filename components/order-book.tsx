@@ -17,15 +17,15 @@ export default function OrderBook({
   ...props
 }: {
   name: string
-  bids: { price: string; rawPrice: string; size: string; tick: number }[]
-  asks: { price: string; rawPrice: string; size: string; tick: number }[]
+  bids: { price: string; rawPrice: string; size: string }[]
+  asks: { price: string; rawPrice: string; size: string }[]
   availableDecimalPlacesGroups: Decimals[]
   selectedDecimalPlaces: Decimals
   setSelectedDecimalPlaces: (decimals: Decimals) => void
   setDepthClickedIndex: (index: {
     isBid: boolean
     index: number
-    depth: { price: string; rawPrice: string; size: string; tick: number }
+    depth: { price: string; rawPrice: string; size: string }
   }) => void
 } & React.HTMLAttributes<HTMLDivElement>) {
   const biggestDepth = BigNumber.max(
