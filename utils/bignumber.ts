@@ -5,7 +5,7 @@ export const getDecimalPlaces = (
   places: number = 4,
 ) => {
   const TEN = new BigNumber(10)
-  const value = new BigNumber(number)
+  const value = new BigNumber(`0.${number.toString().split('.')[1] || '0'}`)
   if (value.eq(0)) {
     return places
   }
