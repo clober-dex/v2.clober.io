@@ -55,7 +55,7 @@ export default function OrderBook({
           {bids
             .sort((a, b) => new BigNumber(b.price).minus(a.price).toNumber())
             .slice(0, 20)
-            .map(({ price, rawPrice, size, tick }, index) => {
+            .map(({ price, rawPrice, size }, index) => {
               return (
                 <button
                   key={`bid-${index}`}
@@ -64,7 +64,7 @@ export default function OrderBook({
                     setDepthClickedIndex({
                       isBid: true,
                       index,
-                      depth: { price, rawPrice, size, tick },
+                      depth: { price, rawPrice, size },
                     })
                   }
                 >
@@ -91,7 +91,7 @@ export default function OrderBook({
           {asks
             .sort((a, b) => new BigNumber(a.price).minus(b.price).toNumber())
             .slice(0, 20)
-            .map(({ price, rawPrice, size, tick }, index) => {
+            .map(({ price, rawPrice, size }, index) => {
               return (
                 <button
                   key={`ask-${index}`}
@@ -100,7 +100,7 @@ export default function OrderBook({
                     setDepthClickedIndex({
                       isBid: false,
                       index,
-                      depth: { price, rawPrice, size, tick },
+                      depth: { price, rawPrice, size },
                     })
                   }
                 >
