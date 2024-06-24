@@ -222,40 +222,19 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   // When depthClickedIndex is changed, reset the priceInput
   useEffect(() => {
     if (depthClickedIndex && inputCurrency && outputCurrency) {
-      const quote = getQuoteToken({
-        chainId: selectedChain.id,
-        token0: inputCurrency.address,
-        token1: outputCurrency.address,
-      })
-      const [quoteCurrency, baseCurrency] = isAddressEqual(
-        quote,
-        inputCurrency.address,
-      )
-        ? [inputCurrency, outputCurrency]
-        : [outputCurrency, inputCurrency]
       if (depthClickedIndex.isBid && bids[depthClickedIndex.index]) {
         setPriceInput(toPlacesString(bids[depthClickedIndex.index].price))
-        setIsBid(() => false)
-        setInputCurrency(baseCurrency)
-        setOutputCurrency(quoteCurrency)
       } else if (!depthClickedIndex.isBid && asks[depthClickedIndex.index]) {
         setPriceInput(toPlacesString(asks[depthClickedIndex.index].price))
-        setIsBid(() => true)
-        setInputCurrency(quoteCurrency)
-        setOutputCurrency(baseCurrency)
       }
     }
   }, [
     asks,
     bids,
     depthClickedIndex,
-    setPriceInput,
     inputCurrency,
     outputCurrency,
-    selectedChain.id,
-    setIsBid,
-    setInputCurrency,
-    setOutputCurrency,
+    setPriceInput,
   ])
 
   const previousValues = useRef({
