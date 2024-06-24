@@ -25,7 +25,6 @@ export const LimitContainer = () => {
     setSelectedDecimalPlaces,
     bids,
     asks,
-    depthClickedIndex,
     setDepthClickedIndex,
   } = useMarketContext()
   const { openOrders } = useOpenOrderContext()

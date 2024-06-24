@@ -20,7 +20,6 @@ export const IframeContainer = () => {
     setSelectedDecimalPlaces,
     bids,
     asks,
-    depthClickedIndex,
     setDepthClickedIndex,
   } = useMarketContext()
   const { limit } = useLimitContractContext()
