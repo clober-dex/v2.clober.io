@@ -1,25 +1,24 @@
 import BigNumber from 'bignumber.js'
 
-export const getDecimalPlaces = (
-  number: BigNumber.Value,
-  places: number = 4,
-) => {
-  const TEN = new BigNumber(10)
+export const findFirstNonZeroIndex = (number: BigNumber.Value): number => {
   const value = new BigNumber(number)
-  if (value.eq(0)) {
-    return places
-  }
-  if (value.gte(TEN.pow(places))) {
+  const decimalPart = value.minus(value.integerValue())
+  if (decimalPart.isZero()) {
     return 0
   }
   let i = 0
-  while (value.abs().lt(TEN.pow(-i * places))) {
+  while (
+    decimalPart
+      .times(10 ** i)
+      .integerValue()
+      .isZero()
+  ) {
     i += 1
   }
-  return i ? i * places : 4
+  return i
 }
 
 export const toPlacesString = (number: BigNumber.Value, places: number = 4) => {
-  const value = new BigNumber(number)
-  return value.toFixed(Number(getDecimalPlaces(number, places)))
+  const index = findFirstNonZeroIndex(number)
+  return new BigNumber(number).toFixed(Math.max(places, index))
 }
