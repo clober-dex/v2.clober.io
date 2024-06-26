@@ -163,9 +163,7 @@ export const LimitContainer = () => {
                 : 0n
             }
             swapInputCurrencyAndOutputCurrency={() => {
-              setIsBid((prevState) =>
-                depthClickedIndex ? depthClickedIndex.isBid : !prevState,
-              )
+              setIsBid((prevState) => !prevState)
               setDepthClickedIndex(undefined)
               setInputCurrencyAmount(outputCurrencyAmount)
 
