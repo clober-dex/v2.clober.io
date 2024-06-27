@@ -5,6 +5,23 @@ import { Decimals } from '../model/decimals'
 
 import { toPlacesString } from './bignumber'
 
+export function calculateInputCurrencyAmountString(
+  isBid: boolean,
+  outputCurrencyAmount: string,
+  priceInput: string,
+  inputCurrencyDecimals: number,
+) {
+  const inputCurrencyAmount = isBid
+    ? new BigNumber(outputCurrencyAmount).times(priceInput)
+    : new BigNumber(outputCurrencyAmount).div(priceInput)
+  return toPlacesString(
+    inputCurrencyAmount.isNaN() || !inputCurrencyAmount.isFinite()
+      ? new BigNumber(0)
+      : inputCurrencyAmount,
+    inputCurrencyDecimals,
+  )
+}
+
 export function calculateOutputCurrencyAmountString(
   isBid: boolean,
   inputCurrencyAmount: string,
@@ -20,20 +37,6 @@ export function calculateOutputCurrencyAmountString(
       : outputCurrencyAmount,
     outputCurrencyDecimals,
   )
-}
-
-export function calculatePriceInputString(
-  isBid: boolean,
-  inputCurrencyAmount: string,
-  outputCurrencyAmount: string,
-  currentPriceInput: string,
-) {
-  const expectedPriceInput = isBid
-    ? new BigNumber(inputCurrencyAmount).div(outputCurrencyAmount)
-    : new BigNumber(inputCurrencyAmount).times(outputCurrencyAmount)
-  return expectedPriceInput.isNaN() || !expectedPriceInput.isFinite()
-    ? currentPriceInput
-    : toPlacesString(expectedPriceInput)
 }
 
 export function parseDepth(
