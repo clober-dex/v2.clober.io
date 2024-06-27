@@ -20,5 +20,8 @@ export const findFirstNonZeroIndex = (number: BigNumber.Value): number => {
 
 export const toPlacesString = (number: BigNumber.Value, places: number = 4) => {
   const index = findFirstNonZeroIndex(number)
-  return new BigNumber(number).toFixed(Math.max(places, index))
+  return new BigNumber(number).toFixed(
+    Math.max(places, index),
+    BigNumber.ROUND_FLOOR,
+  )
 }
