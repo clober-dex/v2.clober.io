@@ -38,6 +38,7 @@ export const Default: Story = {
     outputCurrencyAmount: '0.1',
     setOutputCurrencyAmount: () => {},
     swapInputCurrencyAndOutputCurrency: () => {},
+    minimumDecimalPlaces: 6,
   },
 }
 

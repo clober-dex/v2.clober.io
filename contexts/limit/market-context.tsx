@@ -16,6 +16,7 @@ import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
 import { useChainContext } from '../chain-context'
 import { getCurrencyAddress } from '../../utils/currency'
 import { RPC_URL } from '../../constants/rpc-urls'
+import { toPlacesString } from '../../utils/bignumber'
 
 import { useLimitContext } from './limit-context'
 
@@ -74,6 +75,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     inputCurrency,
     outputCurrency,
     setOutputCurrencyAmount,
+    setInputCurrencyAmount,
   } = useLimitContext()
 
   const [selectedDecimalPlaces, setSelectedDecimalPlaces] = useState<
@@ -192,25 +194,42 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   // When depth is changed
   useEffect(() => {
     setDepthClickedIndex(undefined)
+    const minimumDecimalPlaces = availableDecimalPlacesGroups[0].value
 
     setPriceInput(
-      isBid
-        ? asks[0]?.price ?? bids[0]?.price ?? '1'
-        : bids[0]?.price ?? asks[0]?.price ?? '1',
+      toPlacesString(
+        isBid
+          ? asks[0]?.price ?? bids[0]?.price ?? '1'
+          : bids[0]?.price ?? asks[0]?.price ?? '1',
+        minimumDecimalPlaces + 1,
+      ),
     )
-  }, [asks, bids, isBid, setPriceInput])
+  }, [asks, availableDecimalPlacesGroups, bids, isBid, setPriceInput])
 
   // When depthClickedIndex is changed, reset the priceInput
   useEffect(() => {
+    const minimumDecimalPlaces = availableDecimalPlacesGroups[0].value
+
     if (depthClickedIndex && inputCurrency && outputCurrency) {
       if (depthClickedIndex.isBid && bids[depthClickedIndex.index]) {
-        setPriceInput(bids[depthClickedIndex.index].price)
+        setPriceInput(
+          toPlacesString(
+            bids[depthClickedIndex.index].price,
+            minimumDecimalPlaces + 1,
+          ),
+        )
       } else if (!depthClickedIndex.isBid && asks[depthClickedIndex.index]) {
-        setPriceInput(asks[depthClickedIndex.index].price)
+        setPriceInput(
+          toPlacesString(
+            asks[depthClickedIndex.index].price,
+            minimumDecimalPlaces + 1,
+          ),
+        )
       }
     }
   }, [
     asks,
+    availableDecimalPlacesGroups,
     bids,
     depthClickedIndex,
     inputCurrency,
