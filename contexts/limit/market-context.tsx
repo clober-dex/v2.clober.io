@@ -201,7 +201,8 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
         isBid
           ? asks[0]?.price ?? bids[0]?.price ?? '1'
           : bids[0]?.price ?? asks[0]?.price ?? '1',
-        minimumDecimalPlaces + 1,
+        minimumDecimalPlaces,
+        isBid ? BigNumber.ROUND_FLOOR : BigNumber.ROUND_CEIL,
       ),
     )
   }, [asks, availableDecimalPlacesGroups, bids, isBid, setPriceInput])
@@ -215,14 +216,15 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
         setPriceInput(
           toPlacesString(
             bids[depthClickedIndex.index].price,
-            minimumDecimalPlaces + 1,
+            minimumDecimalPlaces,
+            isBid ? BigNumber.ROUND_FLOOR : BigNumber.ROUND_CEIL,
           ),
         )
       } else if (!depthClickedIndex.isBid && asks[depthClickedIndex.index]) {
         setPriceInput(
           toPlacesString(
             asks[depthClickedIndex.index].price,
-            minimumDecimalPlaces + 1,
+            minimumDecimalPlaces,
           ),
         )
       }
