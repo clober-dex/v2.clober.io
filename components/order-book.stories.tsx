@@ -17,18 +17,18 @@ export const Default: Story = {
   args: {
     name: 'OrderBook',
     bids: [
-      { price: '0.000001', size: '12' },
-      { price: '0.000002', size: '12' },
-      { price: '0.000003', size: '12' },
-      { price: '0.000004', size: '12' },
-      { price: '0.000005', size: '1' },
+      { price: '0.000001', tick: 1, size: '12' },
+      { price: '0.000002', tick: 1, size: '12' },
+      { price: '0.000003', tick: 1, size: '12' },
+      { price: '0.000004', tick: 1, size: '12' },
+      { price: '0.000005', tick: 1, size: '1' },
     ],
     asks: [
-      { price: '0.000006', size: '12' },
-      { price: '0.000007', size: '12' },
-      { price: '0.000008', size: '12' },
-      { price: '0.000009', size: '12' },
-      { price: '0.000010', size: '1' },
+      { price: '0.000006', tick: 1, size: '12' },
+      { price: '0.000007', tick: 1, size: '12' },
+      { price: '0.000008', tick: 1, size: '12' },
+      { price: '0.000009', tick: 1, size: '12' },
+      { price: '0.000010', tick: 1, size: '1' },
     ],
     availableDecimalPlacesGroups: [
       { label: '0.000001', value: 6 },

@@ -17,8 +17,8 @@ export default function OrderBook({
   ...props
 }: {
   name: string
-  bids: { price: string; size: string }[]
-  asks: { price: string; size: string }[]
+  bids: { price: string; tick: number; size: string }[]
+  asks: { price: string; tick: number; size: string }[]
   availableDecimalPlacesGroups: Decimals[]
   selectedDecimalPlaces: Decimals
   setSelectedDecimalPlaces: (decimals: Decimals) => void

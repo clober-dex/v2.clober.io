@@ -42,10 +42,12 @@ type MarketContext = {
   ) => void
   bids: {
     price: string
+    tick: number
     size: string
   }[]
   asks: {
     price: string
+    tick: number
     size: string
   }[]
 }
