@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { getMarket, Market, getPriceNeighborhood } from '@clober/v2-sdk'
+import { getMarket, Market } from '@clober/v2-sdk'
 import { useQuery } from 'wagmi'
 import BigNumber from 'bignumber.js'
 import { getAddress } from 'viem'
@@ -15,7 +15,6 @@ import { getPriceDecimals } from '../../utils/prices'
 import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
 import { useChainContext } from '../chain-context'
 import { getCurrencyAddress } from '../../utils/currency'
-import { toPlacesString } from '../../utils/bignumber'
 import { RPC_URL } from '../../constants/rpc-urls'
 
 import { useLimitContext } from './limit-context'
@@ -196,8 +195,8 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
     setPriceInput(
       isBid
-        ? toPlacesString(asks[0]?.price ?? bids[0]?.price ?? '1')
-        : toPlacesString(bids[0]?.price ?? asks[0]?.price ?? '1'),
+        ? asks[0]?.price ?? bids[0]?.price ?? '1'
+        : bids[0]?.price ?? asks[0]?.price ?? '1',
     )
   }, [asks, bids, isBid, setPriceInput])
 
@@ -205,39 +204,18 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   useEffect(() => {
     if (depthClickedIndex && inputCurrency && outputCurrency) {
       if (depthClickedIndex.isBid && bids[depthClickedIndex.index]) {
-        const {
-          normal: {
-            now: { price },
-          },
-        } = getPriceNeighborhood({
-          chainId: selectedChain.id,
-          price: bids[depthClickedIndex.index].price,
-          currency0: inputCurrency,
-          currency1: outputCurrency,
-        })
-        setPriceInput(toPlacesString(price))
+        setPriceInput(bids[depthClickedIndex.index].price)
       } else if (!depthClickedIndex.isBid && asks[depthClickedIndex.index]) {
-        const {
-          normal: {
-            up: { price },
-          },
-        } = getPriceNeighborhood({
-          chainId: selectedChain.id,
-          price: asks[depthClickedIndex.index].price,
-          currency0: inputCurrency,
-          currency1: outputCurrency,
-        })
-        setPriceInput(toPlacesString(price))
+        setPriceInput(asks[depthClickedIndex.index].price)
       }
     }
   }, [
     asks,
     bids,
     depthClickedIndex,
-    setPriceInput,
     inputCurrency,
     outputCurrency,
-    selectedChain.id,
+    setPriceInput,
   ])
 
   const previousValues = useRef({

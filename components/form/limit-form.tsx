@@ -12,7 +12,6 @@ import CurrencySelect from '../selector/currency-select'
 import { Balances } from '../../model/balances'
 import { Prices } from '../../model/prices'
 import CheckIcon from '../icon/check-icon'
-import { toPlacesString } from '../../utils/bignumber'
 
 export const LimitForm = ({
   chainId,
@@ -148,7 +147,7 @@ export const LimitForm = ({
                   currency0: inputCurrency,
                   currency1: outputCurrency,
                 })
-                setPriceInput(toPlacesString(price))
+                setPriceInput(price)
               }
             }}
             className="cursor-pointer group group-hover:ring-1 group-hover:ring-gray-700 flex w-full h-[21px] sm:h-[26px] bg-gray-800 rounded flex-col items-center justify-center gap-1"
@@ -180,7 +179,7 @@ export const LimitForm = ({
                   currency0: inputCurrency,
                   currency1: outputCurrency,
                 })
-                setPriceInput(toPlacesString(price))
+                setPriceInput(price)
               }
             }}
             className="cursor-pointer group group-hover:ring-1 group-hover:ring-gray-700 flex w-full h-[21px] sm:h-[26px] bg-gray-800 rounded flex-col items-center justify-center gap-1"
