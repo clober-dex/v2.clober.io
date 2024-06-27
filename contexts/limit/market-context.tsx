@@ -6,8 +6,8 @@ import { getAddress } from 'viem'
 
 import { isMarketEqual } from '../../utils/market'
 import {
+  calculateInputCurrencyAmountString,
   calculateOutputCurrencyAmountString,
-  calculatePriceInputString,
   isOrderBookEqual,
   parseDepth,
 } from '../../utils/order-book'
@@ -228,7 +228,8 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     if (
       new BigNumber(inputCurrencyAmount).isNaN() ||
       new BigNumber(inputCurrencyAmount).isZero() ||
-      !outputCurrency?.decimals
+      !outputCurrency?.decimals ||
+      !inputCurrency?.decimals
     ) {
       return
     }
@@ -248,17 +249,17 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
         inputCurrencyAmount,
       }
     }
-    // `outputCurrencyAmount` is changed -> `priceInput` will be changed
+    // `outputCurrencyAmount` is changed -> `inputCurrencyAmount` will be changed
     else if (
       previousValues.current.outputCurrencyAmount !== outputCurrencyAmount
     ) {
-      const priceInput = calculatePriceInputString(
+      const inputCurrencyAmount = calculateInputCurrencyAmountString(
         isBid,
-        inputCurrencyAmount,
         outputCurrencyAmount,
-        previousValues.current.priceInput,
+        priceInput,
+        inputCurrency.decimals,
       )
-      setPriceInput(priceInput)
+      setInputCurrencyAmount(inputCurrencyAmount)
       previousValues.current = {
         priceInput,
         outputCurrencyAmount,
@@ -283,13 +284,14 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
       }
     }
   }, [
+    inputCurrency?.decimals,
+    outputCurrency?.decimals,
     inputCurrencyAmount,
     isBid,
-    outputCurrency?.decimals,
     outputCurrencyAmount,
     priceInput,
+    setInputCurrencyAmount,
     setOutputCurrencyAmount,
-    setPriceInput,
   ])
 
   return (
