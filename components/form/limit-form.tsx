@@ -41,6 +41,7 @@ export const LimitForm = ({
   setOutputCurrencyAmount,
   availableOutputCurrencyBalance,
   swapInputCurrencyAndOutputCurrency,
+  minimumDecimalPlaces,
   actionButtonProps,
 }: {
   chainId: number
@@ -69,6 +70,7 @@ export const LimitForm = ({
   setOutputCurrencyAmount: (outputCurrencyAmount: string) => void
   availableOutputCurrencyBalance: bigint
   swapInputCurrencyAndOutputCurrency: () => void
+  minimumDecimalPlaces: number
   actionButtonProps: ActionButtonProps
 }) => {
   return showInputCurrencySelect ? (
@@ -137,7 +139,11 @@ export const LimitForm = ({
         <div className="flex w-[34px] sm:w-11 h-12 sm:h-[60px] flex-col gap-[6px] md:gap-2">
           <button
             onClick={() => {
-              if (inputCurrency && outputCurrency) {
+              if (
+                inputCurrency &&
+                outputCurrency &&
+                !new BigNumber(priceInput).isNaN()
+              ) {
                 const {
                   normal: {
                     up: { price },
@@ -148,7 +154,7 @@ export const LimitForm = ({
                   currency0: inputCurrency,
                   currency1: outputCurrency,
                 })
-                setPriceInput(toPlacesString(price))
+                setPriceInput(toPlacesString(price, minimumDecimalPlaces))
               }
             }}
             className="cursor-pointer group group-hover:ring-1 group-hover:ring-gray-700 flex w-full h-[21px] sm:h-[26px] bg-gray-800 rounded flex-col items-center justify-center gap-1"
@@ -169,7 +175,11 @@ export const LimitForm = ({
           </button>
           <button
             onClick={() => {
-              if (inputCurrency && outputCurrency) {
+              if (
+                inputCurrency &&
+                outputCurrency &&
+                !new BigNumber(priceInput).isNaN()
+              ) {
                 const {
                   normal: {
                     now: { price },
@@ -180,7 +190,7 @@ export const LimitForm = ({
                   currency0: inputCurrency,
                   currency1: outputCurrency,
                 })
-                setPriceInput(toPlacesString(price))
+                setPriceInput(toPlacesString(price, minimumDecimalPlaces))
               }
             }}
             className="cursor-pointer group group-hover:ring-1 group-hover:ring-gray-700 flex w-full h-[21px] sm:h-[26px] bg-gray-800 rounded flex-col items-center justify-center gap-1"
