@@ -73,6 +73,16 @@ export const LimitForm = ({
   minimumDecimalPlaces: number
   actionButtonProps: ActionButtonProps
 }) => {
+  const minimumPrice = toPlacesString(
+    new BigNumber(0.1).pow(minimumDecimalPlaces).toString(),
+    minimumDecimalPlaces,
+    BigNumber.ROUND_CEIL,
+  )
+  const maximumPrice = toPlacesString(
+    '8662020672688495886265',
+    minimumDecimalPlaces,
+    BigNumber.ROUND_FLOOR,
+  )
   return showInputCurrencySelect ? (
     <CurrencySelect
       chainId={chainId}
@@ -145,11 +155,10 @@ export const LimitForm = ({
                 outputCurrency &&
                 !new BigNumber(priceInput).isNaN()
               ) {
-                const minimumPrice = toPlacesString(
-                  new BigNumber(0.1).pow(minimumDecimalPlaces).toString(),
-                  minimumDecimalPlaces,
-                  BigNumber.ROUND_CEIL,
-                )
+                if (new BigNumber(priceInput).gte(maximumPrice)) {
+                  setPriceInput('')
+                  return
+                }
                 const {
                   normal: {
                     now: { tick },
@@ -209,11 +218,10 @@ export const LimitForm = ({
                 outputCurrency &&
                 !new BigNumber(priceInput).isNaN()
               ) {
-                const minimumPrice = toPlacesString(
-                  new BigNumber(0.1).pow(minimumDecimalPlaces).toString(),
-                  minimumDecimalPlaces,
-                  BigNumber.ROUND_CEIL,
-                )
+                if (new BigNumber(priceInput).gte(maximumPrice)) {
+                  setPriceInput('')
+                  return
+                }
                 const {
                   normal: {
                     now: { tick },
