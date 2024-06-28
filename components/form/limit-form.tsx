@@ -2,7 +2,6 @@ import React from 'react'
 import { getAddress, isAddressEqual } from 'viem'
 import { getMarketPrice, getPriceNeighborhood, Market } from '@clober/v2-sdk'
 import BigNumber from 'bignumber.js'
-import next from 'ajv/lib/vocabularies/next'
 
 import NumberInput from '../input/number-input'
 import CurrencyAmountInput from '../input/currency-amount-input'
