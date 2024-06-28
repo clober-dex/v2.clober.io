@@ -1,7 +1,8 @@
 import React from 'react'
 import { getAddress, isAddressEqual } from 'viem'
-import { getPriceNeighborhood, Market } from '@clober/v2-sdk'
+import { getMarketPrice, getPriceNeighborhood, Market } from '@clober/v2-sdk'
 import BigNumber from 'bignumber.js'
+import next from 'ajv/lib/vocabularies/next'
 
 import NumberInput from '../input/number-input'
 import CurrencyAmountInput from '../input/currency-amount-input'
@@ -140,21 +141,49 @@ export const LimitForm = ({
           <button
             onClick={() => {
               if (
+                selectedMarket &&
                 inputCurrency &&
                 outputCurrency &&
                 !new BigNumber(priceInput).isNaN()
               ) {
+                const minimumPrice = toPlacesString(
+                  new BigNumber(0.1).pow(minimumDecimalPlaces).toString(),
+                  minimumDecimalPlaces,
+                  BigNumber.ROUND_CEIL,
+                )
                 const {
                   normal: {
-                    up: { price },
+                    now: { tick },
                   },
                 } = getPriceNeighborhood({
                   chainId,
-                  price: new BigNumber(priceInput).times(1.00001).toString(),
+                  price: priceInput,
                   currency0: inputCurrency,
                   currency1: outputCurrency,
                 })
-                setPriceInput(toPlacesString(price, minimumDecimalPlaces))
+                let currentTick = tick
+                // eslint-disable-next-line no-constant-condition
+                while (true) {
+                  const price = getMarketPrice({
+                    marketQuoteCurrency: selectedMarket.quote,
+                    marketBaseCurrency: selectedMarket.base,
+                    bidTick: currentTick,
+                  })
+                  const nextPrice = toPlacesString(
+                    price,
+                    minimumDecimalPlaces,
+                    BigNumber.ROUND_CEIL,
+                  )
+                  if (new BigNumber(nextPrice).lt(minimumPrice)) {
+                    setPriceInput(minimumPrice)
+                    break
+                  }
+                  if (new BigNumber(nextPrice).gt(priceInput)) {
+                    setPriceInput(nextPrice)
+                    break
+                  }
+                  currentTick = currentTick + 1n
+                }
               }
             }}
             className="cursor-pointer group group-hover:ring-1 group-hover:ring-gray-700 flex w-full h-[21px] sm:h-[26px] bg-gray-800 rounded flex-col items-center justify-center gap-1"
@@ -176,21 +205,49 @@ export const LimitForm = ({
           <button
             onClick={() => {
               if (
+                selectedMarket &&
                 inputCurrency &&
                 outputCurrency &&
                 !new BigNumber(priceInput).isNaN()
               ) {
+                const minimumPrice = toPlacesString(
+                  new BigNumber(0.1).pow(minimumDecimalPlaces).toString(),
+                  minimumDecimalPlaces,
+                  BigNumber.ROUND_CEIL,
+                )
                 const {
                   normal: {
-                    now: { price },
+                    now: { tick },
                   },
                 } = getPriceNeighborhood({
                   chainId,
-                  price: new BigNumber(priceInput).times(0.99999).toString(),
+                  price: priceInput,
                   currency0: inputCurrency,
                   currency1: outputCurrency,
                 })
-                setPriceInput(toPlacesString(price, minimumDecimalPlaces))
+                let currentTick = tick
+                // eslint-disable-next-line no-constant-condition
+                while (true) {
+                  const price = getMarketPrice({
+                    marketQuoteCurrency: selectedMarket.quote,
+                    marketBaseCurrency: selectedMarket.base,
+                    bidTick: currentTick,
+                  })
+                  const nextPrice = toPlacesString(
+                    price,
+                    minimumDecimalPlaces,
+                    BigNumber.ROUND_CEIL,
+                  )
+                  if (new BigNumber(nextPrice).lte(minimumPrice)) {
+                    setPriceInput(minimumPrice)
+                    break
+                  }
+                  if (new BigNumber(nextPrice).lt(priceInput)) {
+                    setPriceInput(nextPrice)
+                    break
+                  }
+                  currentTick = currentTick - 1n
+                }
               }
             }}
             className="cursor-pointer group group-hover:ring-1 group-hover:ring-gray-700 flex w-full h-[21px] sm:h-[26px] bg-gray-800 rounded flex-col items-center justify-center gap-1"

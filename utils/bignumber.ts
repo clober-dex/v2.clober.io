@@ -18,6 +18,10 @@ export const findFirstNonZeroIndex = (number: BigNumber.Value): number => {
   return i
 }
 
-export const toPlacesString = (number: BigNumber.Value, places: number = 4) => {
-  return new BigNumber(number).toFixed(places, BigNumber.ROUND_FLOOR)
+export const toPlacesString = (
+  number: BigNumber.Value,
+  places: number = 4,
+  roundingMode: BigNumber.RoundingMode = BigNumber.ROUND_FLOOR,
+): string => {
+  return new BigNumber(number).toFixed(places, roundingMode)
 }
