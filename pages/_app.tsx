@@ -145,7 +145,6 @@ const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
 function App({ Component, pageProps }: AppProps) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
-  console.log(router.pathname)
   return (
     <>
       <ErrorBoundary>
