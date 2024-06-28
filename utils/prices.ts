@@ -7,5 +7,5 @@ export const getPriceDecimals = (price: number, r: number = 1.0001) => {
   const priceDiff = new BigNumber(r)
     .multipliedBy(priceNumber)
     .minus(priceNumber)
-  return findFirstNonZeroIndex(priceDiff) + 1
+  return findFirstNonZeroIndex(priceDiff)
 }
