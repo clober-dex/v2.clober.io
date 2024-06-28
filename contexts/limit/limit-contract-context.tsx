@@ -130,8 +130,11 @@ export const LimitContractProvider = ({
             erc20PermitParam,
             postOnly,
             rpcUrl: RPC_URL[selectedChain.id],
+            roundingDownTakenBid: true,
+            roundingDownMakeAsk: true,
           },
         })
+        console.log('limitOrder result: ', result)
 
         setConfirmation({
           title: `Place Order`,
