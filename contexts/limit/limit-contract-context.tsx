@@ -1,16 +1,14 @@
 import React, { useCallback } from 'react'
 import { useQueryClient, useWalletClient } from 'wagmi'
-import { isAddressEqual, parseUnits, zeroAddress } from 'viem'
+import { isAddressEqual, zeroAddress } from 'viem'
 import {
   cancelOrders,
   claimOrders,
-  CurrencyFlow,
   limitOrder,
   openMarket,
   OpenOrder,
   signERC20Permit,
 } from '@clober/v2-sdk'
-import BigNumber from 'bignumber.js'
 
 import { useChainContext } from '../chain-context'
 import { Currency } from '../../model/currency'
