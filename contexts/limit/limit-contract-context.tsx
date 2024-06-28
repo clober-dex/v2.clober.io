@@ -1,16 +1,14 @@
 import React, { useCallback } from 'react'
 import { useQueryClient, useWalletClient } from 'wagmi'
-import { isAddressEqual, parseUnits, zeroAddress } from 'viem'
+import { isAddressEqual, zeroAddress } from 'viem'
 import {
   cancelOrders,
   claimOrders,
-  CurrencyFlow,
   limitOrder,
   openMarket,
   OpenOrder,
   signERC20Permit,
 } from '@clober/v2-sdk'
-import BigNumber from 'bignumber.js'
 
 import { useChainContext } from '../chain-context'
 import { Currency } from '../../model/currency'
@@ -119,7 +117,7 @@ export const LimitContractProvider = ({
           })
           await approve20(walletClient, inputCurrency, amount)
         }
-        const { transaction, result } = await limitOrder({
+        const args = {
           chainId: selectedChain.id,
           userAddress: walletClient.account.address,
           inputToken: inputCurrency.address,
@@ -130,40 +128,49 @@ export const LimitContractProvider = ({
             erc20PermitParam,
             postOnly,
             rpcUrl: RPC_URL[selectedChain.id],
+            roundingDownTakenBid: true,
+            roundingDownMakeAsk: true,
           },
-        })
+        }
+        const { transaction, result } = await limitOrder(args)
+        console.log('limitOrder request: ', args)
+        console.log('limitOrder result: ', result)
 
-        setConfirmation({
-          title: `Place Order`,
-          body: 'Please confirm in your wallet.',
-          fields: [result.make, result.taken, result.spent]
-            .reduce((acc, currencyFlow) => {
-              const index = acc.findIndex(
-                (cf) =>
-                  cf.currency.address === currencyFlow.currency.address &&
-                  cf.direction === currencyFlow.direction,
-              )
-              if (index === -1) {
-                acc.push(currencyFlow)
-              } else {
-                acc[index].amount = new BigNumber(acc[index].amount)
-                  .plus(currencyFlow.amount)
-                  .toString()
-              }
-              return acc
-            }, [] as CurrencyFlow[])
-            .filter(
-              ({ amount, currency }) =>
-                parseUnits(amount, currency.decimals) > 0n,
-            )
-            .map(({ amount, currency, direction }) => ({
-              currency,
-              label: currency.symbol,
-              value: toPlacesString(amount),
-              direction,
-            })) as Confirmation['fields'],
-        })
-
+        if (Number(result.spent.amount) === 0) {
+          setConfirmation({
+            title: `Place Order`,
+            body: 'Please confirm in your wallet.',
+            fields: [
+              {
+                direction: result.make.direction,
+                currency: result.make.currency,
+                label: result.make.currency.symbol,
+                value: toPlacesString(result.make.amount),
+              },
+            ] as Confirmation['fields'],
+          })
+        } else {
+          setConfirmation({
+            title: `Place Order`,
+            body: 'Please confirm in your wallet.',
+            fields: [
+              {
+                direction: result.make.direction,
+                currency: result.make.currency,
+                label: result.make.currency.symbol,
+                value: toPlacesString(
+                  Number(result.make.amount) + Number(result.spent.amount),
+                ),
+              },
+              {
+                direction: result.taken.direction,
+                currency: result.taken.currency,
+                label: result.taken.currency.symbol,
+                value: toPlacesString(result.taken.amount),
+              },
+            ] as Confirmation['fields'],
+          })
+        }
         await sendTransaction(walletClient, transaction)
       } catch (e) {
         console.error(e)

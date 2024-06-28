@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { getMarket, Market, getPriceNeighborhood } from '@clober/v2-sdk'
+import { getMarket, Market } from '@clober/v2-sdk'
 import { useQuery } from 'wagmi'
 import BigNumber from 'bignumber.js'
 import { getAddress } from 'viem'
@@ -141,7 +141,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
   const availableDecimalPlacesGroups = useMemo(() => {
     const availableDecimalPlacesGroups = selectedMarket
-      ? (Array.from(Array(4).keys())
+      ? (Array.from(Array(DEFAULT_DECIMAL_PLACES_GROUPS.length).keys())
           .map((i) => {
             const minPrice = Math.min(
               Number(
@@ -192,44 +192,41 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   // When depth is changed
   useEffect(() => {
     setDepthClickedIndex(undefined)
+    const minimumDecimalPlaces = availableDecimalPlacesGroups[0].value
 
     setPriceInput(
-      isBid
-        ? toPlacesString(asks[0]?.price ?? bids[0]?.price ?? '1')
-        : toPlacesString(bids[0]?.price ?? asks[0]?.price ?? '1'),
+      toPlacesString(
+        isBid
+          ? asks[0]?.price ?? bids[0]?.price ?? '1'
+          : bids[0]?.price ?? asks[0]?.price ?? '1',
+        minimumDecimalPlaces,
+      ),
     )
-  }, [asks, bids, isBid, setPriceInput])
+  }, [asks, availableDecimalPlacesGroups, bids, isBid, setPriceInput])
 
   // When depthClickedIndex is changed, reset the priceInput
   useEffect(() => {
+    const minimumDecimalPlaces = availableDecimalPlacesGroups[0].value
+
     if (depthClickedIndex && inputCurrency && outputCurrency) {
       if (depthClickedIndex.isBid && bids[depthClickedIndex.index]) {
-        const {
-          normal: {
-            now: { price },
-          },
-        } = getPriceNeighborhood({
-          chainId: selectedChain.id,
-          price: bids[depthClickedIndex.index].price,
-          currency0: inputCurrency,
-          currency1: outputCurrency,
-        })
-        setPriceInput(toPlacesString(price))
+        setPriceInput(
+          toPlacesString(
+            bids[depthClickedIndex.index].price,
+            minimumDecimalPlaces,
+          ),
+        )
       } else if (!depthClickedIndex.isBid && asks[depthClickedIndex.index]) {
-        const {
-          normal: {
-            up: { price },
-          },
-        } = getPriceNeighborhood({
-          chainId: selectedChain.id,
-          price: asks[depthClickedIndex.index].price,
-          currency0: inputCurrency,
-          currency1: outputCurrency,
-        })
-        setPriceInput(toPlacesString(price))
+        setPriceInput(
+          toPlacesString(
+            asks[depthClickedIndex.index].price,
+            minimumDecimalPlaces,
+          ),
+        )
       }
     }
   }, [
+    availableDecimalPlacesGroups,
     asks,
     bids,
     depthClickedIndex,

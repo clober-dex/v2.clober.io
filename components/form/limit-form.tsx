@@ -1,6 +1,6 @@
 import React from 'react'
 import { getAddress, isAddressEqual } from 'viem'
-import { getPriceNeighborhood, Market } from '@clober/v2-sdk'
+import { getMarketPrice, getPriceNeighborhood, Market } from '@clober/v2-sdk'
 import BigNumber from 'bignumber.js'
 
 import NumberInput from '../input/number-input'
@@ -41,6 +41,7 @@ export const LimitForm = ({
   setOutputCurrencyAmount,
   availableOutputCurrencyBalance,
   swapInputCurrencyAndOutputCurrency,
+  minimumDecimalPlaces,
   actionButtonProps,
 }: {
   chainId: number
@@ -69,8 +70,19 @@ export const LimitForm = ({
   setOutputCurrencyAmount: (outputCurrencyAmount: string) => void
   availableOutputCurrencyBalance: bigint
   swapInputCurrencyAndOutputCurrency: () => void
+  minimumDecimalPlaces: number
   actionButtonProps: ActionButtonProps
 }) => {
+  const minimumPrice = toPlacesString(
+    new BigNumber(0.1).pow(minimumDecimalPlaces).toString(),
+    minimumDecimalPlaces,
+    BigNumber.ROUND_CEIL,
+  )
+  const maximumPrice = toPlacesString(
+    '8662020672688495886265',
+    minimumDecimalPlaces,
+    BigNumber.ROUND_FLOOR,
+  )
   return showInputCurrencySelect ? (
     <CurrencySelect
       chainId={chainId}
@@ -129,6 +141,9 @@ export const LimitForm = ({
             {isBid ? 'Buy' : 'Sell'} {selectedMarket?.base.symbol} at rate
           </div>
           <NumberInput
+            onBlur={() => {
+              setPriceInput(toPlacesString(priceInput, minimumDecimalPlaces))
+            }}
             value={priceInput}
             onValueChange={setPriceInput}
             className="text-xl w-full sm:text-2xl bg-transparent placeholder-gray-500 text-white outline-none"
@@ -137,18 +152,49 @@ export const LimitForm = ({
         <div className="flex w-[34px] sm:w-11 h-12 sm:h-[60px] flex-col gap-[6px] md:gap-2">
           <button
             onClick={() => {
-              if (inputCurrency && outputCurrency) {
+              if (
+                selectedMarket &&
+                inputCurrency &&
+                outputCurrency &&
+                !new BigNumber(priceInput).isNaN()
+              ) {
+                if (new BigNumber(priceInput).gte(maximumPrice)) {
+                  setPriceInput('')
+                  return
+                }
                 const {
                   normal: {
-                    up: { price },
+                    now: { tick },
                   },
                 } = getPriceNeighborhood({
                   chainId,
-                  price: new BigNumber(priceInput).times(1.00001).toString(),
+                  price: priceInput,
                   currency0: inputCurrency,
                   currency1: outputCurrency,
                 })
-                setPriceInput(toPlacesString(price))
+                let currentTick = tick
+                // eslint-disable-next-line no-constant-condition
+                while (true) {
+                  const price = getMarketPrice({
+                    marketQuoteCurrency: selectedMarket.quote,
+                    marketBaseCurrency: selectedMarket.base,
+                    bidTick: currentTick,
+                  })
+                  const nextPrice = toPlacesString(
+                    price,
+                    minimumDecimalPlaces,
+                    BigNumber.ROUND_CEIL,
+                  )
+                  if (new BigNumber(nextPrice).lt(minimumPrice)) {
+                    setPriceInput(minimumPrice)
+                    break
+                  }
+                  if (new BigNumber(nextPrice).gt(priceInput)) {
+                    setPriceInput(nextPrice)
+                    break
+                  }
+                  currentTick = currentTick + 1n
+                }
               }
             }}
             className="cursor-pointer group group-hover:ring-1 group-hover:ring-gray-700 flex w-full h-[21px] sm:h-[26px] bg-gray-800 rounded flex-col items-center justify-center gap-1"
@@ -169,18 +215,49 @@ export const LimitForm = ({
           </button>
           <button
             onClick={() => {
-              if (inputCurrency && outputCurrency) {
+              if (
+                selectedMarket &&
+                inputCurrency &&
+                outputCurrency &&
+                !new BigNumber(priceInput).isNaN()
+              ) {
+                if (new BigNumber(priceInput).gte(maximumPrice)) {
+                  setPriceInput('')
+                  return
+                }
                 const {
                   normal: {
-                    now: { price },
+                    now: { tick },
                   },
                 } = getPriceNeighborhood({
                   chainId,
-                  price: new BigNumber(priceInput).times(0.99999).toString(),
+                  price: priceInput,
                   currency0: inputCurrency,
                   currency1: outputCurrency,
                 })
-                setPriceInput(toPlacesString(price))
+                let currentTick = tick
+                // eslint-disable-next-line no-constant-condition
+                while (true) {
+                  const price = getMarketPrice({
+                    marketQuoteCurrency: selectedMarket.quote,
+                    marketBaseCurrency: selectedMarket.base,
+                    bidTick: currentTick,
+                  })
+                  const nextPrice = toPlacesString(
+                    price,
+                    minimumDecimalPlaces,
+                    BigNumber.ROUND_CEIL,
+                  )
+                  if (new BigNumber(nextPrice).lte(minimumPrice)) {
+                    setPriceInput(minimumPrice)
+                    break
+                  }
+                  if (new BigNumber(nextPrice).lt(priceInput)) {
+                    setPriceInput(nextPrice)
+                    break
+                  }
+                  currentTick = currentTick - 1n
+                }
               }
             }}
             className="cursor-pointer group group-hover:ring-1 group-hover:ring-gray-700 flex w-full h-[21px] sm:h-[26px] bg-gray-800 rounded flex-col items-center justify-center gap-1"

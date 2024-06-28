@@ -29,5 +29,4 @@ export const AGGREGATORS: {
       findSupportChain(CHAIN_IDS.ZKSYNC.valueOf())!,
     ),
   ],
-  [CHAIN_IDS.ZKSYNC_SEPOLIA]: [],
 }

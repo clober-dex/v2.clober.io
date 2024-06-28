@@ -56,20 +56,6 @@ export const WHITELISTED_CURRENCIES: {
   ],
   [CHAIN_IDS.BASE]: [],
   [CHAIN_IDS.ZKSYNC]: [],
-  [CHAIN_IDS.ZKSYNC_SEPOLIA]: [
-    {
-      address: '0x1d32dcf2d957c9973a00d53641aeeb8d671df865',
-      name: 'MockToken',
-      symbol: 'TEST',
-      decimals: 18,
-    },
-    {
-      address: '0xe6b14f66a3ad92edd45960afd1d932fbb7f92d21',
-      name: 'MockUSDT',
-      symbol: 'USDT',
-      decimals: 6,
-    },
-  ],
 }
 
 export const DEFAULT_INPUT_CURRENCY: {
@@ -89,7 +75,6 @@ export const DEFAULT_INPUT_CURRENCY: {
     decimals: 6,
   },
   [CHAIN_IDS.ZKSYNC]: ETH,
-  [CHAIN_IDS.ZKSYNC_SEPOLIA]: ETH,
 }
 
 export const DEFAULT_OUTPUT_CURRENCY: {
@@ -117,12 +102,6 @@ export const DEFAULT_OUTPUT_CURRENCY: {
     address: '0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4',
     name: 'USD Coin',
     symbol: 'USDC',
-    decimals: 6,
-  },
-  [CHAIN_IDS.ZKSYNC_SEPOLIA]: {
-    address: '0xe6b14f66a3ad92edd45960afd1d932fbb7f92d21',
-    name: 'MockUSDT',
-    symbol: 'USDT',
     decimals: 6,
   },
 }

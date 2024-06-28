@@ -65,7 +65,7 @@ export function parseDepth(
           const price = new BigNumber(curr.price)
           const key = new BigNumber(price).toFixed(
             decimalPlaces.value,
-            BigNumber.ROUND_FLOOR,
+            BigNumber.ROUND_CEIL,
           )
           prev.set(
             key,

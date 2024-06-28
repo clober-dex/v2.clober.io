@@ -9,5 +9,4 @@ export const RPC_URL: {
   [CHAIN_IDS.BERACHAIN_TESTNET]: 'https://artio.rpc.berachain.com',
   [CHAIN_IDS.BASE]: `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
   [CHAIN_IDS.ZKSYNC]: `https://zksync-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-  [CHAIN_IDS.ZKSYNC_SEPOLIA]: `https://zksync-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
 }
