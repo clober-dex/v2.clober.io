@@ -87,10 +87,10 @@ export const DEFAULT_OUTPUT_CURRENCY: {
     decimals: 6,
   },
   [CHAIN_IDS.BERACHAIN_TESTNET]: {
-    address: '0x7588AFc469d95300C2206Bf8a6Ee9bf5d2719314',
-    name: 'MockUSDT',
-    symbol: 'USDT',
-    decimals: 6,
+    address: '0x7EeCA4205fF31f947EdBd49195a7A88E6A91161B',
+    name: 'Honey',
+    symbol: 'HONEY',
+    decimals: 18,
   },
   [CHAIN_IDS.BASE]: {
     address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
