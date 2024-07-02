@@ -32,53 +32,50 @@ export default function PathVizViewer({
 }: {
   pathVizData?: PathViz
 }) {
-  return (
+  return pathVizData ? (
     <ReactFlowProvider>
       <_PathViz
-        pathVizData={
-          pathVizData
-            ? {
-                nodes: pathVizData.nodes,
-                links: pathVizData.links
-                  .reduce(
-                    (acc, link) => {
-                      const existingLink = acc.find(
-                        (l) =>
-                          l.source === link.source &&
-                          l.target === link.target &&
-                          l.label === link.label,
-                      )
-                      if (existingLink) {
-                        existingLink.in_value =
-                          existingLink.in_value + link.in_value
-                        existingLink.out_value =
-                          existingLink.out_value + link.out_value
-                        existingLink.nextValue =
-                          existingLink.nextValue + link.nextValue
-                        existingLink.stepValue =
-                          existingLink.stepValue + link.stepValue
-                        existingLink.value = existingLink.value + link.value
-                      } else {
-                        acc.push(link)
-                      }
-                      return acc
-                    },
-                    [] as PathViz['links'],
-                  )
-                  .sort((a, b) =>
-                    a.source === b.source
-                      ? a.target - b.target
-                      : a.source - b.source,
-                  ),
-              }
-            : undefined
-        }
+        pathVizData={{
+          nodes: pathVizData.nodes,
+          links: pathVizData.links
+            .reduce(
+              (acc, link) => {
+                const existingLink = acc.find(
+                  (l) =>
+                    l.source === link.source &&
+                    l.target === link.target &&
+                    l.label === link.label,
+                )
+                if (existingLink) {
+                  existingLink.in_value = existingLink.in_value + link.in_value
+                  existingLink.out_value =
+                    existingLink.out_value + link.out_value
+                  existingLink.nextValue =
+                    existingLink.nextValue + link.nextValue
+                  existingLink.stepValue =
+                    existingLink.stepValue + link.stepValue
+                  existingLink.value = existingLink.value + link.value
+                } else {
+                  acc.push(link)
+                }
+                return acc
+              },
+              [] as PathViz['links'],
+            )
+            .sort((a, b) =>
+              a.source === b.source ? a.target - b.target : a.source - b.source,
+            ),
+        }}
       />
     </ReactFlowProvider>
+  ) : (
+    <div
+      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[504px]`}
+    ></div>
   )
 }
 
-const _PathViz = ({ pathVizData }: { pathVizData?: PathViz }) => {
+const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
   const instance = useReactFlow()
 
   const [hoveredNode, setHoveredNode] = useState<null | NodeType>(null)
