@@ -11,9 +11,9 @@
 }
 
 .react-flow__handle-left {
-    display: none !important;
+    background: none !important;
 }
 
 .react-flow__handle-right {
-    display: none !important;
+    background: none !important;
 }
