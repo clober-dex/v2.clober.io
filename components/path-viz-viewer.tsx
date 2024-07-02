@@ -349,14 +349,14 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
             </div>
           )}
       </ReactFlow>
-      <div className="absolute hidden bottom-2 lg:grid grid-cols-3 text-white text-xs">
+      <div className="absolute hidden bottom-3 lg:grid grid-cols-3 text-white text-xs">
         {Object.values(dexNames)
           .reduce((acc, v) => {
             return acc.concat(v)
           }, [])
           .filter((v, i, a) => a.indexOf(v) === i)
           .map((v, i) => (
-            <div key={i} className="flex items-center gap-2 pr-4">
+            <div key={i} className="flex items-center gap-2 pt-0.5 pr-4">
               <div
                 className="w-2 h-2 rounded-full"
                 style={{ backgroundColor: stringToColor(v) }}
