@@ -72,7 +72,7 @@ export default function PathVizViewer({
     </ReactFlowProvider>
   ) : (
     <div
-      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[600px]`}
+      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] h-full w-full md:w-[480px] lg:w-[600px]`}
     ></div>
   )
 }
@@ -252,15 +252,6 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
           </div>
         </div>
 
-        <div className="absolute top-full left-2 right-2 mt-0.5 flex flex-wrap items-center gap-0.5">
-          {targetConnected.map((x, i) => (
-            <div
-              key={`${i}`}
-              className="w-1 h-1 rounded-full"
-              style={{ background: stringToColor(x.label) }}
-            />
-          ))}
-        </div>
         {targetHandle && <Handle type="target" position={Position.Left} />}
         {sourceHandle && <Handle type="source" position={Position.Right} />}
       </div>
@@ -277,7 +268,7 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
 
   return (
     <div
-      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[600px]`}
+      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] h-full w-full md:w-[480px] lg:w-[600px]`}
     >
       <ReactFlow
         nodeTypes={{
@@ -304,7 +295,7 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
               nodes[parseInt(hoveredNode.id)].data.symbol
           ) &&
           nodes[parseInt(hoveredNode.id)]?.data.targetConnected.length > 0 && (
-            <div className="absolute left-0 top-0 p-3 z-50 bg-gray-950 bg-opacity-90 overflow-hidden rounded-br-xl pointer-events-none">
+            <div className="z-[10000] absolute left-0 top-0 p-3 bg-gray-950 bg-opacity-90 overflow-hidden rounded-br-xl pointer-events-none">
               <div className="flex flex-col gap-2">
                 {nodes[parseInt(hoveredNode.id)].data.targetConnected.map(
                   (x, i) => {
@@ -348,23 +339,23 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
               </div>
             </div>
           )}
+        <div className="z-[1000] absolute hidden bottom-0 left-1 lg:grid grid-cols-2 text-white text-xs">
+          {Object.values(dexNames)
+            .reduce((acc, v) => {
+              return acc.concat(v)
+            }, [])
+            .filter((v, i, a) => a.indexOf(v) === i)
+            .map((v, i) => (
+              <div key={i} className="flex items-center gap-2 pt-0.5 pr-4">
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: stringToColor(v) }}
+                />
+                {v}
+              </div>
+            ))}
+        </div>
       </ReactFlow>
-      <div className="absolute hidden bottom-3 lg:grid grid-cols-2 text-white text-xs">
-        {Object.values(dexNames)
-          .reduce((acc, v) => {
-            return acc.concat(v)
-          }, [])
-          .filter((v, i, a) => a.indexOf(v) === i)
-          .map((v, i) => (
-            <div key={i} className="flex items-center gap-2 pt-0.5 pr-4">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: stringToColor(v) }}
-              />
-              {v}
-            </div>
-          ))}
-      </div>
     </div>
   )
 }
