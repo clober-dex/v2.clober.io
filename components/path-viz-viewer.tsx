@@ -78,7 +78,6 @@ export default function PathVizViewer({
 }
 
 const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
-  console.log('pathVizData', pathVizData)
   const instance = useReactFlow()
 
   const [hoveredNode, setHoveredNode] = useState<null | NodeType>(null)
@@ -277,6 +276,14 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
     )
   }
 
+  const uniqueSourceSymbols =
+    hoveredNode &&
+    nodes[parseInt(hoveredNode.id)]?.data.targetConnected.length > 0
+      ? nodes[parseInt(hoveredNode.id)].data.targetConnected
+          .map((x) => x.sourceToken.symbol)
+          .filter((v, i, a) => a.indexOf(v) === i)
+      : []
+
   return (
     <div
       className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[800px]`}
@@ -300,6 +307,11 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
         fitView
       >
         {hoveredNode &&
+          !(
+            uniqueSourceSymbols.length === 1 &&
+            uniqueSourceSymbols[0] ===
+              nodes[parseInt(hoveredNode.id)].data.symbol
+          ) &&
           nodes[parseInt(hoveredNode.id)]?.data.targetConnected.length > 0 && (
             <div className="absolute left-0 top-0 p-3 z-50 bg-gray-950 bg-opacity-90 overflow-hidden rounded-br-xl pointer-events-none">
               <div className="flex flex-col gap-2">
