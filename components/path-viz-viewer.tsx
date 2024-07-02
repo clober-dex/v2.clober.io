@@ -339,7 +339,7 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
               </div>
             </div>
           )}
-        <div className="z-[1000] absolute hidden bottom-0 left-1 lg:grid grid-cols-2 text-white text-xs">
+        <div className="z-[1000] absolute hidden bottom-0 left-1 lg:grid grid-cols-1 text-white text-xs">
           {Object.values(dexNames)
             .reduce((acc, v) => {
               return acc.concat(v)

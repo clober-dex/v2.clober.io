@@ -78,7 +78,7 @@ export const SwapContainer = () => {
     <div className="flex flex-col w-fit mb-4 sm:mb-6">
       <div className="flex flex-col gap-3">
         <div className="flex flex-col w-full lg:flex-row gap-4">
-          <div className="flex flex-col rounded-2xl bg-gray-900 p-6 sm:w-[528px] lg:w-[480px]">
+          <div className="flex flex-col rounded-2xl bg-gray-900 p-6 min-h-[280px] h-[392px] sm:w-[528px] lg:w-[480px]">
             <SwapForm
               chainId={selectedChain.id}
               currencies={currencies}
