@@ -72,7 +72,7 @@ export default function PathVizViewer({
     </ReactFlowProvider>
   ) : (
     <div
-      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[800px]`}
+      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[600px]`}
     ></div>
   )
 }
@@ -225,16 +225,7 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
       sourceHandle: boolean
     }
   }) => {
-    const uniqueSourceSymbols = targetConnected
-      .map((x) => x.sourceToken.symbol)
-      .filter((v, i, a) => a.indexOf(v) === i)
-    return uniqueSourceSymbols.length === 1 &&
-      uniqueSourceSymbols[0] === symbol ? (
-      <div className="flex items-center p-1 bg-gray-700 rounded-full gap-2">
-        {targetHandle && <Handle type="target" position={Position.Left} />}
-        {sourceHandle && <Handle type="source" position={Position.Right} />}
-      </div>
-    ) : (
+    return (
       <div
         className="flex items-center p-1 lg:px-2 bg-gray-700 rounded-full gap-2"
         data-tooltip-id={id}
@@ -286,7 +277,7 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
 
   return (
     <div
-      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[800px]`}
+      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[600px]`}
     >
       <ReactFlow
         nodeTypes={{
@@ -358,6 +349,22 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
             </div>
           )}
       </ReactFlow>
+      <div className="absolute hidden bottom-2 lg:grid grid-cols-3 text-white text-xs">
+        {Object.values(dexNames)
+          .reduce((acc, v) => {
+            return acc.concat(v)
+          }, [])
+          .filter((v, i, a) => a.indexOf(v) === i)
+          .map((v, i) => (
+            <div key={i} className="flex items-center gap-2 pr-4">
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: stringToColor(v) }}
+              />
+              {v}
+            </div>
+          ))}
+      </div>
     </div>
   )
 }

@@ -152,7 +152,7 @@ export const SwapContainer = () => {
               }}
             />
           </div>
-          <div className="flex flex-col rounded-2xl bg-gray-900 p-6">
+          <div className="relative flex flex-col rounded-2xl bg-gray-900 p-6">
             <PathVizViewer pathVizData={data?.pathViz} />
           </div>
         </div>
