@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import ReactFlow, {
+  BaseEdge,
+  getSimpleBezierPath,
   Handle,
   Node as NodeType,
   Position,
@@ -70,29 +72,44 @@ export default function PathVizViewer({
     </ReactFlowProvider>
   ) : (
     <div
-      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[504px]`}
+      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[800px]`}
     ></div>
   )
 }
 
 const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
+  console.log('pathVizData', pathVizData)
   const instance = useReactFlow()
 
   const [hoveredNode, setHoveredNode] = useState<null | NodeType>(null)
+  const numberOfEdge: { [key: string]: number } =
+    pathVizData.links.reduce(
+      (acc, l) => {
+        acc[`${l.source}-${l.target}`] = pathVizData.links.filter(
+          (ll) => ll.target === l.target && ll.source === l.source,
+        ).length
+        return acc
+      },
+      {} as { [key: string]: number },
+    ) ?? ({} as { [key: string]: number })
+  const dexNames: { [key: string]: string[] } = pathVizData.links.reduce(
+    (acc, l) => {
+      const key = `${l.source}-${l.target}`
+      if (acc[key]) {
+        acc[key].push(l.label)
+      } else {
+        acc[key] = [l.label]
+      }
+      return acc
+    },
+    {} as { [key: string]: string[] },
+  )
 
   useEffect(() => {
     setTimeout(() => {
       instance.fitView({})
     }, 0)
   }, [instance, pathVizData])
-
-  if (!pathVizData || !pathVizData.nodes) {
-    return (
-      <div
-        className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[504px]`}
-      ></div>
-    )
-  }
 
   const nodes = pathVizData.nodes.map((n, i) => {
     const id = i.toString()
@@ -122,6 +139,7 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
 
     return {
       data: l,
+      type: 'custom',
       label: '',
       id: i.toString(),
       source: l.source.toString(),
@@ -149,12 +167,128 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
       })
   })
 
+  const Edge = ({
+    id,
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+    target,
+    source,
+  }: {
+    id: string
+    sourceX: number
+    sourceY: number
+    targetX: number
+    targetY: number
+    target: number
+    source: number
+  }) => {
+    const length = numberOfEdge[`${source}-${target}`]
+    return (
+      <>
+        {Array.from({ length }).map((_, i) => (
+          <BaseEdge
+            style={{
+              stroke: stringToColor(dexNames[`${source}-${target}`][i]),
+            }}
+            key={`${id}-${i}`}
+            id={id}
+            path={
+              getSimpleBezierPath({
+                sourceX,
+                sourceY: sourceY + (i - Math.floor(length / 2)) * (18 / length),
+                targetX,
+                targetY,
+              })[0]
+            }
+          />
+        ))}
+      </>
+    )
+  }
+
+  const Node = ({
+    data: { id, symbol, icon, targetConnected, targetHandle, sourceHandle },
+  }: {
+    data: {
+      id: string
+      symbol: string
+      icon?: string
+      targetConnected: {
+        label: string
+        in_value: string
+        out_value: string
+        sourceToken: { symbol: string }
+        targetToken: { symbol: string }
+      }[]
+      targetHandle: boolean
+      sourceHandle: boolean
+    }
+  }) => {
+    const uniqueSourceSymbols = targetConnected
+      .map((x) => x.sourceToken.symbol)
+      .filter((v, i, a) => a.indexOf(v) === i)
+    return uniqueSourceSymbols.length === 1 &&
+      uniqueSourceSymbols[0] === symbol ? (
+      <div className="flex items-center p-1 bg-gray-700 rounded-full gap-2">
+        {targetHandle && <Handle type="target" position={Position.Left} />}
+        {sourceHandle && <Handle type="source" position={Position.Right} />}
+      </div>
+    ) : (
+      <div
+        className="flex items-center p-1 lg:px-2 bg-gray-700 rounded-full gap-2"
+        data-tooltip-id={id}
+      >
+        <div className="flex items-center rounded-full gap-2">
+          <CurrencyIcon
+            currency={{
+              symbol,
+              decimals: 18,
+              address: zeroAddress,
+              name: '',
+              icon,
+            }}
+            className="rounded-full w-5 h-5"
+          />
+          <div
+            className="text-sm text-white hidden lg:flex w-12"
+            style={{
+              transform: `scale(${1 - (symbol.length - 4) / 10})`,
+              transformOrigin: 'left',
+            }}
+          >
+            {symbol}
+          </div>
+        </div>
+
+        <div className="absolute top-full left-2 right-2 mt-0.5 flex flex-wrap items-center gap-0.5">
+          {targetConnected.map((x, i) => (
+            <div
+              key={`${i}`}
+              className="w-1 h-1 rounded-full"
+              style={{ background: stringToColor(x.label) }}
+            />
+          ))}
+        </div>
+        {targetHandle && <Handle type="target" position={Position.Left} />}
+        {sourceHandle && <Handle type="source" position={Position.Right} />}
+      </div>
+    )
+  }
+
   return (
     <div
-      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[504px]`}
+      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[800px]`}
     >
       <ReactFlow
-        nodeTypes={nodeTypes}
+        nodeTypes={{
+          custom: Node,
+        }}
+        edgeTypes={{
+          // @ts-ignore
+          custom: Edge,
+        }}
         nodes={nodes}
         edges={edges}
         onNodeMouseEnter={(e, n) => {
@@ -214,77 +348,4 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
       </ReactFlow>
     </div>
   )
-}
-
-const Node = ({
-  data: { id, symbol, icon, targetConnected, targetHandle, sourceHandle },
-}: {
-  data: {
-    id: string
-    symbol: string
-    icon?: string
-    targetConnected: {
-      label: string
-      in_value: string
-      out_value: string
-      sourceToken: { symbol: string }
-      targetToken: { symbol: string }
-    }[]
-    targetHandle: boolean
-    sourceHandle: boolean
-  }
-}) => {
-  const uniqueSourceSymbols = targetConnected
-    .map((x) => x.sourceToken.symbol)
-    .filter((v, i, a) => a.indexOf(v) === i)
-  return uniqueSourceSymbols.length === 1 &&
-    uniqueSourceSymbols[0] === symbol ? (
-    <div className="flex items-center p-1 bg-gray-700 rounded-full gap-2">
-      {targetHandle && <Handle type="target" position={Position.Left} />}
-      {sourceHandle && <Handle type="source" position={Position.Right} />}
-    </div>
-  ) : (
-    <div
-      className="flex items-center p-1 lg:px-2 bg-gray-700 rounded-full gap-2"
-      data-tooltip-id={id}
-    >
-      <div className="flex items-center rounded-full gap-2">
-        <CurrencyIcon
-          currency={{
-            symbol,
-            decimals: 18,
-            address: zeroAddress,
-            name: '',
-            icon,
-          }}
-          className="rounded-full w-5 h-5"
-        />
-        <div
-          className="text-sm text-white hidden lg:flex w-12"
-          style={{
-            transform: `scale(${1 - (symbol.length - 4) / 10})`,
-            transformOrigin: 'left',
-          }}
-        >
-          {symbol}
-        </div>
-      </div>
-
-      <div className="absolute top-full left-2 right-2 mt-0.5 flex flex-wrap items-center gap-0.5">
-        {targetConnected.map((x, i) => (
-          <div
-            key={`${i}`}
-            className="w-1 h-1 rounded-full"
-            style={{ background: stringToColor(x.label) }}
-          />
-        ))}
-      </div>
-      {targetHandle && <Handle type="target" position={Position.Left} />}
-      {sourceHandle && <Handle type="source" position={Position.Right} />}
-    </div>
-  )
-}
-
-const nodeTypes = {
-  custom: Node,
 }
