@@ -346,7 +346,8 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
                 />
                 {v}
               </div>
-            ))}
+            ))
+            .slice(0, 14)}
         </div>
       </ReactFlow>
     </div>
