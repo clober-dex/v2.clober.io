@@ -176,14 +176,6 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
 
   useEffect(() => {
-    if (selectedChain.id === beraTestnetChain.id) {
-      // set default currencies for bera testnet
-      setInputCurrency(_currencies[3])
-      setOutputCurrency(_currencies[0])
-      setCurrencies(_currencies)
-      return
-    }
-
     if (!fetchCurrenciesDone(_currencies, selectedChain)) {
       setInputCurrency(DEFAULT_INPUT_CURRENCY[selectedChain.id])
       setOutputCurrency(DEFAULT_OUTPUT_CURRENCY[selectedChain.id])
