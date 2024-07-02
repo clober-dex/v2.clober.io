@@ -1,5 +1,5 @@
 import { Chain } from 'wagmi'
-import { formatUnits, isAddressEqual } from 'viem'
+import { formatUnits, isAddressEqual, zeroAddress } from 'viem'
 
 import { Currency } from '../currency'
 import { fetchApi } from '../../apis/utils'
@@ -50,6 +50,7 @@ export class OogaBoogaAggregator implements Aggregator {
     //   transport: http(),
     // })
     const currencies = await this.currencies()
+    userAddress = userAddress || zeroAddress
     const { result } = await fetchApi<{
       result: any
     }>(
