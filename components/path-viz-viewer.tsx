@@ -234,8 +234,11 @@ const Node = ({
     sourceHandle: boolean
   }
 }) => {
-  return targetConnected.length === 1 &&
-    targetConnected[0].sourceToken.symbol === symbol ? (
+  const uniqueSourceSymbols = targetConnected
+    .map((x) => x.sourceToken.symbol)
+    .filter((v, i, a) => a.indexOf(v) === i)
+  return uniqueSourceSymbols.length === 1 &&
+    uniqueSourceSymbols[0] === symbol ? (
     <div className="flex items-center p-1 bg-gray-700 rounded-full gap-2">
       {targetHandle && <Handle type="target" position={Position.Left} />}
       {sourceHandle && <Handle type="source" position={Position.Right} />}
