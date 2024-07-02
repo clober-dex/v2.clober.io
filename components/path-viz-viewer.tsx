@@ -181,7 +181,7 @@ const _PathViz = ({ pathVizData }: { pathVizData?: PathViz }) => {
 }
 
 const Node = ({
-  data: { id, symbol, targetConnected, targetHandle, sourceHandle },
+  data: { id, symbol, icon, targetConnected, targetHandle, sourceHandle },
 }: {
   data: {
     id: string
@@ -204,6 +204,7 @@ const Node = ({
             decimals: 18,
             address: zeroAddress,
             name: '',
+            icon,
           }}
           className="rounded-full w-5 h-5"
         />
