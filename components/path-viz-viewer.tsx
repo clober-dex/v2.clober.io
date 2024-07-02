@@ -349,7 +349,7 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
             </div>
           )}
       </ReactFlow>
-      <div className="absolute hidden bottom-3 lg:grid grid-cols-3 text-white text-xs">
+      <div className="absolute hidden bottom-3 lg:grid grid-cols-2 text-white text-xs">
         {Object.values(dexNames)
           .reduce((acc, v) => {
             return acc.concat(v)
