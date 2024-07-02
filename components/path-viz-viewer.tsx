@@ -34,7 +34,46 @@ export default function PathVizViewer({
 }) {
   return (
     <ReactFlowProvider>
-      <_PathViz pathVizData={pathVizData} />
+      <_PathViz
+        pathVizData={
+          pathVizData
+            ? {
+                nodes: pathVizData.nodes,
+                links: pathVizData.links
+                  .reduce(
+                    (acc, link) => {
+                      const existingLink = acc.find(
+                        (l) =>
+                          l.source === link.source &&
+                          l.target === link.target &&
+                          l.label === link.label,
+                      )
+                      if (existingLink) {
+                        existingLink.in_value =
+                          existingLink.in_value + link.in_value
+                        existingLink.out_value =
+                          existingLink.out_value + link.out_value
+                        existingLink.nextValue =
+                          existingLink.nextValue + link.nextValue
+                        existingLink.stepValue =
+                          existingLink.stepValue + link.stepValue
+                        existingLink.value = existingLink.value + link.value
+                      } else {
+                        acc.push(link)
+                      }
+                      return acc
+                    },
+                    [] as PathViz['links'],
+                  )
+                  .sort((a, b) =>
+                    a.source === b.source
+                      ? a.target - b.target
+                      : a.source - b.source,
+                  ),
+              }
+            : undefined
+        }
+      />
     </ReactFlowProvider>
   )
 }
@@ -187,12 +226,24 @@ const Node = ({
     id: string
     symbol: string
     icon?: string
-    targetConnected: { label: string; in_value: string; out_value: string }[]
+    targetConnected: {
+      label: string
+      in_value: string
+      out_value: string
+      sourceToken: { symbol: string }
+      targetToken: { symbol: string }
+    }[]
     targetHandle: boolean
     sourceHandle: boolean
   }
 }) => {
-  return (
+  return targetConnected.length === 1 &&
+    targetConnected[0].sourceToken.symbol === symbol ? (
+    <div className="flex items-center p-1 bg-gray-700 rounded-full gap-2">
+      {targetHandle && <Handle type="target" position={Position.Left} />}
+      {sourceHandle && <Handle type="source" position={Position.Right} />}
+    </div>
+  ) : (
     <div
       className="flex items-center p-1 lg:px-2 bg-gray-700 rounded-full gap-2"
       data-tooltip-id={id}
