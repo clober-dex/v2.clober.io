@@ -21,13 +21,14 @@ export async function fetchWhitelistCurrencies(chainId: CHAIN_IDS) {
       symbol: currency.symbol,
       decimals: currency.decimals,
     }))
+    const result = WHITELISTED_CURRENCIES[chainId].concat(currencies)
     const icons = await fetchCurrencyIcons(
-      currencies.map((currency) => currency.symbol),
+      result.map((currency) => currency.symbol),
     )
-    currencies.forEach((currency) => {
+    result.forEach((currency) => {
       currency.icon = icons[currency.symbol]
     })
-    return WHITELISTED_CURRENCIES[chainId].concat(currencies)
+    return result
   } catch (e) {
     return WHITELISTED_CURRENCIES[chainId]
   }
