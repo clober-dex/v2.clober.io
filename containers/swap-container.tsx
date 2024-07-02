@@ -12,7 +12,6 @@ import { useSwapContext } from '../contexts/swap/swap-context'
 import { useSwapContractContext } from '../contexts/swap/swap-contract-context'
 import { OdosLogoSvg } from '../components/svg/odos-logo-svg'
 import { testnetChainIds } from '../constants/chain'
-import { beraTestnetChain } from '../constants/dev-chain'
 
 export const SwapContainer = () => {
   const {

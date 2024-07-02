@@ -208,19 +208,12 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
   }
 
   const Node = ({
-    data: { id, symbol, icon, targetConnected, targetHandle, sourceHandle },
+    data: { id, symbol, icon, targetHandle, sourceHandle },
   }: {
     data: {
       id: string
       symbol: string
       icon?: string
-      targetConnected: {
-        label: string
-        in_value: string
-        out_value: string
-        sourceToken: { symbol: string }
-        targetToken: { symbol: string }
-      }[]
       targetHandle: boolean
       sourceHandle: boolean
     }
