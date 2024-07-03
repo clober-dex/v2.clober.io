@@ -9,3 +9,11 @@
 .react-flow__edge {
     pointer-events: none !important;
 }
+
+.react-flow__handle-left {
+    background: none !important;
+}
+
+.react-flow__handle-right {
+    background: none !important;
+}

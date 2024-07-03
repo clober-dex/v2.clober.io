@@ -89,7 +89,7 @@ const CurrencySelect = ({
           />
         </div>
       </div>
-      <div className="flex flex-col h-72 overflow-y-auto bg-gray-900 rounded-b-xl sm:rounded-b-3xl">
+      <div className="flex flex-col h-60 overflow-y-auto bg-gray-900 rounded-b-xl sm:rounded-b-3xl">
         {(customizedCurrency ? [...currencies, customizedCurrency] : currencies)
           .filter(
             (currency) =>
