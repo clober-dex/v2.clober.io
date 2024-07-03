@@ -5,6 +5,7 @@ import { Currency } from '../currency'
 import { fetchApi } from '../../apis/utils'
 import { Prices } from '../prices'
 import { PathViz } from '../pathviz'
+import { fetchCurrencyIcons } from '../../utils/currency'
 
 import { Aggregator } from './index'
 
@@ -90,6 +91,12 @@ export class OdosAggregator implements Aggregator {
         sourceBlacklist: [],
         pathViz: true,
       }),
+    })
+    const icons = await fetchCurrencyIcons(
+      result.pathViz.nodes.map((token) => token.symbol),
+    )
+    result.pathViz.nodes.forEach((node) => {
+      node.icon = icons[node.symbol]
     })
     return {
       amountOut: BigInt(result.outAmounts[0]),

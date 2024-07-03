@@ -34,12 +34,14 @@ export const WHITELISTED_CURRENCIES: {
       name: 'BERA',
       symbol: 'BERA',
       decimals: 18,
+      icon: 'https://artio-static-asset-public.s3.ap-southeast-1.amazonaws.com/assets/bera.png',
     },
     {
       address: '0x7EeCA4205fF31f947EdBd49195a7A88E6A91161B',
       name: 'Honey',
       symbol: 'HONEY',
       decimals: 18,
+      icon: 'https://artio-static-asset-public.s3.ap-southeast-1.amazonaws.com/assets/honey.png',
     },
     {
       address: '0x7588AFc469d95300C2206Bf8a6Ee9bf5d2719314',

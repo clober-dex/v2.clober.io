@@ -15,6 +15,7 @@ import {
   ETH,
 } from '../constants/currency'
 import { Chain } from '../model/chain'
+import { fetchApi } from '../apis/utils'
 
 export const LOCAL_STORAGE_INPUT_CURRENCY_KEY = (
   context: string,
@@ -26,6 +27,24 @@ export const LOCAL_STORAGE_OUTPUT_CURRENCY_KEY = (
 ) => `${chain.id}-outputCurrency-${context}`
 export const QUERY_PARAM_INPUT_CURRENCY_KEY = 'inputCurrency'
 export const QUERY_PARAM_OUTPUT_CURRENCY_KEY = 'outputCurrency'
+
+export const fetchCurrencyIcons = async (
+  symbols: string[],
+): Promise<{ [key: string]: string | undefined }> => {
+  if (symbols.length === 0) {
+    return {}
+  }
+  return fetchApi<{
+    [key: string]: string | undefined
+  }>('https://ooga-booga-proxy.clober.io', `icons/${symbols.join(',')}`)
+}
+
+export const fetchCurrencyIcon = async (
+  symbol: string,
+): Promise<string | undefined> => {
+  const icons = await fetchCurrencyIcons([symbol])
+  return icons[symbol]
+}
 
 export const fetchCurrency = async (
   chainId: number,
@@ -63,11 +82,14 @@ export const fetchCurrency = async (
     return undefined
   }
 
+  const icon = await fetchCurrencyIcon(symbol)
+
   return {
     address,
     name: name,
     symbol: symbol,
     decimals: decimals,
+    icon,
   }
 }
 
