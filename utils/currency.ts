@@ -39,13 +39,6 @@ export const fetchCurrencyIcons = async (
   }>('https://ooga-booga-proxy.clober.io', `icons/${symbols.join(',')}`)
 }
 
-export const fetchCurrencyIcon = async (
-  symbol: string,
-): Promise<string | undefined> => {
-  const icons = await fetchCurrencyIcons([symbol])
-  return icons[symbol]
-}
-
 export const fetchCurrency = async (
   chainId: number,
   address: `0x${string}`,
@@ -82,7 +75,7 @@ export const fetchCurrency = async (
     return undefined
   }
 
-  const icon = await fetchCurrencyIcon(symbol)
+  const icon = (await fetchCurrencyIcons([symbol]))[symbol]
 
   return {
     address,
