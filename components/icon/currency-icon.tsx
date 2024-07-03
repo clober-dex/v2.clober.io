@@ -10,6 +10,8 @@ export const CurrencyIcon = ({
 }: {
   currency: Currency
 } & React.ImgHTMLAttributes<HTMLImageElement>) => {
+  const [tryCount, setTryCount] = React.useState(0)
+
   const chainId = Number(localStorage.getItem(LOCAL_STORAGE_CHAIN_KEY) ?? '0')
   const chain = supportChains.find((chain) => chain.id === chainId)
   return (
@@ -17,11 +19,16 @@ export const CurrencyIcon = ({
       className="rounded-full"
       src={getLogo(currency)}
       onError={(e) => {
+        if (tryCount >= 1) {
+          e.currentTarget.src = '/unknown.svg'
+          return
+        }
         e.currentTarget.src = chain
           ? `https://dd.dexscreener.com/ds-data/tokens/${
               chain.network
             }/${currency.address.toLowerCase()}.png?size=lg`
           : '/unknown.svg'
+        setTryCount((count) => count + 1)
       }}
       {...props}
     />
