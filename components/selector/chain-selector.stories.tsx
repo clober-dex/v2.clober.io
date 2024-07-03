@@ -26,94 +26,36 @@ export default {
 type Story = StoryObj<typeof ChainSelector>
 export const Default: Story = {
   args: {
-    chain: {
-      ...arbitrumSepolia,
-      defaultGasPrice: 0n,
-      expireIn: 0,
-    },
+    chain: arbitrumSepolia,
     setChain: () => {},
     chains: [
-      {
-        ...arbitrumSepolia,
-        defaultGasPrice: 0n,
-        expireIn: 240,
-      },
+      arbitrumSepolia,
       {
         ...beraTestnetChain,
-        defaultGasPrice: 0n,
-        expireIn: 240,
         icon: 'https://img.cryptorank.io/coins/berachain1681996075164.png',
       },
-      {
-        ...base,
-        defaultGasPrice: 0n,
-        expireIn: 240,
-      },
-      {
-        ...zkSync,
-        defaultGasPrice: 0n,
-        expireIn: 240,
-      },
+      base,
+      zkSync,
     ],
   },
 }
 
 export const OnlyMainnet: Story = {
   args: {
-    chain: {
-      ...mainnet,
-      defaultGasPrice: 0n,
-      expireIn: 0,
-    },
+    chain: mainnet,
     setChain: () => {},
-    chains: [
-      {
-        ...mainnet,
-        defaultGasPrice: 0n,
-        expireIn: 0,
-      },
-      {
-        ...polygon,
-        defaultGasPrice: 0n,
-        expireIn: 0,
-      },
-      {
-        ...arbitrum,
-        defaultGasPrice: 0n,
-        expireIn: 0,
-      },
-      {
-        ...base,
-        defaultGasPrice: 0n,
-        expireIn: 0,
-      },
-      {
-        ...fantom,
-        defaultGasPrice: 0n,
-        expireIn: 0,
-      },
-    ],
+    chains: [mainnet, polygon, arbitrum, base, fantom],
   },
 }
 
 export const OnlyTestnet: Story = {
   args: {
-    chain: {
-      ...arbitrumSepolia,
-      defaultGasPrice: 0n,
-      expireIn: 0,
-    },
+    chain: arbitrumSepolia,
     setChain: () => {},
     chains: [
-      {
-        ...arbitrumSepolia,
-        defaultGasPrice: 0n,
-        expireIn: 0,
-      },
+      arbitrumSepolia,
       {
         ...beraTestnetChain,
-        defaultGasPrice: 0n,
-        expireIn: 240,
         icon: 'https://img.cryptorank.io/coins/berachain1681996075164.png',
       },
     ],

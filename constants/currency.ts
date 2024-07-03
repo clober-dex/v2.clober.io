@@ -3,6 +3,8 @@ import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Currency } from '../model/currency'
 
+import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from './currencies/80085'
+
 export const ETH: Currency = {
   address: zeroAddress,
   name: 'Ethereum',
@@ -28,34 +30,7 @@ export const WHITELISTED_CURRENCIES: {
       decimals: 6,
     },
   ],
-  [CHAIN_IDS.BERACHAIN_TESTNET]: [
-    {
-      address: zeroAddress,
-      name: 'BERA',
-      symbol: 'BERA',
-      decimals: 18,
-      icon: 'https://artio-static-asset-public.s3.ap-southeast-1.amazonaws.com/assets/bera.png',
-    },
-    {
-      address: '0x7EeCA4205fF31f947EdBd49195a7A88E6A91161B',
-      name: 'Honey',
-      symbol: 'HONEY',
-      decimals: 18,
-      icon: 'https://artio-static-asset-public.s3.ap-southeast-1.amazonaws.com/assets/honey.png',
-    },
-    {
-      address: '0x7588AFc469d95300C2206Bf8a6Ee9bf5d2719314',
-      name: 'MockUSDT',
-      symbol: 'USDT',
-      decimals: 6,
-    },
-    {
-      address: '0x7d06c636bA86BD1fc2C38B11F1e5701145CABc30',
-      name: 'MockToken',
-      symbol: 'TEST',
-      decimals: 18,
-    },
-  ],
+  [CHAIN_IDS.BERACHAIN_TESTNET]: BERACHAIN_TESTNET_WHITELISTED_CURRENCIES,
   [CHAIN_IDS.BASE]: [],
   [CHAIN_IDS.ZKSYNC]: [],
 }

@@ -18,7 +18,7 @@ const Context = React.createContext<ChainContext>({
   setSelectedChain: (_) => _,
 })
 
-const LOCAL_STORAGE_CHAIN_KEY = 'chain'
+export const LOCAL_STORAGE_CHAIN_KEY = 'chain'
 const QUERY_PARAM_CHAIN_KEY = 'chain'
 
 export const ChainProvider = ({ children }: React.PropsWithChildren<{}>) => {

@@ -3,13 +3,12 @@ import { getAddress } from 'viem'
 
 import { Currency } from '../model/currency'
 import { WHITELISTED_CURRENCIES } from '../constants/currency'
-import { fetchCurrencyIcons } from '../utils/currency'
 
 import { fetchApi } from './utils'
 
 export async function fetchWhitelistCurrencies(chainId: CHAIN_IDS) {
   try {
-    const currencies: Currency[] = Object.entries(
+    const currencies = Object.entries(
       (
         await fetchApi<{
           tokenMap: Currency[]
@@ -21,14 +20,7 @@ export async function fetchWhitelistCurrencies(chainId: CHAIN_IDS) {
       symbol: currency.symbol,
       decimals: currency.decimals,
     }))
-    const result = WHITELISTED_CURRENCIES[chainId].concat(currencies)
-    const icons = await fetchCurrencyIcons(
-      result.map((currency) => currency.symbol),
-    )
-    result.forEach((currency) => {
-      currency.icon = icons[currency.symbol]
-    })
-    return result
+    return WHITELISTED_CURRENCIES[chainId].concat(currencies)
   } catch (e) {
     return WHITELISTED_CURRENCIES[chainId]
   }
