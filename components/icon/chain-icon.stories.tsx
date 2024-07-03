@@ -23,17 +23,17 @@ type Story = StoryObj<typeof ChainIcon>
 
 export const Ethereum: Story = {
   args: {
-    chain: { ...mainnet, defaultGasPrice: 0n, expireIn: 0 },
+    chain: mainnet,
   },
 }
 export const Polygon: Story = {
   args: {
-    chain: { ...polygon, defaultGasPrice: 0n, expireIn: 0 },
+    chain: polygon,
   },
 }
 
 export const Arbitrum: Story = {
   args: {
-    chain: { ...arbitrum, defaultGasPrice: 0n, expireIn: 0 },
+    chain: arbitrum,
   },
 }
