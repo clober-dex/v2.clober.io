@@ -1,8 +1,6 @@
 import { Chain as WagmiChain } from 'wagmi'
 
 export type Chain = WagmiChain & {
-  expireIn: number
-  defaultGasPrice: bigint
   icon?: string
 }
 
