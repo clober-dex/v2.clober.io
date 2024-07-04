@@ -59,7 +59,7 @@ const CurrencySelect = ({
   )
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col h-full gap-4">
       <div className="flex items-center justify-center">
         <div className="w-6 h-6 cursor-pointer relative" onClick={onBack}>
           <LeftBracketAngleSvg />
@@ -89,64 +89,69 @@ const CurrencySelect = ({
           />
         </div>
       </div>
-      <div className="flex flex-col h-60 overflow-y-auto bg-gray-900 rounded-b-xl sm:rounded-b-3xl">
-        {(customizedCurrency ? [...currencies, customizedCurrency] : currencies)
-          .filter(
-            (currency) =>
-              (isAddress(value) &&
-                isAddressEqual(currency.address, getAddress(value))) ||
-              currency.name.toLowerCase().includes(value.toLowerCase()) ||
-              currency.symbol.toLowerCase().includes(value.toLowerCase()),
+      <div className="flex relative h-full w-full">
+        <div className="absolute h-full w-full top-0 flex flex-col overflow-y-auto bg-gray-900 rounded-b-xl sm:rounded-b-3xl">
+          {(customizedCurrency
+            ? [...currencies, customizedCurrency]
+            : currencies
           )
-          .sort((a, b) => {
-            const aValue =
-              Number(balances[getAddress(a.address)] ?? 0n) *
-              (prices[getAddress(a.address)] ?? 0.000000000000001)
-            const bValue =
-              Number(balances[getAddress(b.address)] ?? 0n) *
-              (prices[getAddress(b.address)] ?? 0.000000000000001)
-            return aValue > bValue ? -1 : aValue < bValue ? 1 : 0
-          })
-          .map((currency) => (
-            <button
-              key={currency.address}
-              className="flex w-full px-4 py-2 items-center justify-between text-start"
-              onClick={() => onCurrencySelect(currency)}
-            >
-              <div className="flex items-center gap-3">
-                <CurrencyIcon
-                  currency={currency}
-                  className="w-6 h-6 sm:w-8 sm:h-8 rounded-full"
-                />
-                <div>
-                  <div className="text-sm sm:text-base font-bold text-white">
-                    {currency.symbol}
+            .filter(
+              (currency) =>
+                (isAddress(value) &&
+                  isAddressEqual(currency.address, getAddress(value))) ||
+                currency.name.toLowerCase().includes(value.toLowerCase()) ||
+                currency.symbol.toLowerCase().includes(value.toLowerCase()),
+            )
+            .sort((a, b) => {
+              const aValue =
+                Number(balances[getAddress(a.address)] ?? 0n) *
+                (prices[getAddress(a.address)] ?? 0.000000000000001)
+              const bValue =
+                Number(balances[getAddress(b.address)] ?? 0n) *
+                (prices[getAddress(b.address)] ?? 0.000000000000001)
+              return aValue > bValue ? -1 : aValue < bValue ? 1 : 0
+            })
+            .map((currency) => (
+              <button
+                key={currency.address}
+                className="flex w-full px-4 py-2 items-center justify-between text-start"
+                onClick={() => onCurrencySelect(currency)}
+              >
+                <div className="flex items-center gap-3">
+                  <CurrencyIcon
+                    currency={currency}
+                    className="w-6 h-6 sm:w-8 sm:h-8 rounded-full"
+                  />
+                  <div>
+                    <div className="text-sm sm:text-base font-bold text-white">
+                      {currency.symbol}
+                    </div>
+                    <div className="text-xs text-gray-500">{currency.name}</div>
                   </div>
-                  <div className="text-xs text-gray-500">{currency.name}</div>
                 </div>
-              </div>
-              <div className="flex-1 text-sm text-end text-white">
-                <div>
-                  {formatUnits(
-                    balances[getAddress(currency.address)] ?? 0n,
-                    currency.decimals,
-                    prices[getAddress(currency.address)] ?? 0,
-                  )}
-                </div>
-                {prices[getAddress(currency.address)] ? (
-                  <div className="text-gray-500 text-xs">
-                    {formatDollarValue(
+                <div className="flex-1 text-sm text-end text-white">
+                  <div>
+                    {formatUnits(
                       balances[getAddress(currency.address)] ?? 0n,
                       currency.decimals,
                       prices[getAddress(currency.address)] ?? 0,
                     )}
                   </div>
-                ) : (
-                  <></>
-                )}
-              </div>
-            </button>
-          ))}
+                  {prices[getAddress(currency.address)] ? (
+                    <div className="text-gray-500 text-xs">
+                      {formatDollarValue(
+                        balances[getAddress(currency.address)] ?? 0n,
+                        currency.decimals,
+                        prices[getAddress(currency.address)] ?? 0,
+                      )}
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              </button>
+            ))}
+        </div>
       </div>
     </div>
   )
