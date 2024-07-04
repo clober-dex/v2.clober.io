@@ -6,7 +6,7 @@ import {
   zeroAddress,
 } from 'viem'
 
-import { supportChains } from '../constants/chain'
+import { findSupportChain, supportChains } from '../constants/chain'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { Currency } from '../model/currency'
 import {
@@ -15,6 +15,7 @@ import {
   ETH,
 } from '../constants/currency'
 import { Chain } from '../model/chain'
+import { fetchApi } from '../apis/utils'
 
 export const LOCAL_STORAGE_INPUT_CURRENCY_KEY = (
   context: string,
@@ -26,6 +27,16 @@ export const LOCAL_STORAGE_OUTPUT_CURRENCY_KEY = (
 ) => `${chain.id}-outputCurrency-${context}`
 export const QUERY_PARAM_INPUT_CURRENCY_KEY = 'inputCurrency'
 export const QUERY_PARAM_OUTPUT_CURRENCY_KEY = 'outputCurrency'
+
+const currencyCache: {
+  [key: string]: Currency | null
+} = {}
+const getCurrencyCacheKey = (chainId: number, name: string) =>
+  `${chainId}-${name.toLowerCase()}`
+
+let fetchCurrencyJobId: NodeJS.Timeout | null = null
+let fetchCurrencyJobResult: Currency | undefined = undefined
+let fetchCurrencyJobResultCode: number = 0
 
 export const fetchCurrency = async (
   chainId: number,
@@ -68,6 +79,84 @@ export const fetchCurrency = async (
     name: name,
     symbol: symbol,
     decimals: decimals,
+  }
+}
+
+export const fetchCurrencyByName = async (
+  chainId: number,
+  name: string,
+): Promise<Currency | undefined> => {
+  if (fetchCurrencyJobId) {
+    clearTimeout(fetchCurrencyJobId)
+    fetchCurrencyJobId = null
+  }
+  const previousCode = fetchCurrencyJobResultCode
+  fetchCurrencyJobId = setTimeout(async () => {
+    fetchCurrencyJobResult = await fetchCurrencyByNameImpl(chainId, name)
+    fetchCurrencyJobResultCode = Math.random()
+  }, 500)
+
+  while (fetchCurrencyJobResultCode === previousCode) {
+    await new Promise((resolve) => setTimeout(resolve, 10))
+  }
+  return fetchCurrencyJobResult
+}
+
+export const fetchCurrencyByNameImpl = async (
+  chainId: number,
+  name: string,
+): Promise<Currency | undefined> => {
+  const chain = findSupportChain(chainId)
+  if (!chain) {
+    return undefined
+  }
+
+  const cacheKey = getCurrencyCacheKey(chainId, name)
+  if (currencyCache[cacheKey] !== undefined) {
+    return currencyCache[cacheKey] ?? undefined
+  }
+
+  try {
+    const searchResult = (await fetchApi<any>(
+      'https://api.dexscreener.com',
+      `latest/dex/search?q=${name}`,
+    )) as any
+    const pairs = (searchResult.pairs ?? []) as any[]
+    const candidateTokens: {
+      [key: `0x${string}`]: number
+    } = {}
+    for (const pair of pairs) {
+      const chainName = (pair.chainId as string).split('-')[0]
+      if (chainName !== chain.network) {
+        continue
+      }
+
+      const baseToken = pair.baseToken as any
+      const quoteToken = pair.quoteToken as any
+      for (const token of [baseToken, quoteToken]) {
+        if (
+          (token.symbol as string).toLowerCase().includes(name.toLowerCase()) ||
+          (token.name as string).toLowerCase().includes(name.toLowerCase())
+        ) {
+          candidateTokens[token.address as `0x${string}`] =
+            (candidateTokens[token.address as `0x${string}`] ?? 0) +
+            (pair.volume.h24 as number)
+        }
+      }
+    }
+    if (Object.keys(candidateTokens).length === 0) {
+      currencyCache[cacheKey] = null
+      return undefined
+    }
+
+    const address = (Object.keys(candidateTokens) as `0x${string}`[]).sort(
+      (a, b) => candidateTokens[b] - candidateTokens[a],
+    )[0]
+    const token = await fetchCurrency(chainId, address)
+    currencyCache[cacheKey] = token ?? null
+    return token
+  } catch (e) {
+    return undefined
   }
 }
 

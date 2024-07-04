@@ -8,7 +8,7 @@ import { formatDollarValue, formatUnits } from '../../utils/bigint'
 import { CurrencyIcon } from '../icon/currency-icon'
 import { Balances } from '../../model/balances'
 import { Prices } from '../../model/prices'
-import { fetchCurrency } from '../../utils/currency'
+import { fetchCurrency, fetchCurrencyByName } from '../../utils/currency'
 
 const CurrencySelect = ({
   chainId,
@@ -33,6 +33,7 @@ const CurrencySelect = ({
   const [value, _setValue] = React.useState('')
   const setValue = useCallback(
     async (value: string) => {
+      _setValue(value)
       if (
         isAddress(value) &&
         !currencies.find((currency) =>
@@ -52,8 +53,33 @@ const CurrencySelect = ({
             setCustomizedCurrency(undefined)
           }
         }
+      } else if (
+        !isAddress(value) &&
+        !currencies.find(
+          (currency) =>
+            currency.name.toLowerCase().includes(value.toLowerCase()) ||
+            currency.symbol.toLowerCase().includes(value.toLowerCase()),
+        )
+      ) {
+        if (
+          defaultBlacklistedCurrency &&
+          (defaultBlacklistedCurrency.name
+            .toLowerCase()
+            .includes(value.toLowerCase()) ||
+            defaultBlacklistedCurrency.symbol
+              .toLowerCase()
+              .includes(value.toLowerCase()))
+        ) {
+          setCustomizedCurrency(undefined)
+        } else {
+          const currency = await fetchCurrencyByName(chainId, value)
+          if (currency) {
+            setCustomizedCurrency(currency)
+          } else {
+            setCustomizedCurrency(undefined)
+          }
+        }
       }
-      _setValue(value)
     },
     [chainId, currencies, defaultBlacklistedCurrency],
   )
