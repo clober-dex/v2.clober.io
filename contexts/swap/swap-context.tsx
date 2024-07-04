@@ -73,7 +73,7 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { data: _currencies } = useQuery(
     ['swap-currencies', selectedChain],
     async () => {
-      return fetchCurrencies(AGGREGATORS[selectedChain.id])
+      return fetchCurrencies(selectedChain.id, AGGREGATORS[selectedChain.id])
     },
     {
       initialData: [],

@@ -14,12 +14,13 @@ import {
   LOCAL_STORAGE_INPUT_CURRENCY_KEY,
   LOCAL_STORAGE_OUTPUT_CURRENCY_KEY,
 } from '../../utils/currency'
-import { fetchWhitelistCurrencies } from '../../apis/currencies'
 import {
   DEFAULT_INPUT_CURRENCY,
   DEFAULT_OUTPUT_CURRENCY,
 } from '../../constants/currency'
 import { setQueryParams } from '../../utils/url'
+import { fetchCurrencies } from '../../apis/swap/currencies'
+import { AGGREGATORS } from '../../constants/aggregators'
 
 type LimitContext = {
   balances: Balances
@@ -95,7 +96,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { data: _currencies } = useQuery(
     ['limit-currencies', selectedChain],
     async () => {
-      return fetchWhitelistCurrencies(selectedChain.id)
+      return fetchCurrencies(selectedChain.id, AGGREGATORS[selectedChain.id])
     },
     {
       initialData: [],
