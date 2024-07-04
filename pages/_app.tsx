@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import '../styles/globals.css'
 import '@rainbow-me/rainbowkit/styles.css'
 import {
+  connectorsForWallets,
   darkTheme,
   getDefaultWallets,
   RainbowKitProvider,
@@ -13,6 +14,15 @@ import { jsonRpcProvider } from '@wagmi/core/providers/jsonRpc'
 import { identify } from '@web3analytic/funnel-sdk'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
+import {
+  enkryptWallet,
+  okxWallet,
+  phantomWallet,
+  rabbyWallet,
+  trustWallet,
+  xdefiWallet,
+  zerionWallet,
+} from '@rainbow-me/rainbowkit/wallets'
 
 import HeaderContainer from '../containers/header-container'
 import Footer from '../components/footer'
@@ -43,11 +53,33 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
   { rank: true },
 )
 
-const { connectors } = getDefaultWallets({
+const PROJECT_ID = '14e09398dd595b0d1dccabf414ac4531'
+const { wallets } = getDefaultWallets({
   appName: 'Clober Dex',
-  projectId: '14e09398dd595b0d1dccabf414ac4531',
+  projectId: PROJECT_ID,
   chains,
 })
+
+const connectors = connectorsForWallets([
+  ...wallets,
+  {
+    groupName: 'Popular',
+    wallets: [
+      rabbyWallet({ chains }),
+      phantomWallet({ chains }),
+      okxWallet({ chains, projectId: PROJECT_ID }),
+    ],
+  },
+  {
+    groupName: 'The others',
+    wallets: [
+      enkryptWallet({ chains }),
+      trustWallet({ chains, projectId: PROJECT_ID }),
+      xdefiWallet({ chains }),
+      zerionWallet({ chains, projectId: PROJECT_ID }),
+    ],
+  },
+])
 
 const wagmiConfig = createConfig({
   autoConnect: true,
