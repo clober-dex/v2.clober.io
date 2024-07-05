@@ -1,6 +1,22 @@
 import React from 'react'
 import { useAccount } from 'wagmi'
 
+import { Vault } from '../model/vault'
+import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from '../constants/currencies/80085'
+import { VaultCard } from '../components/card/vault-card'
+
+const vaults: Vault[] = BERACHAIN_TESTNET_WHITELISTED_CURRENCIES.map(
+  (currency) => {
+    return {
+      currency0: currency,
+      currency1: currency,
+      apy: 120.5434,
+      tvl: 43123123.0123455,
+      volume24h: 123123.123411,
+    }
+  },
+)
+
 export const VaultContainer = () => {
   const { address: userAddress } = useAccount()
 
@@ -92,7 +108,31 @@ export const VaultContainer = () => {
           </div>
         </div>
       </div>
-      <div className="flex">Down</div>
+      <div className="flex w-auto h-[564px] flex-col items-center mt-6 lg:mt-12">
+        <div className="flex flex-col lg:w-[960px] h-full gap-6">
+          <div className="hidden lg:flex self-stretch px-4 justify-start items-center gap-4">
+            <div className="w-60 text-gray-400 text-sm font-semibold">
+              Vault
+            </div>
+            <div className="w-[140px] text-gray-400 text-sm font-semibold">
+              APY
+            </div>
+            <div className="w-[140px] text-gray-400 text-sm font-semibold">
+              Total Liquidity
+            </div>
+            <div className="w-[140px] text-gray-400 text-sm font-semibold">
+              24h Volume
+            </div>
+          </div>
+          <div className="flex justify-center relative w-full h-full md:h-[400px]">
+            <div className="lg:absolute lg:top-0 w-full h-full lg:overflow-y-scroll items-center flex flex-col md:grid md:grid-cols-2 lg:flex gap-3">
+              {vaults.map((vault, index) => (
+                <VaultCard key={index} vault={vault} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
