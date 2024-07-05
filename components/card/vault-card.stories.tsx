@@ -16,6 +16,12 @@ type Story = StoryObj<typeof VaultCard>
 export const Default: Story = {
   args: {
     vault: {
+      lp: {
+        address: '0x0000000000000000000000000000000000000003',
+        name: 'ETH-USDC-LP',
+        symbol: 'ETH-USDC-LP',
+        decimals: 18,
+      },
       currency0: {
         address: '0x0000000000000000000000000000000000000003',
         name: 'ETH',

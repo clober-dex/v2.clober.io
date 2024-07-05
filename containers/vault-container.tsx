@@ -8,6 +8,7 @@ import { VaultCard } from '../components/card/vault-card'
 const vaults: Vault[] = BERACHAIN_TESTNET_WHITELISTED_CURRENCIES.map(
   (currency) => {
     return {
+      lp: currency,
       currency0: currency,
       currency1: currency,
       apy: 120.5434,
