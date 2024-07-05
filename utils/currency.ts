@@ -29,14 +29,24 @@ export const QUERY_PARAM_INPUT_CURRENCY_KEY = 'inputCurrency'
 export const QUERY_PARAM_OUTPUT_CURRENCY_KEY = 'outputCurrency'
 
 const currencyCache: {
-  [key: string]: Currency | null
+  [key: string]: Currency[]
 } = {}
 const getCurrencyCacheKey = (chainId: number, name: string) =>
   `${chainId}-${name.toLowerCase()}`
 
 let fetchCurrencyJobId: NodeJS.Timeout | null = null
-let fetchCurrencyJobResult: Currency | undefined = undefined
+let fetchCurrencyJobResult: Currency[] = []
 let fetchCurrencyJobResultCode: number = 0
+
+export const deduplicateCurrencies = (currencies: Currency[]) => {
+  return currencies
+    .sort((a, b) => (b.isVerified ? 1 : 0) - (a.isVerified ? 1 : 0))
+    .filter(
+      (currency, index, self) =>
+        self.findIndex((c) => isAddressEqual(c.address, currency.address)) ===
+        index,
+    )
+}
 
 export const fetchCurrency = async (
   chainId: number,
@@ -82,10 +92,10 @@ export const fetchCurrency = async (
   }
 }
 
-export const fetchCurrencyByName = async (
+export const fetchCurrenciesByName = async (
   chainId: number,
   name: string,
-): Promise<Currency | undefined> => {
+): Promise<Currency[]> => {
   if (fetchCurrencyJobId) {
     clearTimeout(fetchCurrencyJobId)
     fetchCurrencyJobId = null
@@ -105,15 +115,15 @@ export const fetchCurrencyByName = async (
 export const fetchCurrencyByNameImpl = async (
   chainId: number,
   name: string,
-): Promise<Currency | undefined> => {
+): Promise<Currency[]> => {
   const chain = findSupportChain(chainId)
   if (!chain) {
-    return undefined
+    return []
   }
 
   const cacheKey = getCurrencyCacheKey(chainId, name)
   if (currencyCache[cacheKey] !== undefined) {
-    return currencyCache[cacheKey] ?? undefined
+    return currencyCache[cacheKey]
   }
 
   try {
@@ -144,19 +154,19 @@ export const fetchCurrencyByNameImpl = async (
         }
       }
     }
-    if (Object.keys(candidateTokens).length === 0) {
-      currencyCache[cacheKey] = null
-      return undefined
-    }
 
-    const address = (Object.keys(candidateTokens) as `0x${string}`[]).sort(
+    const addresses = (Object.keys(candidateTokens) as `0x${string}`[]).sort(
       (a, b) => candidateTokens[b] - candidateTokens[a],
-    )[0]
-    const token = await fetchCurrency(chainId, address)
-    currencyCache[cacheKey] = token ?? null
-    return token
+    )
+    const tokens = (
+      await Promise.all(
+        addresses.map((address) => fetchCurrency(chainId, address)),
+      )
+    ).filter((token) => token !== undefined) as Currency[]
+    currencyCache[cacheKey] = tokens
+    return tokens
   } catch (e) {
-    return undefined
+    return []
   }
 }
 

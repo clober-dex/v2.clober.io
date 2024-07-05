@@ -4,6 +4,7 @@ export type Currency = {
   symbol: string
   decimals: number
   icon?: string
+  isVerified?: boolean
 }
 
 export function getLogo(currency?: Currency): string {

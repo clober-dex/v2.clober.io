@@ -8,7 +8,11 @@ import { formatDollarValue, formatUnits } from '../../utils/bigint'
 import { CurrencyIcon } from '../icon/currency-icon'
 import { Balances } from '../../model/balances'
 import { Prices } from '../../model/prices'
-import { fetchCurrency, fetchCurrencyByName } from '../../utils/currency'
+import {
+  deduplicateCurrencies,
+  fetchCurrenciesByName,
+  fetchCurrency,
+} from '../../utils/currency'
 
 const CurrencySelect = ({
   chainId,
@@ -27,13 +31,16 @@ const CurrencySelect = ({
   onCurrencySelect: (currency: Currency) => void
   defaultBlacklistedCurrency?: Currency
 } & React.HTMLAttributes<HTMLDivElement>) => {
-  const [customizedCurrency, setCustomizedCurrency] = React.useState<
-    Currency | undefined
+  const [customizedCurrencies, setCustomizedCurrencies] = React.useState<
+    Currency[] | undefined
   >()
+  const [loadingCurrencies, setLoadingCurrencies] =
+    React.useState<boolean>(false)
   const [value, _setValue] = React.useState('')
   const setValue = useCallback(
     async (value: string) => {
       _setValue(value)
+      setLoadingCurrencies(true)
       if (
         isAddress(value) &&
         !currencies.find((currency) =>
@@ -44,42 +51,24 @@ const CurrencySelect = ({
           defaultBlacklistedCurrency &&
           isAddressEqual(defaultBlacklistedCurrency.address, getAddress(value))
         ) {
-          setCustomizedCurrency(undefined)
+          setCustomizedCurrencies(undefined)
         } else {
           const currency = await fetchCurrency(chainId, value)
           if (currency) {
-            setCustomizedCurrency(currency)
+            setCustomizedCurrencies([currency])
           } else {
-            setCustomizedCurrency(undefined)
+            setCustomizedCurrencies(undefined)
           }
         }
-      } else if (
-        !isAddress(value) &&
-        !currencies.find(
-          (currency) =>
-            currency.name.toLowerCase().includes(value.toLowerCase()) ||
-            currency.symbol.toLowerCase().includes(value.toLowerCase()),
-        )
-      ) {
-        if (
-          defaultBlacklistedCurrency &&
-          (defaultBlacklistedCurrency.name
-            .toLowerCase()
-            .includes(value.toLowerCase()) ||
-            defaultBlacklistedCurrency.symbol
-              .toLowerCase()
-              .includes(value.toLowerCase()))
-        ) {
-          setCustomizedCurrency(undefined)
+      } else if (!isAddress(value)) {
+        const currencies = await fetchCurrenciesByName(chainId, value)
+        if (currencies.length > 0) {
+          setCustomizedCurrencies(currencies)
         } else {
-          const currency = await fetchCurrencyByName(chainId, value)
-          if (currency) {
-            setCustomizedCurrency(currency)
-          } else {
-            setCustomizedCurrency(undefined)
-          }
+          setCustomizedCurrencies(undefined)
         }
       }
+      setLoadingCurrencies(false)
     },
     [chainId, currencies, defaultBlacklistedCurrency],
   )
@@ -116,13 +105,25 @@ const CurrencySelect = ({
         </div>
       </div>
       <div className="flex flex-col h-60 overflow-y-auto bg-gray-900 rounded-b-xl sm:rounded-b-3xl">
-        {(customizedCurrency ? [...currencies, customizedCurrency] : currencies)
+        {deduplicateCurrencies(
+          customizedCurrencies
+            ? [...currencies, ...customizedCurrencies]
+            : currencies,
+        )
           .filter(
             (currency) =>
               (isAddress(value) &&
                 isAddressEqual(currency.address, getAddress(value))) ||
               currency.name.toLowerCase().includes(value.toLowerCase()) ||
               currency.symbol.toLowerCase().includes(value.toLowerCase()),
+          )
+          .filter(
+            (currency) =>
+              !defaultBlacklistedCurrency ||
+              !isAddressEqual(
+                currency.address,
+                defaultBlacklistedCurrency.address,
+              ),
           )
           .sort((a, b) => {
             const aValue =
@@ -146,7 +147,7 @@ const CurrencySelect = ({
                 />
                 <div>
                   <div className="text-sm sm:text-base font-bold text-white">
-                    {currency.symbol}
+                    {currency.symbol} {currency.isVerified ? '✅' : ''}
                   </div>
                   <div className="text-xs text-gray-500">{currency.name}</div>
                 </div>
@@ -173,6 +174,13 @@ const CurrencySelect = ({
               </div>
             </button>
           ))}
+        {loadingCurrencies ? (
+          <div className="flex items-center justify-center h-16 text-sm text-gray-500">
+            Loading...
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   )

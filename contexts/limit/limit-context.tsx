@@ -9,6 +9,7 @@ import { useChainContext } from '../chain-context'
 import { Balances } from '../../model/balances'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 import {
+  deduplicateCurrencies,
   fetchCurrenciesDone,
   fetchCurrency,
   LOCAL_STORAGE_INPUT_CURRENCY_KEY,
@@ -112,14 +113,9 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       if (!userAddress) {
         return {}
       }
-      const uniqueCurrencies = currencies
-        .filter(
-          (currency, index, self) =>
-            self.findIndex((c) =>
-              isAddressEqual(c.address, currency.address),
-            ) === index,
-        )
-        .filter((currency) => !isAddressEqual(currency.address, zeroAddress))
+      const uniqueCurrencies = deduplicateCurrencies(currencies).filter(
+        (currency) => !isAddressEqual(currency.address, zeroAddress),
+      )
       const results = await readContracts({
         contracts: uniqueCurrencies.map((currency) => ({
           address: currency.address,
@@ -224,17 +220,12 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
         : DEFAULT_OUTPUT_CURRENCY[selectedChain.id]
 
       setCurrencies(
-        [..._currencies]
-          .concat(
+        deduplicateCurrencies(
+          [..._currencies].concat(
             _inputCurrency ? [_inputCurrency] : [],
             _outputCurrency ? [_outputCurrency] : [],
-          )
-          .filter(
-            (currency, index, self) =>
-              self.findIndex((c) =>
-                isAddressEqual(c.address, currency.address),
-              ) === index,
           ),
+        ),
       )
       setInputCurrency(_inputCurrency)
       setOutputCurrency(_outputCurrency)

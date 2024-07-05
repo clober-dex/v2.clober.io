@@ -11,5 +11,7 @@ export async function fetchCurrencies(
   const currencies = await Promise.all(
     aggregators.map((aggregator) => aggregator.currencies()),
   )
-  return WHITELISTED_CURRENCIES[chainId].concat(currencies.flat())
+  return WHITELISTED_CURRENCIES[chainId]
+    .concat(currencies.flat())
+    .map((currency) => ({ ...currency, isVerified: true }))
 }

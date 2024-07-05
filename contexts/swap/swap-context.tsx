@@ -12,6 +12,7 @@ import { fetchPrices } from '../../apis/swap/prices'
 import { useChainContext } from '../chain-context'
 import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 import {
+  deduplicateCurrencies,
   fetchCurrenciesDone,
   fetchCurrency,
   LOCAL_STORAGE_INPUT_CURRENCY_KEY,
@@ -22,7 +23,6 @@ import {
   DEFAULT_INPUT_CURRENCY,
   DEFAULT_OUTPUT_CURRENCY,
 } from '../../constants/currency'
-import { beraTestnetChain } from '../../constants/dev-chain'
 
 type SwapContext = {
   currencies: Currency[]
@@ -100,14 +100,11 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
       if (!userAddress || !currencies) {
         return {}
       }
-      const uniqueCurrencies = currencies
-        .filter((currency) => !isAddressEqual(currency.address, zeroAddress))
-        .filter(
-          (currency, index, self) =>
-            self.findIndex((c) =>
-              isAddressEqual(c.address, currency.address),
-            ) === index,
-        )
+      const uniqueCurrencies = deduplicateCurrencies(
+        currencies.filter(
+          (currency) => !isAddressEqual(currency.address, zeroAddress),
+        ),
+      )
       const results = await readContracts({
         contracts: uniqueCurrencies.map((currency) => ({
           address: currency.address,
@@ -210,17 +207,12 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
         : DEFAULT_OUTPUT_CURRENCY[selectedChain.id]
 
       setCurrencies(
-        [..._currencies]
-          .concat(
+        deduplicateCurrencies(
+          [..._currencies].concat(
             _inputCurrency ? [_inputCurrency] : [],
             _outputCurrency ? [_outputCurrency] : [],
-          )
-          .filter(
-            (currency, index, self) =>
-              self.findIndex((c) =>
-                isAddressEqual(c.address, currency.address),
-              ) === index,
           ),
+        ),
       )
       setInputCurrency(_inputCurrency)
       setOutputCurrency(_outputCurrency)
