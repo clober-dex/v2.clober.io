@@ -23,7 +23,7 @@ export const VaultContainer = () => {
   const [tab, setTab] = React.useState<'my-liquidity' | 'vault'>('vault')
 
   return (
-    <div className="w-full flex flex-col text-white">
+    <div className="w-full flex flex-col text-white mb-4">
       <div className="flex justify-center w-auto sm:h-[400px] bg-gradient-to-t from-slate-900 to-slate-900">
         <div className="w-[960px] mt-8 sm:mt-16 flex flex-col sm:gap-12 items-center">
           <div className="flex w-[261px] h-12 sm:h-[72px] flex-col justify-start items-center gap-2 sm:gap-3">
@@ -108,8 +108,8 @@ export const VaultContainer = () => {
           </div>
         </div>
       </div>
-      <div className="flex w-auto h-[564px] flex-col items-center mt-6 lg:mt-12">
-        <div className="flex flex-col lg:w-[960px] h-full gap-6">
+      <div className="flex w-auto flex-col items-center mt-6 lg:mt-12 px-4 lg:px-0">
+        <div className="flex flex-col w-full lg:w-[960px] h-full gap-6">
           <div className="hidden lg:flex self-stretch px-4 justify-start items-center gap-4">
             <div className="w-60 text-gray-400 text-sm font-semibold">
               Vault
@@ -124,8 +124,8 @@ export const VaultContainer = () => {
               24h Volume
             </div>
           </div>
-          <div className="flex justify-center relative w-full h-full md:h-[400px]">
-            <div className="lg:absolute lg:top-0 w-full h-full lg:overflow-y-scroll items-center flex flex-col md:grid md:grid-cols-2 lg:flex gap-3">
+          <div className="relative flex justify-center w-full h-full lg:h-[360px]">
+            <div className="lg:absolute lg:top-0 lg:overflow-x-scroll w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:flex gap-3">
               {vaults.map((vault, index) => (
                 <VaultCard key={index} vault={vault} />
               ))}

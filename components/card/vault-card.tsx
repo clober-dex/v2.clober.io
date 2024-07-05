@@ -40,7 +40,7 @@ export const VaultCard = ({ vault }: { vault: Vault }) => {
           </div>
         </div>
       </div>
-      <div className="flex lg:hidden w-[328px] h-[116px] p-4 bg-gray-800 rounded-xl flex-col justify-center items-start gap-4">
+      <div className="flex lg:hidden w-full h-[116px] p-4 bg-gray-800 rounded-xl flex-col justify-center items-start gap-4">
         <div className="flex items-center gap-2 self-stretch">
           <div className="w-10 h-6 relative">
             <CurrencyIcon
@@ -79,14 +79,14 @@ export const VaultCard = ({ vault }: { vault: Vault }) => {
             </svg>
           </div>
         </div>
-        <div className="flex w-[296px] h-11 justify-start items-start gap-2">
-          <div className="w-[93.33px] flex-col justify-start items-center gap-2 inline-flex">
+        <div className="w-full flex flex-row flex-1 h-11 justify-start items-start gap-2">
+          <div className="flex w-full flex-col justify-start items-center gap-2">
             <div className="self-stretch text-gray-400 text-xs">APY</div>
             <div className="self-stretch text-white text-sm font-bold">
               {vault.apy.toFixed(2)}%
             </div>
           </div>
-          <div className="grow shrink basis-0 flex-col justify-start items-center gap-2 inline-flex">
+          <div className="flex w-full flex-col justify-start items-center gap-2">
             <div className="self-stretch text-center text-gray-400 text-xs">
               Total Liquidity
             </div>
@@ -94,7 +94,7 @@ export const VaultCard = ({ vault }: { vault: Vault }) => {
               ${toCommaSeparated(vault.tvl.toFixed(0))}
             </div>
           </div>
-          <div className="grow shrink basis-0 flex-col justify-start items-center gap-2 inline-flex">
+          <div className="flex w-full flex-col justify-start items-center gap-2">
             <div className="self-stretch text-right text-gray-400 text-xs">
               24h Volume
             </div>
