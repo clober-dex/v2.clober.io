@@ -202,10 +202,17 @@ function App({ Component, pageProps }: AppProps) {
                         </div>
                       </div>
                     </div>
+                  ) : router.pathname === '/vault' ? (
+                    <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
+                      <Panel open={open} setOpen={setOpen} router={router} />
+                      <HeaderContainer onMenuClick={() => setOpen(true)} />
+
+                      <Component {...pageProps} />
+                    </div>
                   ) : (
                     <SwapProvidersWrapper>
                       <div className="flex flex-col w-[100vw] min-h-[100vh] bg-gray-950">
-                        <Panel open={open} setOpen={setOpen} />
+                        <Panel open={open} setOpen={setOpen} router={router} />
                         <HeaderContainer onMenuClick={() => setOpen(true)} />
                         <MainComponentWrapper>
                           <Component {...pageProps} />

@@ -2,13 +2,16 @@ import React, { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
+import { NextRouter } from 'next/router'
 
 const Panel = ({
   open,
   setOpen,
+  router,
 }: {
   open: boolean
   setOpen: (open: boolean) => void
+  router: NextRouter
 }) => {
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -46,6 +49,45 @@ const Panel = ({
                     </div>
                     <div className="flex flex-col text-white justify-center text-base font-bold relative mb-6 flex-1 pl-6 pr-16 gap-8">
                       <div className="flex flex-col gap-4 items-start w-[192px]">
+                        <button
+                          disabled={
+                            router.pathname === '/limit' ||
+                            router.pathname === '/swap'
+                          }
+                          onClick={() => {
+                            router.replace('limit', undefined, {
+                              shallow: true,
+                            })
+                            setOpen(false)
+                          }}
+                        >
+                          Limit order / Swap
+                        </button>
+                        <button
+                          disabled={router.pathname === '/vault'}
+                          onClick={() => {
+                            router.replace('vault', undefined, {
+                              shallow: true,
+                            })
+                            setOpen(false)
+                          }}
+                        >
+                          Vault
+                        </button>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="192"
+                          height="2"
+                          viewBox="0 0 192 2"
+                          fill="none"
+                        >
+                          <path
+                            d="M0 1H192"
+                            strokeWidth="1.5"
+                            className="stroke-gray-600"
+                          />
+                        </svg>
+
                         <Link
                           className="link"
                           target="_blank"
