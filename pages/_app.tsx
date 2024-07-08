@@ -131,6 +131,29 @@ const SwapProvidersWrapper = ({ children }: React.PropsWithChildren) => {
   )
 }
 
+const PanelWrapper = ({
+  open,
+  setOpen,
+  children,
+}: {
+  open: boolean
+  setOpen: (open: boolean) => void
+} & React.PropsWithChildren) => {
+  const router = useRouter()
+  const { selectedChain } = useChainContext()
+
+  return (
+    <Panel
+      chainId={selectedChain.id}
+      open={open}
+      setOpen={setOpen}
+      router={router}
+    >
+      {children}
+    </Panel>
+  )
+}
+
 const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
   const router = useRouter()
   const { selectedChain } = useChainContext()
@@ -191,8 +214,8 @@ function App({ Component, pageProps }: AppProps) {
           <Web3AnalyticWrapper>
             <TransactionProvider>
               <ChainProvider>
-                <LimitProvidersWrapper>
-                  {router.pathname === '/iframe' ? (
+                {router.pathname === '/iframe' ? (
+                  <LimitProvidersWrapper>
                     <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
                       <HeaderContainer onMenuClick={() => setOpen(true)} />
 
@@ -202,17 +225,19 @@ function App({ Component, pageProps }: AppProps) {
                         </div>
                       </div>
                     </div>
-                  ) : router.pathname === '/pool' ? (
-                    <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
-                      <Panel open={open} setOpen={setOpen} router={router} />
-                      <HeaderContainer onMenuClick={() => setOpen(true)} />
+                  </LimitProvidersWrapper>
+                ) : router.pathname.includes('/pool') ? (
+                  <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
+                    <PanelWrapper open={open} setOpen={setOpen} />
+                    <HeaderContainer onMenuClick={() => setOpen(true)} />
 
-                      <Component {...pageProps} />
-                    </div>
-                  ) : (
+                    <Component {...pageProps} />
+                  </div>
+                ) : (
+                  <LimitProvidersWrapper>
                     <SwapProvidersWrapper>
                       <div className="flex flex-col w-[100vw] min-h-[100vh] bg-gray-950">
-                        <Panel open={open} setOpen={setOpen} router={router} />
+                        <PanelWrapper open={open} setOpen={setOpen} />
                         <HeaderContainer onMenuClick={() => setOpen(true)} />
                         <MainComponentWrapper>
                           <Component {...pageProps} />
@@ -220,8 +245,8 @@ function App({ Component, pageProps }: AppProps) {
                         <Footer />
                       </div>
                     </SwapProvidersWrapper>
-                  )}
-                </LimitProvidersWrapper>
+                  </LimitProvidersWrapper>
+                )}
               </ChainProvider>
             </TransactionProvider>
           </Web3AnalyticWrapper>
