@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import '../styles/globals.css'
 import '@rainbow-me/rainbowkit/styles.css'
 import {
@@ -194,6 +194,16 @@ const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
 function App({ Component, pageProps }: AppProps) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
+
+  const handlePopState = useCallback(async () => {
+    window.location.reload()
+  }, [])
+
+  useEffect(() => {
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [handlePopState])
+
   return (
     <>
       <ErrorBoundary>
