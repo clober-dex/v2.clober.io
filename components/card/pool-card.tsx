@@ -1,6 +1,6 @@
 import React from 'react'
-import Link from 'next/link'
 import { CHAIN_IDS } from '@clober/v2-sdk'
+import { NextRouter } from 'next/router'
 
 import { Pool } from '../../model/pool'
 import { CurrencyIcon } from '../icon/currency-icon'
@@ -9,9 +9,11 @@ import { toCommaSeparated } from '../../utils/number'
 export const PoolCard = ({
   chainId,
   pool,
+  router,
 }: {
   chainId: CHAIN_IDS
   pool: Pool
+  router: NextRouter
 }) => {
   return (
     <>
@@ -42,16 +44,17 @@ export const PoolCard = ({
         <div className="w-[140px] text-white text-base font-bold">
           ${toCommaSeparated(pool.volume24h.toFixed(0))}
         </div>
-        <Link
-          href={`/pools/${pool.lpCurrency.address}?chain=${chainId}`}
-          target="_blank"
+        <button
+          onClick={() =>
+            router.push(`/pools/${pool.lpCurrency.address}?chain=${chainId}`)
+          }
           className="flex w-[196px] h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1"
           rel="noreferrer"
         >
           <div className="grow shrink basis-0 opacity-90 text-center text-white text-sm font-bold">
             Add Liquidity
           </div>
-        </Link>
+        </button>
       </div>
       <div className="flex lg:hidden w-full h-[116px] p-4 bg-gray-800 rounded-xl flex-col justify-center items-start gap-4">
         <div className="flex items-center gap-2 self-stretch">
@@ -74,9 +77,10 @@ export const PoolCard = ({
               {pool.currency1.symbol}
             </div>
           </div>
-          <Link
-            href={`/pools/${pool.lpCurrency.address}?chain=${chainId}`}
-            target="_blank"
+          <button
+            onClick={() =>
+              router.push(`/pools/${pool.lpCurrency.address}?chain=${chainId}`)
+            }
             className="flex ml-auto"
             rel="noreferrer"
           >
@@ -95,7 +99,7 @@ export const PoolCard = ({
                 strokeLinejoin="round"
               />
             </svg>
-          </Link>
+          </button>
         </div>
         <div className="w-full flex flex-row flex-1 h-11 justify-start items-start gap-2">
           <div className="flex w-full flex-col justify-start items-center gap-2">

@@ -1,5 +1,6 @@
 import React from 'react'
 import { useAccount } from 'wagmi'
+import { useRouter } from 'next/router'
 
 import { Pool, PoolPosition } from '../model/pool'
 import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from '../constants/currencies/80085'
@@ -32,6 +33,7 @@ const poolPositions: PoolPosition[] = Array.from({ length: 5 }).map(
 )
 
 export const PoolContainer = () => {
+  const router = useRouter()
   const { address: userAddress } = useAccount()
   const { selectedChain } = useChainContext()
 
@@ -148,6 +150,7 @@ export const PoolContainer = () => {
                       chainId={selectedChain.id}
                       key={index}
                       pool={pool}
+                      router={router}
                     />
                   ))}
                 </div>

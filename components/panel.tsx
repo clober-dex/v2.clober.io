@@ -58,13 +58,7 @@ const Panel = ({
                             router.pathname === '/swap'
                           }
                           onClick={() => {
-                            router.replace(
-                              `/limit?chain=${chainId}`,
-                              undefined,
-                              {
-                                shallow: true,
-                              },
-                            )
+                            router.push(`/limit?chain=${chainId}`)
                             setOpen(false)
                           }}
                         >
@@ -73,13 +67,7 @@ const Panel = ({
                         <button
                           disabled={router.pathname === '/pool'}
                           onClick={() => {
-                            router.replace(
-                              `/pool?chain=${chainId}`,
-                              undefined,
-                              {
-                                shallow: true,
-                              },
-                            )
+                            router.push(`/pool?chain=${chainId}`)
                             setOpen(false)
                           }}
                         >
