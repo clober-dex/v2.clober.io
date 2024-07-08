@@ -1,9 +1,10 @@
 import React from 'react'
 import { useAccount } from 'wagmi'
 
-import { Vault } from '../model/vault'
+import { OpenVault, Vault } from '../model/vault'
 import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from '../constants/currencies/80085'
 import { VaultCard } from '../components/card/vault-card'
+import { OpenVaultCard } from '../components/card/open-vault-card'
 
 const vaults: Vault[] = BERACHAIN_TESTNET_WHITELISTED_CURRENCIES.map(
   (currency) => {
@@ -17,6 +18,15 @@ const vaults: Vault[] = BERACHAIN_TESTNET_WHITELISTED_CURRENCIES.map(
     }
   },
 )
+
+const openVaults: OpenVault[] = Array.from({ length: 5 }).map((_, index) => {
+  return {
+    lp: BERACHAIN_TESTNET_WHITELISTED_CURRENCIES[index],
+    vault: vaults[index],
+    lpAmount: 1001234000000000000n,
+    lpValue: 123441.3241,
+  }
+})
 
 export const VaultContainer = () => {
   const { address: userAddress } = useAccount()
@@ -111,27 +121,37 @@ export const VaultContainer = () => {
       </div>
       <div className="flex w-auto flex-col items-center mt-6 lg:mt-12 px-4 lg:px-0">
         <div className="flex flex-col w-full lg:w-[960px] h-full gap-6">
-          <div className="hidden lg:flex self-stretch px-4 justify-start items-center gap-4">
-            <div className="w-60 text-gray-400 text-sm font-semibold">
-              Vault
-            </div>
-            <div className="w-[140px] text-gray-400 text-sm font-semibold">
-              APY
-            </div>
-            <div className="w-[140px] text-gray-400 text-sm font-semibold">
-              Total Liquidity
-            </div>
-            <div className="w-[140px] text-gray-400 text-sm font-semibold">
-              24h Volume
-            </div>
-          </div>
-          <div className="relative flex justify-center w-full h-full lg:h-[360px]">
-            <div className="lg:absolute lg:top-0 lg:overflow-x-scroll w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:flex gap-3">
-              {vaults.map((vault, index) => (
-                <VaultCard key={index} vault={vault} />
+          {tab === 'vault' ? (
+            <>
+              <div className="hidden lg:flex self-stretch px-4 justify-start items-center gap-4">
+                <div className="w-60 text-gray-400 text-sm font-semibold">
+                  Vault
+                </div>
+                <div className="w-[140px] text-gray-400 text-sm font-semibold">
+                  APY
+                </div>
+                <div className="w-[140px] text-gray-400 text-sm font-semibold">
+                  Total Liquidity
+                </div>
+                <div className="w-[140px] text-gray-400 text-sm font-semibold">
+                  24h Volume
+                </div>
+              </div>
+              <div className="relative flex justify-center w-full h-full lg:h-[360px]">
+                <div className="lg:absolute lg:top-0 lg:overflow-x-scroll w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:flex gap-3">
+                  {vaults.map((vault, index) => (
+                    <VaultCard key={index} vault={vault} />
+                  ))}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-[18px]">
+              {openVaults.map((openVault, index) => (
+                <OpenVaultCard key={index} openVault={openVault} />
               ))}
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

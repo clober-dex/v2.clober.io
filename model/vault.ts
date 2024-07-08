@@ -8,3 +8,9 @@ export type Vault = {
   tvl: number
   volume24h: number
 }
+
+export type OpenVault = {
+  vault: Vault
+  lpAmount: bigint
+  lpValue: number
+}
