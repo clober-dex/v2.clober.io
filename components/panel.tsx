@@ -64,15 +64,15 @@ const Panel = ({
                           Limit order / Swap
                         </button>
                         <button
-                          disabled={router.pathname === '/vault'}
+                          disabled={router.pathname === '/pool'}
                           onClick={() => {
-                            router.replace('vault', undefined, {
+                            router.replace('pool', undefined, {
                               shallow: true,
                             })
                             setOpen(false)
                           }}
                         >
-                          Vault
+                          Pool
                         </button>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

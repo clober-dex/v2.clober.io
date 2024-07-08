@@ -1,6 +1,6 @@
 import { Currency } from './currency'
 
-export type Vault = {
+export type Pool = {
   lp: Currency
   currency0: Currency
   currency1: Currency
@@ -9,8 +9,8 @@ export type Vault = {
   volume24h: number
 }
 
-export type OpenVault = {
-  vault: Vault
-  lpAmount: bigint
-  lpValue: number
+export type PoolPosition = {
+  pool: Pool
+  amount: bigint
+  value: number
 }

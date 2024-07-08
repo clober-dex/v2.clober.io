@@ -1,38 +1,38 @@
 import React from 'react'
 
-import { Vault } from '../../model/vault'
+import { Pool } from '../../model/pool'
 import { CurrencyIcon } from '../icon/currency-icon'
 import { toCommaSeparated } from '../../utils/number'
 
-export const VaultCard = ({ vault }: { vault: Vault }) => {
+export const PoolCard = ({ pool }: { pool: Pool }) => {
   return (
     <>
       <div className="hidden lg:flex w-[960px] h-16 px-5 py-4 bg-gray-800 rounded-2xl justify-start items-center gap-4">
         <div className="flex w-60 items-center gap-2">
           <div className="w-14 h-8 shrink-0 relative">
             <CurrencyIcon
-              currency={vault.currency0}
+              currency={pool.currency0}
               className="w-8 h-8 absolute left-0 top-0 z-[1]"
             />
             <CurrencyIcon
-              currency={vault.currency1}
+              currency={pool.currency1}
               className="w-8 h-8 absolute left-6 top-0"
             />
           </div>
           <div className="flex items-center text-white text-base font-bold gap-1">
-            <div>{vault.currency0.symbol}</div>
+            <div>{pool.currency0.symbol}</div>
             <div>-</div>
-            <div>{vault.currency1.symbol}</div>
+            <div>{pool.currency1.symbol}</div>
           </div>
         </div>
         <div className="w-[140px] text-white text-base font-bold">
-          {vault.apy.toFixed(2)}%
+          {pool.apy.toFixed(2)}%
         </div>
         <div className="w-[140px] text-white text-base font-bold">
-          ${toCommaSeparated(vault.tvl.toFixed(0))}
+          ${toCommaSeparated(pool.tvl.toFixed(0))}
         </div>
         <div className="w-[140px] text-white text-base font-bold">
-          ${toCommaSeparated(vault.volume24h.toFixed(0))}
+          ${toCommaSeparated(pool.volume24h.toFixed(0))}
         </div>
         <div className="flex w-[196px] h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1">
           <div className="grow shrink basis-0 opacity-90 text-center text-white text-sm font-bold">
@@ -44,21 +44,21 @@ export const VaultCard = ({ vault }: { vault: Vault }) => {
         <div className="flex items-center gap-2 self-stretch">
           <div className="w-10 h-6 relative">
             <CurrencyIcon
-              currency={vault.currency0}
+              currency={pool.currency0}
               className="w-6 h-6 absolute left-0 top-0 z-[1]"
             />
             <CurrencyIcon
-              currency={vault.currency1}
+              currency={pool.currency1}
               className="w-6 h-6 absolute left-[16px] top-0"
             />
           </div>
           <div className="flex gap-1 justify-start items-center">
             <div className="text-white text-base font-bold">
-              {vault.currency0.symbol}
+              {pool.currency0.symbol}
             </div>
             <div className="text-white text-base font-bold">-</div>
             <div className="text-white text-base font-bold">
-              {vault.currency1.symbol}
+              {pool.currency1.symbol}
             </div>
           </div>
           <div className="flex ml-auto">
@@ -83,7 +83,7 @@ export const VaultCard = ({ vault }: { vault: Vault }) => {
           <div className="flex w-full flex-col justify-start items-center gap-2">
             <div className="self-stretch text-gray-400 text-xs">APY</div>
             <div className="self-stretch text-white text-sm font-bold">
-              {vault.apy.toFixed(2)}%
+              {pool.apy.toFixed(2)}%
             </div>
           </div>
           <div className="flex w-full flex-col justify-start items-center gap-2">
@@ -91,7 +91,7 @@ export const VaultCard = ({ vault }: { vault: Vault }) => {
               Total Liquidity
             </div>
             <div className="self-stretch text-center text-white text-sm font-bold">
-              ${toCommaSeparated(vault.tvl.toFixed(0))}
+              ${toCommaSeparated(pool.tvl.toFixed(0))}
             </div>
           </div>
           <div className="flex w-full flex-col justify-start items-center gap-2">
@@ -99,7 +99,7 @@ export const VaultCard = ({ vault }: { vault: Vault }) => {
               24h Volume
             </div>
             <div className="self-stretch text-right text-white text-sm font-bold">
-              ${toCommaSeparated(vault.volume24h.toFixed(0))}
+              ${toCommaSeparated(pool.volume24h.toFixed(0))}
             </div>
           </div>
         </div>

@@ -1,12 +1,12 @@
 import React from 'react'
 import { useAccount } from 'wagmi'
 
-import { OpenVault, Vault } from '../model/vault'
+import { Pool, PoolPosition } from '../model/pool'
 import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from '../constants/currencies/80085'
-import { VaultCard } from '../components/card/vault-card'
-import { OpenVaultCard } from '../components/card/open-vault-card'
+import { PoolCard } from '../components/card/pool-card'
+import { PoolPositionCard } from '../components/card/pool-position-card'
 
-const vaults: Vault[] = BERACHAIN_TESTNET_WHITELISTED_CURRENCIES.map(
+const pools: Pool[] = BERACHAIN_TESTNET_WHITELISTED_CURRENCIES.map(
   (currency) => {
     return {
       lp: currency,
@@ -19,19 +19,21 @@ const vaults: Vault[] = BERACHAIN_TESTNET_WHITELISTED_CURRENCIES.map(
   },
 )
 
-const openVaults: OpenVault[] = Array.from({ length: 5 }).map((_, index) => {
-  return {
-    lp: BERACHAIN_TESTNET_WHITELISTED_CURRENCIES[index],
-    vault: vaults[index],
-    lpAmount: 1001234000000000000n,
-    lpValue: 123441.3241,
-  }
-})
+const poolPositions: PoolPosition[] = Array.from({ length: 5 }).map(
+  (_, index) => {
+    return {
+      lp: BERACHAIN_TESTNET_WHITELISTED_CURRENCIES[index],
+      pool: pools[index],
+      amount: 1001234000000000000n,
+      value: 123441.3241,
+    }
+  },
+)
 
-export const VaultContainer = () => {
+export const PoolContainer = () => {
   const { address: userAddress } = useAccount()
 
-  const [tab, setTab] = React.useState<'my-liquidity' | 'vault'>('vault')
+  const [tab, setTab] = React.useState<'my-liquidity' | 'pool'>('pool')
 
   return (
     <div className="w-full flex flex-col text-white mb-4">
@@ -39,7 +41,7 @@ export const VaultContainer = () => {
         <div className="w-[960px] mt-8 sm:mt-16 flex flex-col sm:gap-12 items-center">
           <div className="flex w-[261px] h-12 sm:h-[72px] flex-col justify-start items-center gap-2 sm:gap-3">
             <div className="self-stretch text-center text-white text-lg sm:text-4xl font-bold">
-              Vault
+              Pool
             </div>
             <div className="self-stretch text-center text-gray-400 text-xs sm:text-sm font-bold">
               Provide liquidity and earn fees!
@@ -66,8 +68,8 @@ export const VaultContainer = () => {
           <div className="flex w-full mt-8 sm:mt-0 sm:mr-auto px-4">
             <div className="w-full sm:w-[328px] h-[40px] sm:h-[56px] items-center flex">
               <button
-                onClick={() => setTab('vault')}
-                disabled={tab === 'vault'}
+                onClick={() => setTab('pool')}
+                disabled={tab === 'pool'}
                 className="flex flex-1 gap-2 items-center justify-center w-full h-full disabled:bg-gray-950 bg-transparent rounded-tl-2xl rounded-tr-2xl"
               >
                 <svg
@@ -87,7 +89,7 @@ export const VaultContainer = () => {
                   />
                 </svg>
                 <div className="text-center text-white text-sm sm:text-base font-bold">
-                  Vault
+                  Pool
                 </div>
               </button>
               <button
@@ -121,11 +123,11 @@ export const VaultContainer = () => {
       </div>
       <div className="flex w-auto flex-col items-center mt-6 lg:mt-12 px-4 lg:px-0">
         <div className="flex flex-col w-full lg:w-[960px] h-full gap-6">
-          {tab === 'vault' ? (
+          {tab === 'pool' ? (
             <>
               <div className="hidden lg:flex self-stretch px-4 justify-start items-center gap-4">
                 <div className="w-60 text-gray-400 text-sm font-semibold">
-                  Vault
+                  Pool
                 </div>
                 <div className="w-[140px] text-gray-400 text-sm font-semibold">
                   APY
@@ -139,16 +141,16 @@ export const VaultContainer = () => {
               </div>
               <div className="relative flex justify-center w-full h-full lg:h-[360px]">
                 <div className="lg:absolute lg:top-0 lg:overflow-x-scroll w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:flex gap-3">
-                  {vaults.map((vault, index) => (
-                    <VaultCard key={index} vault={vault} />
+                  {pools.map((pool, index) => (
+                    <PoolCard key={index} pool={pool} />
                   ))}
                 </div>
               </div>
             </>
           ) : (
             <div className="w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-[18px]">
-              {openVaults.map((openVault, index) => (
-                <OpenVaultCard key={index} openVault={openVault} />
+              {poolPositions.map((poolPosition, index) => (
+                <PoolPositionCard key={index} poolPosition={poolPosition} />
               ))}
             </div>
           )}

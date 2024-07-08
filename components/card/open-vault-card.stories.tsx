@@ -1,31 +1,28 @@
 import React from 'react'
 import '../../styles/globals.css'
 import { Meta, StoryObj } from '@storybook/react'
-import { zeroAddress } from 'viem'
 
-import { dummyCurrencies } from '../../.storybook/dummy-data/currencies'
-
-import { OpenVaultCard } from './open-vault-card'
+import { PoolPositionCard } from './pool-position-card'
 
 export default {
-  title: 'OpenVaultCard',
-  component: OpenVaultCard,
+  title: 'PoolPositionCard',
+  component: PoolPositionCard,
   parameters: {
     layout: 'centered',
   },
   render: ({ ...args }) => (
     <div className="flex flex-col w-[448px] h-[154px] gap-2">
-      <OpenVaultCard {...args} />
+      <PoolPositionCard {...args} />
     </div>
   ),
-} as Meta<typeof OpenVaultCard>
+} as Meta<typeof PoolPositionCard>
 
-type Story = StoryObj<typeof OpenVaultCard>
+type Story = StoryObj<typeof PoolPositionCard>
 
 export const Default: Story = {
   args: {
-    openVault: {
-      vault: {
+    poolPosition: {
+      pool: {
         lp: {
           address: '0x0000000000000000000000000000000000000003',
           name: 'ETH-USDC-LP',
@@ -48,8 +45,8 @@ export const Default: Story = {
         tvl: 43123123.0123455,
         volume24h: 123123.123411,
       },
-      lpAmount: 1001234000000000000n,
-      lpValue: 123441.3241,
+      amount: 1001234000000000000n,
+      value: 123441.3241,
     },
   },
 }

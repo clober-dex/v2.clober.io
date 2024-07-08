@@ -43,15 +43,15 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
             Limit order / Swap
           </button>
           <button
-            disabled={router.pathname === '/vault'}
+            disabled={router.pathname === '/pool'}
             onClick={() =>
-              router.replace('vault', undefined, {
+              router.replace('pool', undefined, {
                 shallow: true,
               })
             }
             className="text-sm text-gray-500 font-semibold disabled:text-white"
           >
-            Vault
+            Pool
           </button>
         </div>
       </div>

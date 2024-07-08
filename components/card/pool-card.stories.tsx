@@ -1,21 +1,23 @@
 import '../../styles/globals.css'
 import { Meta, StoryObj } from '@storybook/react'
+import { base } from 'viem/chains'
 
-import { VaultCard } from './vault-card'
+import { PoolCard } from './pool-card'
 
 export default {
-  title: 'VaultCard',
-  component: VaultCard,
+  title: 'PoolCard',
+  component: PoolCard,
   parameters: {
     layout: 'centered',
   },
-} as Meta<typeof VaultCard>
+} as Meta<typeof PoolCard>
 
-type Story = StoryObj<typeof VaultCard>
+type Story = StoryObj<typeof PoolCard>
 
 export const Default: Story = {
   args: {
-    vault: {
+    chainId: base.id,
+    pool: {
       lp: {
         address: '0x0000000000000000000000000000000000000003',
         name: 'ETH-USDC-LP',

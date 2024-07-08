@@ -202,7 +202,7 @@ function App({ Component, pageProps }: AppProps) {
                         </div>
                       </div>
                     </div>
-                  ) : router.pathname === '/vault' ? (
+                  ) : router.pathname === '/pool' ? (
                     <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
                       <Panel open={open} setOpen={setOpen} router={router} />
                       <HeaderContainer onMenuClick={() => setOpen(true)} />
