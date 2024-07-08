@@ -5,6 +5,7 @@ import { Pool, PoolPosition } from '../model/pool'
 import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from '../constants/currencies/80085'
 import { PoolCard } from '../components/card/pool-card'
 import { PoolPositionCard } from '../components/card/pool-position-card'
+import { useChainContext } from '../contexts/chain-context'
 
 const pools: Pool[] = BERACHAIN_TESTNET_WHITELISTED_CURRENCIES.map(
   (currency) => {
@@ -32,6 +33,7 @@ const poolPositions: PoolPosition[] = Array.from({ length: 5 }).map(
 
 export const PoolContainer = () => {
   const { address: userAddress } = useAccount()
+  const { selectedChain } = useChainContext()
 
   const [tab, setTab] = React.useState<'my-liquidity' | 'pool'>('pool')
 
@@ -142,7 +144,11 @@ export const PoolContainer = () => {
               <div className="relative flex justify-center w-full h-full lg:h-[360px]">
                 <div className="lg:absolute lg:top-0 lg:overflow-x-scroll w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:flex gap-3">
                   {pools.map((pool, index) => (
-                    <PoolCard key={index} pool={pool} />
+                    <PoolCard
+                      chainId={selectedChain.id}
+                      key={index}
+                      pool={pool}
+                    />
                   ))}
                 </div>
               </div>

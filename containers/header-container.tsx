@@ -34,7 +34,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
               router.pathname === '/limit' || router.pathname === '/swap'
             }
             onClick={() =>
-              router.replace('/limit', undefined, {
+              router.replace(`/limit?chain=${selectedChain.id}`, undefined, {
                 shallow: true,
               })
             }
@@ -45,7 +45,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
           <button
             disabled={router.pathname === '/pool'}
             onClick={() =>
-              router.replace('/pool', undefined, {
+              router.replace(`/pool?chain=${selectedChain.id}`, undefined, {
                 shallow: true,
               })
             }

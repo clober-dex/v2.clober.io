@@ -1,10 +1,18 @@
 import React from 'react'
+import Link from 'next/link'
+import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Pool } from '../../model/pool'
 import { CurrencyIcon } from '../icon/currency-icon'
 import { toCommaSeparated } from '../../utils/number'
 
-export const PoolCard = ({ pool }: { pool: Pool }) => {
+export const PoolCard = ({
+  chainId,
+  pool,
+}: {
+  chainId: CHAIN_IDS
+  pool: Pool
+}) => {
   return (
     <>
       <div className="hidden lg:flex w-[960px] h-16 px-5 py-4 bg-gray-800 rounded-2xl justify-start items-center gap-4">
@@ -34,11 +42,16 @@ export const PoolCard = ({ pool }: { pool: Pool }) => {
         <div className="w-[140px] text-white text-base font-bold">
           ${toCommaSeparated(pool.volume24h.toFixed(0))}
         </div>
-        <div className="flex w-[196px] h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1">
+        <Link
+          href={`/pools/${pool.lpCurrency.address}?chain=${chainId}`}
+          target="_blank"
+          className="flex w-[196px] h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1"
+          rel="noreferrer"
+        >
           <div className="grow shrink basis-0 opacity-90 text-center text-white text-sm font-bold">
             Add Liquidity
           </div>
-        </div>
+        </Link>
       </div>
       <div className="flex lg:hidden w-full h-[116px] p-4 bg-gray-800 rounded-xl flex-col justify-center items-start gap-4">
         <div className="flex items-center gap-2 self-stretch">
@@ -61,7 +74,12 @@ export const PoolCard = ({ pool }: { pool: Pool }) => {
               {pool.currency1.symbol}
             </div>
           </div>
-          <div className="flex ml-auto">
+          <Link
+            href={`/pools/${pool.lpCurrency.address}?chain=${chainId}`}
+            target="_blank"
+            className="flex ml-auto"
+            rel="noreferrer"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -77,7 +95,7 @@ export const PoolCard = ({ pool }: { pool: Pool }) => {
                 strokeLinejoin="round"
               />
             </svg>
-          </div>
+          </Link>
         </div>
         <div className="w-full flex flex-row flex-1 h-11 justify-start items-start gap-2">
           <div className="flex w-full flex-col justify-start items-center gap-2">

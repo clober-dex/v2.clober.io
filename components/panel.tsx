@@ -3,16 +3,19 @@ import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { NextRouter } from 'next/router'
+import { CHAIN_IDS } from '@clober/v2-sdk'
 
 const Panel = ({
+  chainId,
   open,
   setOpen,
   router,
 }: {
+  chainId: CHAIN_IDS
   open: boolean
   setOpen: (open: boolean) => void
   router: NextRouter
-}) => {
+} & React.PropsWithChildren) => {
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-[10000]" onClose={setOpen}>
@@ -55,9 +58,13 @@ const Panel = ({
                             router.pathname === '/swap'
                           }
                           onClick={() => {
-                            router.replace('/limit', undefined, {
-                              shallow: true,
-                            })
+                            router.replace(
+                              `/limit?chain=${chainId}`,
+                              undefined,
+                              {
+                                shallow: true,
+                              },
+                            )
                             setOpen(false)
                           }}
                         >
@@ -66,9 +73,13 @@ const Panel = ({
                         <button
                           disabled={router.pathname === '/pool'}
                           onClick={() => {
-                            router.replace('/pool', undefined, {
-                              shallow: true,
-                            })
+                            router.replace(
+                              `/pool?chain=${chainId}`,
+                              undefined,
+                              {
+                                shallow: true,
+                              },
+                            )
                             setOpen(false)
                           }}
                         >
