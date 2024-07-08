@@ -55,7 +55,7 @@ const Panel = ({
                             router.pathname === '/swap'
                           }
                           onClick={() => {
-                            router.replace('limit', undefined, {
+                            router.replace('/limit', undefined, {
                               shallow: true,
                             })
                             setOpen(false)
@@ -66,7 +66,7 @@ const Panel = ({
                         <button
                           disabled={router.pathname === '/pool'}
                           onClick={() => {
-                            router.replace('pool', undefined, {
+                            router.replace('/pool', undefined, {
                               shallow: true,
                             })
                             setOpen(false)

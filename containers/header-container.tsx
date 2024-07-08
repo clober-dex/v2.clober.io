@@ -26,7 +26,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
           href="https://clober.io"
           rel="noreferrer"
         >
-          <img className="h-5 md:h-7" src="logo.svg" alt="logo" />
+          <img className="h-5 md:h-7" src="/logo.svg" alt="logo" />
         </Link>
         <div className="hidden lg:flex items-center gap-8">
           <button
@@ -34,7 +34,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
               router.pathname === '/limit' || router.pathname === '/swap'
             }
             onClick={() =>
-              router.replace('limit', undefined, {
+              router.replace('/limit', undefined, {
                 shallow: true,
               })
             }
@@ -45,7 +45,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
           <button
             disabled={router.pathname === '/pool'}
             onClick={() =>
-              router.replace('pool', undefined, {
+              router.replace('/pool', undefined, {
                 shallow: true,
               })
             }
