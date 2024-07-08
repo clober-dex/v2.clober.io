@@ -23,7 +23,7 @@ export const Default: Story = {
   args: {
     poolPosition: {
       pool: {
-        lp: {
+        address: {
           address: '0x0000000000000000000000000000000000000003',
           name: 'ETH-USDC-LP',
           symbol: 'ETH-USDC-LP',

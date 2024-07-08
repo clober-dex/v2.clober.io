@@ -9,7 +9,7 @@ import { PoolPositionCard } from '../components/card/pool-position-card'
 const pools: Pool[] = BERACHAIN_TESTNET_WHITELISTED_CURRENCIES.map(
   (currency) => {
     return {
-      lp: currency,
+      address: currency,
       currency0: currency,
       currency1: currency,
       apy: 120.5434,

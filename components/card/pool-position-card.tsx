@@ -41,7 +41,7 @@ export const PoolPositionCard = ({
               <div className="text-right text-white text-base">
                 {formatUnits(
                   poolPosition.amount,
-                  poolPosition.pool.lp.decimals,
+                  poolPosition.pool.address.decimals,
                 )}
               </div>
               <div className="text-center text-gray-400 text-sm font-semibold">
@@ -84,7 +84,10 @@ export const PoolPositionCard = ({
           </div>
           <div className="justify-start items-center gap-2 flex">
             <div className="text-white text-sm font-bold">
-              {formatUnits(poolPosition.amount, poolPosition.pool.lp.decimals)}
+              {formatUnits(
+                poolPosition.amount,
+                poolPosition.pool.address.decimals,
+              )}
             </div>
             <div className="text-gray-400 text-xs font-semibold">
               (${toCommaSeparated(poolPosition.value.toFixed(2))})

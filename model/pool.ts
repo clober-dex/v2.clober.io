@@ -1,7 +1,7 @@
 import { Currency } from './currency'
 
 export type Pool = {
-  lp: Currency
+  address: Currency
   currency0: Currency
   currency1: Currency
   apy: number
