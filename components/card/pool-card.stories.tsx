@@ -18,7 +18,7 @@ export const Default: Story = {
   args: {
     chainId: base.id,
     pool: {
-      address: {
+      lpCurrency: {
         address: '0x0000000000000000000000000000000000000003',
         name: 'ETH-USDC-LP',
         symbol: 'ETH-USDC-LP',
