@@ -1,30 +1,23 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { getAddress, isAddressEqual, zeroAddress } from 'viem'
-import { useAccount, useBalance, useQuery } from 'wagmi'
-import { readContracts } from '@wagmi/core'
+import { getAddress, isAddressEqual } from 'viem'
 import { getQuoteToken } from '@clober/v2-sdk'
 
 import { Currency } from '../../model/currency'
 import { useChainContext } from '../chain-context'
-import { Balances } from '../../model/balances'
-import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 import {
   fetchCurrenciesDone,
   fetchCurrency,
   LOCAL_STORAGE_INPUT_CURRENCY_KEY,
   LOCAL_STORAGE_OUTPUT_CURRENCY_KEY,
 } from '../../utils/currency'
-import { fetchWhitelistCurrencies } from '../../apis/currencies'
 import {
   DEFAULT_INPUT_CURRENCY,
   DEFAULT_OUTPUT_CURRENCY,
 } from '../../constants/currency'
 import { setQueryParams } from '../../utils/url'
+import { useCurrencyContext } from '../currency-context'
 
 type LimitContext = {
-  balances: Balances
-  currencies: Currency[]
-  setCurrencies: (currencies: Currency[]) => void
   isBid: boolean
   setIsBid: (isBid: (prevState: boolean) => boolean) => void
   showInputCurrencySelect: boolean
@@ -46,9 +39,6 @@ type LimitContext = {
 }
 
 const Context = React.createContext<LimitContext>({
-  balances: {},
-  currencies: [],
-  setCurrencies: () => {},
   isBid: true,
   setIsBid: () => {},
   showInputCurrencySelect: false,
@@ -70,9 +60,8 @@ const Context = React.createContext<LimitContext>({
 })
 
 export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
-  const { address: userAddress } = useAccount()
-  const { data: balance } = useBalance({ address: userAddress, watch: true })
   const { selectedChain } = useChainContext()
+  const { whitelistCurrencies, setCurrencies } = useCurrencyContext()
 
   const [isBid, setIsBid] = useState(true)
 
@@ -91,62 +80,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
   const [isPostOnly, setIsPostOnly] = useState(false)
   const [priceInput, setPriceInput] = useState('')
-
-  const { data: _currencies } = useQuery(
-    ['limit-currencies', selectedChain],
-    async () => {
-      return fetchWhitelistCurrencies(selectedChain.id)
-    },
-    {
-      initialData: [],
-    },
-  ) as {
-    data: Currency[]
-  }
-  const [currencies, setCurrencies] = useState<Currency[]>([])
-
-  const { data: balances } = useQuery(
-    ['limit-balances', userAddress, balance, selectedChain, currencies],
-    async () => {
-      if (!userAddress) {
-        return {}
-      }
-      const uniqueCurrencies = currencies
-        .filter(
-          (currency, index, self) =>
-            self.findIndex((c) =>
-              isAddressEqual(c.address, currency.address),
-            ) === index,
-        )
-        .filter((currency) => !isAddressEqual(currency.address, zeroAddress))
-      const results = await readContracts({
-        contracts: uniqueCurrencies.map((currency) => ({
-          address: currency.address,
-          abi: ERC20_PERMIT_ABI,
-          functionName: 'balanceOf',
-          args: [userAddress],
-        })),
-      })
-      return results.reduce(
-        (acc: {}, { result }, index: number) => {
-          const currency = uniqueCurrencies[index]
-          return {
-            ...acc,
-            [getAddress(currency.address)]: result ?? 0n,
-          }
-        },
-        {
-          [zeroAddress]: balance?.value ?? 0n,
-        },
-      )
-    },
-    {
-      refetchInterval: 5 * 1000,
-      refetchIntervalInBackground: true,
-    },
-  ) as {
-    data: Balances
-  }
 
   const setInputCurrency = useCallback(
     (currency: Currency | undefined) => {
@@ -189,7 +122,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
 
   useEffect(() => {
-    if (!fetchCurrenciesDone(_currencies, selectedChain)) {
+    if (!fetchCurrenciesDone(whitelistCurrencies, selectedChain)) {
       setInputCurrency(DEFAULT_INPUT_CURRENCY[selectedChain.id])
       setOutputCurrency(DEFAULT_OUTPUT_CURRENCY[selectedChain.id])
       return
@@ -204,7 +137,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       )
 
       const _inputCurrency = inputCurrencyAddress
-        ? _currencies.find((currency) =>
+        ? whitelistCurrencies.find((currency) =>
             isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
           ) ??
           (await fetchCurrency(
@@ -213,7 +146,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
           ))
         : DEFAULT_INPUT_CURRENCY[selectedChain.id]
       const _outputCurrency = outputCurrencyAddress
-        ? _currencies.find((currency) =>
+        ? whitelistCurrencies.find((currency) =>
             isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
           ) ??
           (await fetchCurrency(
@@ -223,7 +156,7 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
         : DEFAULT_OUTPUT_CURRENCY[selectedChain.id]
 
       setCurrencies(
-        [..._currencies]
+        [...whitelistCurrencies]
           .concat(
             _inputCurrency ? [_inputCurrency] : [],
             _outputCurrency ? [_outputCurrency] : [],
@@ -254,14 +187,17 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
       }
     }
     action()
-  }, [_currencies, selectedChain, setInputCurrency, setOutputCurrency])
+  }, [
+    selectedChain,
+    setCurrencies,
+    setInputCurrency,
+    setOutputCurrency,
+    whitelistCurrencies,
+  ])
 
   return (
     <Context.Provider
       value={{
-        balances: balances ?? {},
-        currencies,
-        setCurrencies,
         isBid,
         setIsBid,
         showInputCurrencySelect,
