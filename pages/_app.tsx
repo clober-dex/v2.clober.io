@@ -193,11 +193,19 @@ const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
 
 function App({ Component, pageProps }: AppProps) {
   const [open, setOpen] = useState(false)
+  const [history, setHistory] = useState<string[]>([])
   const router = useRouter()
 
   const handlePopState = useCallback(async () => {
-    window.location.reload()
-  }, [])
+    if (history.length > 1) {
+      setHistory((previous) => previous.slice(0, previous.length - 1))
+      router.push(history[history.length - 2])
+    }
+  }, [history, router])
+
+  useEffect(() => {
+    setHistory((previous) => [...previous, router.asPath])
+  }, [router.asPath])
 
   useEffect(() => {
     window.addEventListener('popstate', handlePopState)
