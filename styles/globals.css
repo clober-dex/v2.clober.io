@@ -6,27 +6,56 @@
 @tailwind utilities;
 
 @layer base {
-  [type="search"]::-webkit-search-decoration {display: none}
-  [type="search"]::-webkit-search-cancel-button {display: none}
-  [type="search"]::-webkit-search-results-button {display: none}
-  [type="search"]::-webkit-search-results-decoration {display: none}
+    [type="search"]::-webkit-search-decoration {
+        display: none
+    }
+
+    [type="search"]::-webkit-search-cancel-button {
+        display: none
+    }
+
+    [type="search"]::-webkit-search-results-button {
+        display: none
+    }
+
+    [type="search"]::-webkit-search-results-decoration {
+        display: none
+    }
 }
 
 html,
 body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-  Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  background-color: rgb(3 7 18);
+    padding: 0;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    background-color: rgb(3 7 18);
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+    color: inherit;
+    text-decoration: none;
 }
 
 * {
-  box-sizing: border-box;
-  @apply transition-colors duration-75;
+    box-sizing: border-box;
+    @apply transition-colors duration-75;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #1F2937;
+    border-radius: 12px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #090e18;
+    border-radius: 12px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgb(55 65 81);
 }

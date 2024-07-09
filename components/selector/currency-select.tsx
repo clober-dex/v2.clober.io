@@ -88,12 +88,16 @@ const CurrencySelect = ({
       />
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-center">
-          <div className="w-6 h-6 cursor-pointer relative" onClick={onBack}>
+          <div
+            className="w-6 h-6 cursor-pointer flex items-center justify-center shrink-0"
+            onClick={onBack}
+          >
             <LeftBracketAngleSvg />
           </div>
-          <div className="flex flex-1 items-center justify-center text-base sm:text-xl font-bold text-white">
+          <div className="flex flex-1 items-center justify-center text-base sm:text-xl font-bold text-white flex-grow">
             Select a token
           </div>
+          <div className="w-6 h-6 shrink-0"></div>
         </div>
         <div className="flex flex-col relative rounded shadow-sm">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -116,7 +120,7 @@ const CurrencySelect = ({
             />
           </div>
         </div>
-        <div className="flex flex-col h-60 overflow-y-auto bg-gray-900 rounded-b-xl sm:rounded-b-3xl">
+        <div className="flex flex-col h-60 overflow-y-auto custom-scrollbar bg-gray-900 rounded-b-xl sm:rounded-b-3xl">
           {deduplicateCurrencies(
             customizedCurrencies
               ? [...currencies, ...customizedCurrencies]
