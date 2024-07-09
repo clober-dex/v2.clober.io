@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import '../styles/globals.css'
 import '@rainbow-me/rainbowkit/styles.css'
 import {
@@ -41,6 +41,8 @@ import { RPC_URL } from '../constants/rpc-urls'
 import ErrorBoundary from '../components/error-boundary'
 import { beraTestnetChain } from '../constants/dev-chain'
 import { CurrencyProvider } from '../contexts/currency-context'
+import { PoolProvider } from '../contexts/pool/pool-context'
+import { PoolContractProvider } from '../contexts/pool/pool-contract-context'
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   supportChains.map((chain) => toWagmiChain(chain)),
@@ -132,6 +134,37 @@ const SwapProvidersWrapper = ({ children }: React.PropsWithChildren) => {
   )
 }
 
+const PoolProvidersWrapper = ({ children }: React.PropsWithChildren) => {
+  return (
+    <PoolProvider>
+      <PoolContractProvider>{children}</PoolContractProvider>
+    </PoolProvider>
+  )
+}
+
+const PanelWrapper = ({
+  open,
+  setOpen,
+  children,
+}: {
+  open: boolean
+  setOpen: (open: boolean) => void
+} & React.PropsWithChildren) => {
+  const router = useRouter()
+  const { selectedChain } = useChainContext()
+
+  return (
+    <Panel
+      chainId={selectedChain.id}
+      open={open}
+      setOpen={setOpen}
+      router={router}
+    >
+      {children}
+    </Panel>
+  )
+}
+
 const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
   const router = useRouter()
   const { selectedChain } = useChainContext()
@@ -142,11 +175,7 @@ const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
           <button
             className="flex font-bold items-center justify-center text-base sm:text-2xl w-16 sm:w-[120px] bg-transparent text-gray-500 disabled:text-white border-0 rounded-none p-2 border-b-4 border-b-transparent border-t-4 border-t-transparent disabled:border-b-white"
             disabled={router.pathname === '/limit'}
-            onClick={() =>
-              router.replace(`/limit?chain=${selectedChain.id}`, undefined, {
-                shallow: true,
-              })
-            }
+            onClick={() => router.push(`/limit?chain=${selectedChain.id}`)}
           >
             Limit
           </button>
@@ -159,9 +188,7 @@ const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
                   .filter((chainId) => chainId !== beraTestnetChain.id)
                   .includes(selectedChain.id)
               ) {
-                router.replace(`/swap?chain=${selectedChain.id}`, undefined, {
-                  shallow: true,
-                })
+                router.push(`/swap?chain=${selectedChain.id}`)
               }
             }}
           >
@@ -177,7 +204,25 @@ const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
 
 function App({ Component, pageProps }: AppProps) {
   const [open, setOpen] = useState(false)
+  const [history, setHistory] = useState<string[]>([])
   const router = useRouter()
+
+  const handlePopState = useCallback(async () => {
+    if (history.length > 1) {
+      setHistory((previous) => previous.slice(0, previous.length - 1))
+      router.push(history[history.length - 2])
+    }
+  }, [history, router])
+
+  useEffect(() => {
+    setHistory((previous) => [...previous, router.asPath])
+  }, [router.asPath])
+
+  useEffect(() => {
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [handlePopState])
+
   return (
     <>
       <ErrorBoundary>
@@ -193,8 +238,8 @@ function App({ Component, pageProps }: AppProps) {
             <TransactionProvider>
               <ChainProvider>
                 <CurrencyProvider>
-                  <LimitProvidersWrapper>
-                    {router.pathname === '/iframe' ? (
+                  {router.pathname === '/iframe' ? (
+                    <LimitProvidersWrapper>
                       <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
                         <HeaderContainer onMenuClick={() => setOpen(true)} />
 
@@ -204,10 +249,21 @@ function App({ Component, pageProps }: AppProps) {
                           </div>
                         </div>
                       </div>
-                    ) : (
+                    </LimitProvidersWrapper>
+                  ) : router.pathname.includes('/pool') ? (
+                    <PoolProvidersWrapper>
+                      <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
+                        <PanelWrapper open={open} setOpen={setOpen} />
+                        <HeaderContainer onMenuClick={() => setOpen(true)} />
+
+                        <Component {...pageProps} />
+                      </div>
+                    </PoolProvidersWrapper>
+                  ) : (
+                    <LimitProvidersWrapper>
                       <SwapProvidersWrapper>
                         <div className="flex flex-col w-[100vw] min-h-[100vh] bg-gray-950">
-                          <Panel open={open} setOpen={setOpen} />
+                          <PanelWrapper open={open} setOpen={setOpen} />
                           <HeaderContainer onMenuClick={() => setOpen(true)} />
                           <MainComponentWrapper>
                             <Component {...pageProps} />
@@ -215,8 +271,8 @@ function App({ Component, pageProps }: AppProps) {
                           <Footer />
                         </div>
                       </SwapProvidersWrapper>
-                    )}
-                  </LimitProvidersWrapper>
+                    </LimitProvidersWrapper>
+                  )}
                 </CurrencyProvider>
               </ChainProvider>
             </TransactionProvider>
