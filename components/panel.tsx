@@ -61,15 +61,21 @@ const Panel = ({
                             router.push(`/limit?chain=${chainId}`)
                             setOpen(false)
                           }}
+                          className="text-gray-500 font-semibold disabled:text-white"
                         >
                           Limit order / Swap
                         </button>
                         <button
-                          disabled={router.pathname.includes('/pool')}
+                          disabled={
+                            true
+                            /*TODO: router.pathname.includes('/pool')*/
+                          }
                           onClick={() => {
                             router.push(`/pool?chain=${chainId}`)
                             setOpen(false)
                           }}
+                          // className="text-gray-500 font-semibold disabled:text-white"
+                          className="text-gray-500 font-semibold"
                         >
                           Pool
                         </button>
