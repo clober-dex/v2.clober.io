@@ -12,13 +12,10 @@ import { useSwapContext } from '../contexts/swap/swap-context'
 import { useSwapContractContext } from '../contexts/swap/swap-contract-context'
 import { OdosLogoSvg } from '../components/svg/odos-logo-svg'
 import { testnetChainIds } from '../constants/chain'
+import { useCurrencyContext } from '../contexts/currency-context'
 
 export const SwapContainer = () => {
   const {
-    balances,
-    currencies,
-    setCurrencies,
-    prices,
     inputCurrency,
     setInputCurrency,
     inputCurrencyAmount,
@@ -28,6 +25,7 @@ export const SwapContainer = () => {
     slippageInput,
     setSlippageInput,
   } = useSwapContext()
+  const { balances, currencies, setCurrencies, prices } = useCurrencyContext()
   const { swap } = useSwapContractContext()
   const { data: feeData } = useFeeData()
   const { address: userAddress } = useAccount()

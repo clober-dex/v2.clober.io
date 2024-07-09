@@ -10,6 +10,7 @@ import { useChainContext } from '../contexts/chain-context'
 import { useMarketContext } from '../contexts/limit/market-context'
 import { useLimitContext } from '../contexts/limit/limit-context'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
+import { useCurrencyContext } from '../contexts/currency-context'
 
 export const IframeContainer = () => {
   const { selectedChain } = useChainContext()
@@ -43,10 +44,8 @@ export const IframeContainer = () => {
     setIsPostOnly,
     priceInput,
     setPriceInput,
-    balances,
-    currencies,
-    setCurrencies,
   } = useLimitContext()
+  const { balances, prices, currencies, setCurrencies } = useCurrencyContext()
 
   const [quoteCurrency, baseCurrency] = useMemo(() => {
     if (inputCurrency && outputCurrency) {
@@ -99,7 +98,7 @@ export const IframeContainer = () => {
           {availableDecimalPlacesGroups ? (
             <LimitForm
               chainId={selectedChain.id}
-              prices={{}} // todo
+              prices={prices}
               balances={balances}
               currencies={currencies}
               setCurrencies={setCurrencies}
