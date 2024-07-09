@@ -89,7 +89,7 @@ const CurrencySelect = ({
           />
         </div>
       </div>
-      <div className="flex relative h-72 md:h-full w-full">
+      <div className="flex relative h-60 lg:h-full w-full">
         <div className="absolute h-full w-full top-0 flex flex-col overflow-y-auto bg-gray-900 rounded-b-xl sm:rounded-b-3xl">
           {(customizedCurrency
             ? [...currencies, customizedCurrency]
