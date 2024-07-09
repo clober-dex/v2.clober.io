@@ -65,7 +65,7 @@ const Panel = ({
                           Limit order / Swap
                         </button>
                         <button
-                          disabled={router.pathname === '/pool'}
+                          disabled={router.pathname.includes('/pool')}
                           onClick={() => {
                             router.push(`/pool?chain=${chainId}`)
                             setOpen(false)

@@ -39,7 +39,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
             Limit order / Swap
           </button>
           <button
-            disabled={router.pathname === '/pool'}
+            disabled={router.pathname.includes('/pool')}
             onClick={() => router.push(`/pool?chain=${selectedChain.id}`)}
             className="text-sm text-gray-500 font-semibold disabled:text-white"
           >
