@@ -18,7 +18,7 @@ const Context = React.createContext<PoolContext>({
   setCurrency1Amount: () => {},
   asRatio: false,
   setAsRatio: () => {},
-  slippageInput: '',
+  slippageInput: '1',
   setSlippageInput: () => {},
 })
 
@@ -26,7 +26,7 @@ export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [currency0Amount, setCurrency0Amount] = React.useState('')
   const [currency1Amount, setCurrency1Amount] = React.useState('')
   const [asRatio, setAsRatio] = React.useState(false)
-  const [slippageInput, setSlippageInput] = React.useState('')
+  const [slippageInput, setSlippageInput] = React.useState('1')
 
   return (
     <Context.Provider

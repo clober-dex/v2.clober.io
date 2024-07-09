@@ -4,16 +4,30 @@ import { useRouter } from 'next/router'
 import { Pool } from '../model/pool'
 import { useChainContext } from '../contexts/chain-context'
 import { CurrencyIcon } from '../components/icon/currency-icon'
+import { AddLiquidityForm } from '../components/form/add-liquidity-form'
+import { usePoolContext } from '../contexts/pool/pool-context'
+import { useCurrencyContext } from '../contexts/currency-context'
 
 export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
   const [tab, setTab] = React.useState<'add-liquidity' | 'remove-liquidity'>(
     'add-liquidity',
   )
-  const { selectedChain } = useChainContext()
   const router = useRouter()
+  const { selectedChain } = useChainContext()
+  const { balances, prices } = useCurrencyContext()
+  const {
+    currency0Amount,
+    setCurrency0Amount,
+    currency1Amount,
+    setCurrency1Amount,
+    asRatio,
+    setAsRatio,
+    slippageInput,
+    setSlippageInput,
+  } = usePoolContext()
 
   return (
-    <div className="flex w-full h-full justify-center mt-8 md:mt-16">
+    <div className="flex w-full h-full justify-center mt-8 md:mt-16 mb-4 sm:mb-6">
       <div className="w-full lg:w-[992px] h-full flex flex-col items-start gap-8 md:gap-12 px-4 lg:px-0">
         <div className="flex w-full h-full items-center">
           <button
@@ -61,8 +75,9 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
             </div>
           </div>
         </div>
-        <div className="h-[592px] flex flex-col lg:flex-row items-center gap-8 self-stretch text-white">
-          <div className="flex flex-col h-full w-full md:w-[480px] items-start gap-8 md:gap-12">
+
+        <div className="flex flex-col lg:flex-row items-center gap-8 self-stretch text-white">
+          <div className="flex flex-col w-full sm:w-[480px] items-start gap-8 md:gap-12">
             <div className="flex flex-col item-st gap-3 md:gap-4 self-stretch">
               <div className="text-white text-sm md:text-base font-bold">
                 Token Price
@@ -102,11 +117,11 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
               <div className="text-white text-sm md:text-base font-bold">
                 Performance Chart
               </div>
-              <div className="flex w-full items-center gap-2 md:gap-3 self-stretch">
+              <div className="flex w-full items-center gap-2 sm:gap-3 self-stretch">
                 <div className="flex text-gray-500 text-xs md:text-sm font-semibold">
                   Sort by date
                 </div>
-                <button className="w-20 md:w-[118px] h-9 px-4 py-2 bg-gray-800 rounded-xl justify-center items-center gap-2 flex">
+                <button className="w-20 sm:w-[118px] h-9 px-4 py-2 bg-gray-800 rounded-xl justify-center items-center gap-2 flex">
                   <div className="opacity-90 text-center text-white text-xs md:text-sm font-semibold">
                     13.05.24
                   </div>
@@ -114,35 +129,26 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                 <div className="w-[10px] opacity-90 text-center text-white text-xs md:text-sm font-semibold">
                   ~
                 </div>
-                <button className="w-20 md:w-[118px] h-9 px-4 py-2 bg-gray-800 rounded-xl justify-center items-center gap-2 flex">
+                <button className="w-20 sm:w-[118px] h-9 px-4 py-2 bg-gray-800 rounded-xl justify-center items-center gap-2 flex">
                   <div className="opacity-90 text-center text-white text-xs md:text-sm font-semibold">
                     13.05.24
                   </div>
                 </button>
-                <button className="w-[58px] md:w-[102px] h-9 px-4 py-2 rounded-xl border-2 border-blue-500 border-solid justify-center items-center gap-2 flex">
+                <button className="w-[58px] sm:w-[102px] h-9 px-4 py-2 rounded-xl border-2 border-blue-500 border-solid justify-center items-center gap-2 flex">
                   <div className="opacity-90 text-center text-blue-500 text-xs md:text-sm font-bold">
                     View
                   </div>
                 </button>
               </div>
-              <div className="flex justify-center w-full">
-                <img
-                  className="hidden md:flex w-[480px] h-80 rounded-2xl"
-                  src="https://via.placeholder.com/480x320"
-                />
-                <img
-                  className="flex md:hidden w-[328px] h-60 rounded-2xl"
-                  src="https://via.placeholder.com/328x240"
-                />
-              </div>
+              <div className="flex justify-center w-full h-[240px] sm:h-[320px] bg-gray-700 rounded-2xl" />
             </div>
           </div>
-          <div className="flex h-full w-full md:w-[480px] flex-col justify-start items-start gap-4">
-            <div className="w-full h-11 md:h-14 p-1.5 md:px-2 rounded-xl md:rounded-2xl border-2 border-slate-800 border-solid justify-center items-center inline-flex">
+          <div className="flex flex-col w-full sm:w-[480px] justify-start items-start gap-4">
+            <div className="w-full sm:h-14 p-1.5 sm:px-2 rounded-xl md:rounded-2xl border-2 border-slate-800 border-solid justify-center items-center inline-flex">
               <button
                 disabled={tab === 'add-liquidity'}
                 onClick={() => setTab('add-liquidity')}
-                className="whitespace-nowrap flex-1 h-8 md:h-10 px-4 md:px-6 py-1.5 md:py-4 disabled:bg-slate-800 rounded-xl justify-center items-center gap-1 md:gap-2 flex"
+                className="whitespace-nowrap flex-1 h-8 sm:h-10 px-4 sm:px-6 py-1.5 sm:py-4 disabled:bg-slate-800 rounded-xl justify-center items-center gap-1 sm:gap-2 flex"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -166,7 +172,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
               <button
                 disabled={tab === 'remove-liquidity'}
                 onClick={() => setTab('remove-liquidity')}
-                className="whitespace-nowrap flex-1 h-8 md:h-10 px-4 md:px-6 py-1.5 md:py-4 disabled:bg-slate-800 rounded-xl justify-center items-center gap-1 md:gap-2 flex"
+                className="whitespace-nowrap flex-1 h-8 sm:h-10 px-4 sm:px-6 py-1.5 sm:py-4 disabled:bg-slate-800 rounded-xl justify-center items-center gap-1 sm:gap-2 flex"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -188,7 +194,32 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                 </div>
               </button>
             </div>
-            Right
+            <div className="p-6 bg-gray-900 rounded-2xl border flex-col justify-start items-start gap-8 flex w-full">
+              <AddLiquidityForm
+                pool={pool}
+                balances={balances}
+                prices={prices}
+                currency0Amount={currency0Amount}
+                setCurrency0Amount={setCurrency0Amount}
+                availableCurrency0Balance={
+                  balances[pool.currency0.address] ?? 0n
+                }
+                currency1Amount={currency1Amount}
+                setCurrency1Amount={setCurrency1Amount}
+                availableCurrency1Balance={
+                  balances[pool.currency1.address] ?? 0n
+                }
+                asRatio={asRatio}
+                setAsRatio={setAsRatio}
+                slippageInput={slippageInput}
+                setSlippageInput={setSlippageInput}
+                actionButtonProps={{
+                  disabled: false,
+                  onClick: () => {},
+                  text: 'Add Liquidity',
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
