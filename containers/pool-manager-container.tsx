@@ -7,6 +7,7 @@ import { CurrencyIcon } from '../components/icon/currency-icon'
 import { AddLiquidityForm } from '../components/form/add-liquidity-form'
 import { usePoolContext } from '../contexts/pool/pool-context'
 import { useCurrencyContext } from '../contexts/currency-context'
+import { RemoveLiquidityForm } from '../components/form/remove-liquidity-form'
 
 export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
   const [tab, setTab] = React.useState<'add-liquidity' | 'remove-liquidity'>(
@@ -24,6 +25,10 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
     setAsRatio,
     slippageInput,
     setSlippageInput,
+    lpCurrencyAmount,
+    setLpCurrencyAmount,
+    removeLiquidityType,
+    setRemoveLiquidityType,
   } = usePoolContext()
 
   return (
@@ -194,31 +199,70 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                 </div>
               </button>
             </div>
-            <div className="p-6 bg-gray-900 rounded-2xl border flex-col justify-start items-start gap-8 flex w-full">
-              <AddLiquidityForm
-                pool={pool}
-                balances={balances}
-                prices={prices}
-                currency0Amount={currency0Amount}
-                setCurrency0Amount={setCurrency0Amount}
-                availableCurrency0Balance={
-                  balances[pool.currency0.address] ?? 0n
-                }
-                currency1Amount={currency1Amount}
-                setCurrency1Amount={setCurrency1Amount}
-                availableCurrency1Balance={
-                  balances[pool.currency1.address] ?? 0n
-                }
-                asRatio={asRatio}
-                setAsRatio={setAsRatio}
-                slippageInput={slippageInput}
-                setSlippageInput={setSlippageInput}
-                actionButtonProps={{
-                  disabled: false,
-                  onClick: () => {},
-                  text: 'Add Liquidity',
-                }}
-              />
+            <div className="p-6 bg-gray-900 rounded-2xl border flex-col justify-start items-start gap-6 md:gap-8 flex w-full">
+              {tab === 'add-liquidity' ? (
+                <AddLiquidityForm
+                  pool={pool}
+                  prices={prices}
+                  currency0Amount={currency0Amount}
+                  setCurrency0Amount={setCurrency0Amount}
+                  availableCurrency0Balance={
+                    balances[pool.currency0.address] ?? 0n
+                  }
+                  currency1Amount={currency1Amount}
+                  setCurrency1Amount={setCurrency1Amount}
+                  availableCurrency1Balance={
+                    balances[pool.currency1.address] ?? 0n
+                  }
+                  asRatio={asRatio}
+                  setAsRatio={setAsRatio}
+                  slippageInput={slippageInput}
+                  setSlippageInput={setSlippageInput}
+                  receiveLpCurrencyAmount={1000999999999999900n}
+                  actionButtonProps={{
+                    disabled: false,
+                    onClick: () => {},
+                    text: 'Add Liquidity',
+                  }}
+                />
+              ) : (
+                <RemoveLiquidityForm
+                  pool={pool}
+                  prices={prices}
+                  lpCurrencyAmount={lpCurrencyAmount}
+                  setLpCurrencyAmount={setLpCurrencyAmount}
+                  availableLpCurrencyBalance={
+                    balances[pool.lpCurrency.address] ?? 0n
+                  }
+                  removeLiquidityType={removeLiquidityType}
+                  setRemoveLiquidityType={setRemoveLiquidityType}
+                  receiveCurrencies={[
+                    {
+                      currency: {
+                        address: '0x0000000000000000000000000000000000000000',
+                        name: 'ETH',
+                        symbol: 'ETH',
+                        decimals: 18,
+                      },
+                      amount: 500499999999999950n,
+                    },
+                    {
+                      currency: {
+                        address: '0x0000000000000000000000000000000000000000',
+                        name: 'ETH',
+                        symbol: 'ETH',
+                        decimals: 18,
+                      },
+                      amount: 500499999999999950n,
+                    },
+                  ]}
+                  actionButtonProps={{
+                    disabled: false,
+                    onClick: () => {},
+                    text: 'Remove Liquidity',
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>
