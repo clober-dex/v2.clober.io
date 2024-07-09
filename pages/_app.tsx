@@ -41,6 +41,8 @@ import { RPC_URL } from '../constants/rpc-urls'
 import ErrorBoundary from '../components/error-boundary'
 import { beraTestnetChain } from '../constants/dev-chain'
 import { CurrencyProvider } from '../contexts/currency-context'
+import { PoolProvider } from '../contexts/pool/pool-context'
+import { PoolContractProvider } from '../contexts/pool/pool-contract-context'
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   supportChains.map((chain) => toWagmiChain(chain)),
@@ -129,6 +131,14 @@ const SwapProvidersWrapper = ({ children }: React.PropsWithChildren) => {
     <SwapProvider>
       <SwapContractProvider>{children}</SwapContractProvider>
     </SwapProvider>
+  )
+}
+
+const PoolProvidersWrapper = ({ children }: React.PropsWithChildren) => {
+  return (
+    <PoolProvider>
+      <PoolContractProvider>{children}</PoolContractProvider>
+    </PoolProvider>
   )
 }
 
@@ -241,12 +251,14 @@ function App({ Component, pageProps }: AppProps) {
                       </div>
                     </LimitProvidersWrapper>
                   ) : router.pathname.includes('/pool') ? (
-                    <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
-                      <PanelWrapper open={open} setOpen={setOpen} />
-                      <HeaderContainer onMenuClick={() => setOpen(true)} />
+                    <PoolProvidersWrapper>
+                      <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
+                        <PanelWrapper open={open} setOpen={setOpen} />
+                        <HeaderContainer onMenuClick={() => setOpen(true)} />
 
-                      <Component {...pageProps} />
-                    </div>
+                        <Component {...pageProps} />
+                      </div>
+                    </PoolProvidersWrapper>
                   ) : (
                     <LimitProvidersWrapper>
                       <SwapProvidersWrapper>
