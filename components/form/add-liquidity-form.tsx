@@ -1,10 +1,7 @@
 import React from 'react'
-import { CHAIN_IDS } from '@clober/v2-sdk'
-import { getAddress } from 'viem'
 import BigNumber from 'bignumber.js'
 
 import { Pool } from '../../model/pool'
-import { Balances } from '../../model/balances'
 import { Prices } from '../../model/prices'
 import { ActionButton, ActionButtonProps } from '../button/action-button'
 import CurrencyAmountInput from '../input/currency-amount-input'
@@ -13,9 +10,9 @@ import { formatDollarValue, formatUnits } from '../../utils/bigint'
 import { SettingSvg } from '../svg/setting-svg'
 import { SwapSettingModal } from '../modal/swap-setting-modal'
 import useDropdown from '../../hooks/useDropdown'
+
 export const AddLiquidityForm = ({
   pool,
-  balances,
   prices,
   currency0Amount,
   setCurrency0Amount,
@@ -27,10 +24,10 @@ export const AddLiquidityForm = ({
   setAsRatio,
   slippageInput,
   setSlippageInput,
+  receiveLpCurrencyAmount,
   actionButtonProps,
 }: {
   pool: Pool
-  balances: Balances
   prices: Prices
   currency0Amount: string
   setCurrency0Amount: (inputCurrencyAmount: string) => void
@@ -42,6 +39,7 @@ export const AddLiquidityForm = ({
   setAsRatio: (asRatio: boolean) => void
   slippageInput: string
   setSlippageInput: (slippageInput: string) => void
+  receiveLpCurrencyAmount: bigint
   actionButtonProps: ActionButtonProps
 }) => {
   const { showDropdown, setShowDropdown } = useDropdown()
@@ -49,7 +47,7 @@ export const AddLiquidityForm = ({
   return (
     <>
       <div className="flex flex-col relative gap-4 self-stretch">
-        <div className="w-full text-white text-base font-bold">
+        <div className="w-full text-white text-sm md:text-base font-bold">
           Enter amount you’d like to add.
         </div>
         <div className="flex flex-col relative gap-4 self-stretch">
@@ -89,20 +87,21 @@ export const AddLiquidityForm = ({
             You will receive
           </div>
           <div className="flex items-center gap-1 ml-auto">
-            <div className="flex items-center gap-1 text-white text-base font-bold">
+            <div className="flex items-center gap-1 text-white text-sm md:text-base font-semibold">
               <div>
                 {toPlacesString(
                   formatUnits(
-                    balances[pool.lpCurrency.address] ?? 0n,
+                    receiveLpCurrencyAmount,
                     pool.lpCurrency.decimals,
                     prices[pool.lpCurrency.address],
                   ),
-                )}
+                )}{' '}
+                {pool.lpCurrency.symbol}
               </div>
-              <div className="text-gray-400 text-base font-semibold">
+              <div className="text-gray-400">
                 (
                 {formatDollarValue(
-                  balances[pool.lpCurrency.address] ?? 0n,
+                  receiveLpCurrencyAmount,
                   pool.lpCurrency.decimals,
                   prices[pool.lpCurrency.address],
                 )}
