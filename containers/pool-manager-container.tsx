@@ -6,6 +6,9 @@ import { useChainContext } from '../contexts/chain-context'
 import { CurrencyIcon } from '../components/icon/currency-icon'
 
 export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
+  const [tab, setTab] = React.useState<'add-liquidity' | 'remove-liquidity'>(
+    'add-liquidity',
+  )
   const { selectedChain } = useChainContext()
   const router = useRouter()
 
@@ -99,40 +102,94 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
               <div className="text-white text-sm md:text-base font-bold">
                 Performance Chart
               </div>
-              <div className="hidden md:flex w-full items-center gap-3 self-stretch">
-                <div className="flex text-gray-500 text-sm font-semibold">
+              <div className="flex w-full items-center gap-2 md:gap-3 self-stretch">
+                <div className="flex text-gray-500 text-xs md:text-sm font-semibold">
                   Sort by date
                 </div>
-                <button className="w-[118px] h-9 px-4 py-2 bg-gray-800 rounded-xl justify-center items-center gap-2 flex">
-                  <div className="opacity-90 text-center text-white text-sm font-semibold">
+                <button className="w-20 md:w-[118px] h-9 px-4 py-2 bg-gray-800 rounded-xl justify-center items-center gap-2 flex">
+                  <div className="opacity-90 text-center text-white text-xs md:text-sm font-semibold">
                     13.05.24
                   </div>
                 </button>
-                <div className="w-[10px] opacity-90 text-center text-white text-sm font-semibold">
+                <div className="w-[10px] opacity-90 text-center text-white text-xs md:text-sm font-semibold">
                   ~
                 </div>
-                <button className="w-[118px] h-9 px-4 py-2 bg-gray-800 rounded-xl justify-center items-center gap-2 flex">
-                  <div className="opacity-90 text-center text-white text-sm font-semibold">
+                <button className="w-20 md:w-[118px] h-9 px-4 py-2 bg-gray-800 rounded-xl justify-center items-center gap-2 flex">
+                  <div className="opacity-90 text-center text-white text-xs md:text-sm font-semibold">
                     13.05.24
                   </div>
                 </button>
-                <button className="w-[102px] h-9 px-4 py-2 rounded-xl border-2 border-blue-500 border-solid justify-center items-center gap-2 flex">
-                  <div className="opacity-90 text-center text-blue-500 text-sm font-bold">
+                <button className="w-[58px] md:w-[102px] h-9 px-4 py-2 rounded-xl border-2 border-blue-500 border-solid justify-center items-center gap-2 flex">
+                  <div className="opacity-90 text-center text-blue-500 text-xs md:text-sm font-bold">
                     View
                   </div>
                 </button>
               </div>
-              <img
-                className="hidden md:flex w-[480px] h-80 rounded-2xl"
-                src="https://via.placeholder.com/480x320"
-              />
-              <img
-                className="flex md:hidden w-[328px] h-60 rounded-2xl"
-                src="https://via.placeholder.com/328x240"
-              />
+              <div className="flex justify-center w-full">
+                <img
+                  className="hidden md:flex w-[480px] h-80 rounded-2xl"
+                  src="https://via.placeholder.com/480x320"
+                />
+                <img
+                  className="flex md:hidden w-[328px] h-60 rounded-2xl"
+                  src="https://via.placeholder.com/328x240"
+                />
+              </div>
             </div>
           </div>
-          <div className="flex h-full w-full md:w-[480px]">Right</div>
+          <div className="flex h-full w-full md:w-[480px] flex-col justify-start items-start gap-4">
+            <div className="w-full h-11 md:h-14 p-1.5 md:px-2 rounded-xl md:rounded-2xl border-2 border-slate-800 border-solid justify-center items-center inline-flex">
+              <button
+                disabled={tab === 'add-liquidity'}
+                onClick={() => setTab('add-liquidity')}
+                className="whitespace-nowrap flex-1 h-8 md:h-10 px-4 md:px-6 py-1.5 md:py-4 disabled:bg-slate-800 rounded-xl justify-center items-center gap-1 md:gap-2 flex"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  className="w-4 h-4 md:w-5 md:h-5"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18ZM11 6C11 5.44772 10.5523 5 10 5C9.44772 5 9 5.44772 9 6V9H6C5.44772 9 5 9.44772 5 10C5 10.5523 5.44772 11 6 11H9V14C9 14.5523 9.44772 15 10 15C10.5523 15 11 14.5523 11 14V11H14C14.5523 11 15 10.5523 15 10C15 9.44772 14.5523 9 14 9H11V6Z"
+                    fill="white"
+                  />
+                </svg>
+                <div className="opacity-90 text-center text-gray-400 text-sm md:text-base font-bold">
+                  Add Liquidity
+                </div>
+              </button>
+              <button
+                disabled={tab === 'remove-liquidity'}
+                onClick={() => setTab('remove-liquidity')}
+                className="whitespace-nowrap flex-1 h-8 md:h-10 px-4 md:px-6 py-1.5 md:py-4 disabled:bg-slate-800 rounded-xl justify-center items-center gap-1 md:gap-2 flex"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  className="w-4 h-4 md:w-5 md:h-5"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18ZM6 9C5.44772 9 5 9.44772 5 10C5 10.5523 5.44772 11 6 11H14C14.5523 11 15 10.5523 15 10C15 9.44772 14.5523 9 14 9H6Z"
+                    fill="#9CA3AF"
+                  />
+                </svg>
+                <div className="opacity-90 text-center text-gray-400 text-sm md:text-base font-bold">
+                  Remove Liquidity
+                </div>
+              </button>
+            </div>
+            Right
+          </div>
         </div>
       </div>
     </div>
