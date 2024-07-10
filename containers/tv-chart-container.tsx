@@ -4,7 +4,6 @@ import { Tooltip } from 'react-tooltip'
 
 import {
   CustomTimezones,
-  IChartingLibraryWidget,
   LanguageCode,
   ResolutionString,
   widget,
@@ -28,12 +27,11 @@ export const TvChartContainer = ({
   chainId: CHAIN_IDS
   market: Market
 }) => {
-  const [mounted, setMounted] = useState(false)
   const [interval, setInterval] = useState('15' as ResolutionString)
   const [fullscreen, setFullscreen] = useState(false)
 
-  const ref = useRef<any>()
-  const refWidget = useRef<IChartingLibraryWidget>(null)
+  const chartContainerRef =
+    useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>
 
   const symbol = useMemo(
     () => `${market.base.symbol}/${market.quote.symbol}`,
@@ -41,13 +39,11 @@ export const TvChartContainer = ({
   )
 
   useEffect(() => {
-    setMounted(false)
-    // @ts-ignore
-    refWidget.current = new widget({
+    const tvWidget = new widget({
       symbol,
-      datafeed: new DataFeed(chainId, market),
+      datafeed: new DataFeed(chainId, market.base, market.quote),
       interval,
-      container: ref.current,
+      container: chartContainerRef.current,
       library_path: '/static/charting_library/',
       locale: getLanguageFromURL() || 'en',
       disabled_features: [
@@ -64,6 +60,8 @@ export const TvChartContainer = ({
       client_id: 'tradingview.com',
       user_id: 'public_user_id',
       theme: 'Dark',
+      timezone: Intl.DateTimeFormat().resolvedOptions()
+        .timeZone as CustomTimezones,
       autosize: true,
       toolbar_bg: '#111827',
       loading_screen: {
@@ -75,58 +73,18 @@ export const TvChartContainer = ({
       },
     })
 
-    refWidget.current.onChartReady(() => {
-      if (!refWidget.current) {
-        return
-      }
-      refWidget.current.applyOverrides({
+    tvWidget.onChartReady(() => {
+      tvWidget.applyOverrides({
         'paneProperties.backgroundGradientStartColor': '#111827',
         'paneProperties.backgroundGradientEndColor': '#111827',
       })
-      refWidget.current.activeChart().createStudy('Volume', false, false)
-      setMounted(true)
+      tvWidget.activeChart().createStudy('Volume', false, false)
     })
 
     return () => {
-      if (refWidget.current) {
-        refWidget.current.remove()
-        setMounted(false)
-      }
+      tvWidget.remove()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chainId, market])
-
-  useEffect(() => {
-    if (mounted && refWidget.current && refWidget.current.activeChart) {
-      try {
-        refWidget.current.activeChart().setSymbol(symbol || '')
-        refWidget.current
-          ?.activeChart()
-          .getTimezoneApi()
-          .setTimezone(
-            Intl.DateTimeFormat().resolvedOptions().timeZone as CustomTimezones,
-          )
-      } catch (e) {
-        console.error(e)
-      }
-    }
-  }, [mounted, symbol])
-
-  const onSetInterval = (key: ResolutionString) => {
-    setInterval(key)
-    refWidget.current?.activeChart().setResolution(key)
-    // set local timezone in tradingview library using IChartWidgetApi.getTimezoneApi
-    try {
-      refWidget.current
-        ?.activeChart()
-        .getTimezoneApi()
-        .setTimezone(
-          Intl.DateTimeFormat().resolvedOptions().timeZone as CustomTimezones,
-        )
-    } catch (e) {
-      console.error(e)
-    }
-  }
+  }, [symbol, interval, chainId, market.base, market.quote])
 
   return (
     <>
@@ -167,7 +125,7 @@ export const TvChartContainer = ({
                   ? 'bg-gray-700 text-white'
                   : 'bg-transparent text-gray-500 hover:bg-gray-800 hover:text-gray-200'
               }`}
-              onClick={() => onSetInterval(key as ResolutionString)}
+              onClick={() => setInterval(key as ResolutionString)}
             >
               {label.toUpperCase()}
             </button>
@@ -212,7 +170,10 @@ export const TvChartContainer = ({
             </svg>
           </button>
         </div>
-        <div className="flex flex-col flex-1 [&>iframe]:flex-1" ref={ref} />
+        <div
+          className="flex flex-col flex-1 [&>iframe]:flex-1"
+          ref={chartContainerRef}
+        />
       </div>
     </>
   )
