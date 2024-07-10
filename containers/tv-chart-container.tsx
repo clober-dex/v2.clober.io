@@ -11,6 +11,8 @@ import {
 import DataFeed from '../utils/datafeed'
 import { SUPPORTED_INTERVALS } from '../utils/chart'
 import { QuestionMarkSvg } from '../components/svg/question-mark-svg'
+import CloseSvg from '../components/svg/close-svg'
+import { getWindowSize } from '../utils/screen'
 
 function getLanguageFromURL(): LanguageCode | null {
   const regex = new RegExp('[\\?&]lang=([^&#]*)')
@@ -23,12 +25,20 @@ function getLanguageFromURL(): LanguageCode | null {
 export const TvChartContainer = ({
   chainId,
   market,
+  setShowOrderBook,
 }: {
   chainId: CHAIN_IDS
   market: Market
+  setShowOrderBook: (showOrderBook: boolean) => void
 }) => {
-  const [interval, setInterval] = useState('15' as ResolutionString)
-  const [fullscreen, setFullscreen] = useState(false)
+  const [windowSize, setWindowSize] = useState(getWindowSize())
+  const isMobile = useMemo(() => windowSize.width <= 1024, [windowSize])
+  const [interval, setInterval] = useState('60' as ResolutionString)
+  const [_fullscreen, setFullscreen] = useState(false)
+  const fullscreen = useMemo(
+    () => _fullscreen || isMobile,
+    [_fullscreen, isMobile],
+  )
 
   const chartContainerRef =
     useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>
@@ -37,6 +47,16 @@ export const TvChartContainer = ({
     () => `${market.base.symbol}/${market.quote.symbol}`,
     [market],
   )
+
+  useEffect(() => {
+    const handleWindowResize = () => {
+      setWindowSize(getWindowSize())
+    }
+    window.addEventListener('resize', handleWindowResize)
+    return () => {
+      window.removeEventListener('resize', handleWindowResize)
+    }
+  }, [])
 
   useEffect(() => {
     const tvWidget = new widget({
@@ -130,6 +150,12 @@ export const TvChartContainer = ({
               {label.toUpperCase()}
             </button>
           ))}
+          <button
+            onClick={() => setShowOrderBook(true)}
+            className="flex lg:hidden p-0 pl-2 bg-transparent"
+          >
+            <CloseSvg className="w-3 h-3" />
+          </button>
           <button
             className={`max-lg:hidden p-0 pl-2 bg-transparent`}
             onClick={() => setFullscreen((x) => !x)}
