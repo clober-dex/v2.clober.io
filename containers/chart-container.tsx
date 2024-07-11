@@ -12,8 +12,10 @@ const TVChartContainer = dynamic(
 
 export const ChartContainer = ({
   selectedMarket,
+  setShowOrderBook,
 }: {
   selectedMarket: Market
+  setShowOrderBook: (showOrderBook: boolean) => void
 }) => {
   const { selectedChain } = useChainContext()
   const [isScriptReady, setIsScriptReady] = useState(false)
@@ -28,7 +30,11 @@ export const ChartContainer = ({
         }}
       />
       {isScriptReady ? (
-        <TVChartContainer chainId={selectedChain.id} market={selectedMarket} />
+        <TVChartContainer
+          chainId={selectedChain.id}
+          market={selectedMarket}
+          setShowOrderBook={setShowOrderBook}
+        />
       ) : (
         <></>
       )}

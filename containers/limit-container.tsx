@@ -99,7 +99,10 @@ export const LimitContainer = () => {
           <></>
         )}
         {!showOrderBook && selectedMarket ? (
-          <ChartContainer selectedMarket={selectedMarket} />
+          <ChartContainer
+            selectedMarket={selectedMarket}
+            setShowOrderBook={setShowOrderBook}
+          />
         ) : (
           <></>
         )}
