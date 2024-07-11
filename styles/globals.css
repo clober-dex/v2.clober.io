@@ -47,15 +47,14 @@ a {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: #1F2937;
+    width: 4px;
+    background: rgb(17 24 39);
     border-radius: 12px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #090e18;
+    width: 4px;
+    height: 80px;
+    background: #374151;
     border-radius: 12px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgb(55 65 81);
 }

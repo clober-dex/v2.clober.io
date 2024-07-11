@@ -153,7 +153,7 @@ const CurrencySelect = ({
             .map((currency) => (
               <button
                 key={currency.address}
-                className="flex w-full px-4 py-2 items-center justify-between text-start hover:bg-gray-700 rounded-lg"
+                className="flex w-full px-4 py-2 items-center justify-between text-start hover:bg-gray-700 rounded-lg shrink-0"
                 onClick={() => {
                   if (currency.isVerified) {
                     onCurrencySelect(currency)
