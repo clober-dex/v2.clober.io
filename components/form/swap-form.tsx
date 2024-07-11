@@ -179,7 +179,7 @@ export const SwapForm = ({
             <>
               {(exchangeRate ? toPlacesString(exchangeRate) : '?') + ' '}
               {(outputCurrency?.symbol ?? 'OUT') + ' '}
-              <span className="text-gray-500">
+              <span className="flex items-center text-gray-500">
                 (~$
                 {toPlacesString(
                   exchangeRate && outputCurrency
