@@ -36,7 +36,10 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { data: whitelistCurrencies } = useQuery(
     ['currencies', selectedChain],
     async () => {
-      return fetchWhitelistCurrencies(selectedChain.id)
+      return fetchWhitelistCurrencies(
+        selectedChain.id,
+        AGGREGATORS[selectedChain.id],
+      )
     },
     {
       initialData: [],

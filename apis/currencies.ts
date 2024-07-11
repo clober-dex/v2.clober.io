@@ -1,27 +1,24 @@
 import { CHAIN_IDS } from '@clober/v2-sdk'
-import { getAddress } from 'viem'
 
-import { Currency } from '../model/currency'
 import { WHITELISTED_CURRENCIES } from '../constants/currency'
+import { Currency } from '../model/currency'
+import { Aggregator } from '../model/aggregator'
 
-import { fetchApi } from './utils'
-
-export async function fetchWhitelistCurrencies(chainId: CHAIN_IDS) {
+export async function fetchWhitelistCurrencies(
+  chainId: CHAIN_IDS,
+  aggregators: Aggregator[],
+): Promise<Currency[]> {
   try {
-    const currencies = Object.entries(
-      (
-        await fetchApi<{
-          tokenMap: Currency[]
-        }>('https://api.odos.xyz', `info/tokens/${chainId}`)
-      ).tokenMap,
-    ).map(([address, currency]) => ({
-      address: getAddress(address),
-      name: currency.name,
-      symbol: currency.symbol,
-      decimals: currency.decimals,
-    }))
-    return WHITELISTED_CURRENCIES[chainId].concat(currencies)
-  } catch (e) {
+    const currencies = await Promise.all(
+      aggregators.map((aggregator) => aggregator.currencies()),
+    )
     return WHITELISTED_CURRENCIES[chainId]
+      .concat(currencies.flat())
+      .map((currency) => ({ ...currency, isVerified: true }))
+  } catch (e) {
+    return WHITELISTED_CURRENCIES[chainId].map((currency) => ({
+      ...currency,
+      isVerified: true,
+    }))
   }
 }
