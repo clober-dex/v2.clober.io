@@ -87,7 +87,7 @@ const CurrencySelect = ({
         onCurrencySelect={onCurrencySelect}
         setInspectingCurrency={setInspectingCurrency}
       />
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 h-full">
         <div className="flex items-center justify-center">
           <div
             className="w-6 h-6 cursor-pointer flex items-center justify-center shrink-0"
@@ -121,7 +121,7 @@ const CurrencySelect = ({
             />
           </div>
         </div>
-        <div className="flex flex-col h-60 overflow-y-auto custom-scrollbar bg-gray-900 rounded-b-xl sm:rounded-b-3xl">
+        <div className="flex flex-col h-full overflow-y-auto custom-scrollbar bg-gray-900 rounded-b-xl sm:rounded-b-3xl">
           {deduplicateCurrencies(
             customizedCurrencies
               ? [...currencies, ...customizedCurrencies]

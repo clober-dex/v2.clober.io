@@ -129,7 +129,7 @@ export const LimitContainer = () => {
         ) : (
           <></>
         )}
-        <div className="flex flex-col rounded-2xl bg-gray-900 p-6 w-[360px] sm:w-[480px] lg:h-[460px]">
+        <div className="flex flex-col rounded-2xl bg-gray-900 p-6 w-[360px] sm:w-[480px] h-[391px] md:h-[459px] lg:h-[460px]">
           {availableDecimalPlacesGroups ? (
             <LimitForm
               chainId={selectedChain.id}

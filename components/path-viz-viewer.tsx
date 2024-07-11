@@ -72,7 +72,7 @@ export default function PathVizViewer({
     </ReactFlowProvider>
   ) : (
     <div
-      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] h-full w-full md:w-[480px] lg:w-[600px]`}
+      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] h-full w-full md:w-[480px] xl:w-[600px]`}
     ></div>
   )
 }
@@ -261,7 +261,7 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
 
   return (
     <div
-      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] h-full w-full md:w-[480px] lg:w-[600px]`}
+      className={`flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] h-full w-full md:w-[480px] xl:w-[600px]`}
     >
       <ReactFlow
         nodeTypes={{
