@@ -29,3 +29,10 @@ export const setQueryParams = (params: { [key: string]: string }) => {
   url.searchParams.sort()
   window.history.replaceState({}, '', url)
 }
+
+export const sliceUrl = (url: string, maxLength: number) => {
+  if (url.length <= maxLength) {
+    return url
+  }
+  return `${url.slice(0, maxLength)}...`
+}

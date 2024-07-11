@@ -82,6 +82,7 @@ const CurrencySelect = ({
   return (
     <>
       <InspectCurrencyModal
+        chainId={chainId}
         currency={inspectingCurrency}
         onCurrencySelect={onCurrencySelect}
         setInspectingCurrency={setInspectingCurrency}
@@ -208,7 +209,7 @@ const CurrencySelect = ({
                       </div>
                       {!currency.isVerified ? (
                         <button
-                          className="flex px-1 py-[2px] justify-center items-center gap-1 rounded bg-[#2B3544] active:ring-2"
+                          className="flex px-1 py-[2px] justify-center items-center gap-1 rounded bg-gray-800 active:ring-2"
                           onClick={(e) => {
                             e.stopPropagation()
                             navigator.clipboard.writeText(currency.address)

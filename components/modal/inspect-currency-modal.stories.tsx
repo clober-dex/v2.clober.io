@@ -15,6 +15,7 @@ type Story = StoryObj<typeof InspectCurrencyModal>
 
 export const Default: Story = {
   args: {
+    chainId: 1,
     currency: {
       address: '0x0000000000000000000000000000000000000003',
       name: 'ETH',
