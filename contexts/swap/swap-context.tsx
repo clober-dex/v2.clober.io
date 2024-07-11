@@ -1,16 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { useAccount, useBalance, useQuery } from 'wagmi'
-import { readContracts } from '@wagmi/core'
-import { getAddress, isAddressEqual, zeroAddress } from 'viem'
+import { getAddress, isAddressEqual } from 'viem'
 
-import { Balances } from '../../model/balances'
 import { Currency } from '../../model/currency'
-import { Prices } from '../../model/prices'
-import { fetchCurrencies } from '../../apis/swap/currencies'
-import { AGGREGATORS } from '../../constants/aggregators'
-import { fetchPrices } from '../../apis/swap/prices'
 import { useChainContext } from '../chain-context'
-import { ERC20_PERMIT_ABI } from '../../abis/@openzeppelin/erc20-permit-abi'
 import {
   deduplicateCurrencies,
   fetchCurrenciesDone,
@@ -23,12 +15,9 @@ import {
   DEFAULT_INPUT_CURRENCY,
   DEFAULT_OUTPUT_CURRENCY,
 } from '../../constants/currency'
+import { useCurrencyContext } from '../currency-context'
 
 type SwapContext = {
-  currencies: Currency[]
-  setCurrencies: (currencies: Currency[]) => void
-  prices: Prices
-  balances: Balances
   inputCurrency: Currency | undefined
   setInputCurrency: (currency: Currency | undefined) => void
   inputCurrencyAmount: string
@@ -40,10 +29,6 @@ type SwapContext = {
 }
 
 const Context = React.createContext<SwapContext>({
-  currencies: [],
-  setCurrencies: () => {},
-  prices: {},
-  balances: {},
   inputCurrency: undefined,
   setInputCurrency: () => {},
   inputCurrencyAmount: '',
@@ -55,12 +40,8 @@ const Context = React.createContext<SwapContext>({
 })
 
 export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
-  const { address: userAddress } = useAccount()
-  const { data: balance } = useBalance({
-    address: userAddress,
-    watch: true,
-  })
   const { selectedChain } = useChainContext()
+  const { whitelistCurrencies, setCurrencies } = useCurrencyContext()
   const [inputCurrency, _setInputCurrency] = useState<Currency | undefined>(
     undefined,
   )
@@ -69,68 +50,6 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
     undefined,
   )
   const [slippageInput, setSlippageInput] = useState('1')
-
-  const { data: _currencies } = useQuery(
-    ['swap-currencies', selectedChain],
-    async () => {
-      return fetchCurrencies(selectedChain.id, AGGREGATORS[selectedChain.id])
-    },
-    {
-      initialData: [],
-    },
-  ) as {
-    data: Currency[]
-  }
-  const [currencies, setCurrencies] = useState<Currency[]>([])
-
-  const { data: prices } = useQuery(
-    ['swap-prices', selectedChain],
-    async () => {
-      return fetchPrices(AGGREGATORS[selectedChain.id])
-    },
-    {
-      refetchInterval: 10 * 1000,
-      refetchIntervalInBackground: true,
-    },
-  )
-
-  const { data: balances } = useQuery(
-    ['swap-balances', userAddress, balance, currencies],
-    async () => {
-      if (!userAddress || !currencies) {
-        return {}
-      }
-      const uniqueCurrencies = deduplicateCurrencies(
-        currencies.filter(
-          (currency) => !isAddressEqual(currency.address, zeroAddress),
-        ),
-      )
-      const results = await readContracts({
-        contracts: uniqueCurrencies.map((currency) => ({
-          address: currency.address,
-          abi: ERC20_PERMIT_ABI,
-          functionName: 'balanceOf',
-          args: [userAddress],
-        })),
-      })
-      return results.reduce(
-        (acc: {}, { result }, index: number) => {
-          const currency = uniqueCurrencies[index]
-          return {
-            ...acc,
-            [getAddress(currency.address)]: result ?? 0n,
-          }
-        },
-        {
-          [zeroAddress]: balance?.value ?? 0n,
-        },
-      )
-    },
-    {
-      refetchInterval: 10 * 1000,
-      refetchIntervalInBackground: true,
-    },
-  ) as { data: Balances }
 
   const setInputCurrency = useCallback(
     (currency: Currency | undefined) => {
@@ -173,7 +92,7 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
 
   useEffect(() => {
-    if (!fetchCurrenciesDone(_currencies, selectedChain)) {
+    if (!fetchCurrenciesDone(whitelistCurrencies, selectedChain)) {
       setInputCurrency(DEFAULT_INPUT_CURRENCY[selectedChain.id])
       setOutputCurrency(DEFAULT_OUTPUT_CURRENCY[selectedChain.id])
       return
@@ -188,7 +107,7 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
       )
 
       const _inputCurrency = inputCurrencyAddress
-        ? _currencies.find((currency) =>
+        ? whitelistCurrencies.find((currency) =>
             isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
           ) ??
           (await fetchCurrency(
@@ -197,7 +116,7 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
           ))
         : DEFAULT_INPUT_CURRENCY[selectedChain.id]
       const _outputCurrency = outputCurrencyAddress
-        ? _currencies.find((currency) =>
+        ? whitelistCurrencies.find((currency) =>
             isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
           ) ??
           (await fetchCurrency(
@@ -208,7 +127,7 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
       setCurrencies(
         deduplicateCurrencies(
-          [..._currencies].concat(
+          [...whitelistCurrencies].concat(
             _inputCurrency ? [_inputCurrency] : [],
             _outputCurrency ? [_outputCurrency] : [],
           ),
@@ -218,15 +137,17 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
       setOutputCurrency(_outputCurrency)
     }
     action()
-  }, [_currencies, selectedChain, setInputCurrency, setOutputCurrency])
+  }, [
+    selectedChain,
+    setCurrencies,
+    setInputCurrency,
+    setOutputCurrency,
+    whitelistCurrencies,
+  ])
 
   return (
     <Context.Provider
       value={{
-        currencies: currencies ?? [],
-        setCurrencies,
-        prices: prices ?? {},
-        balances: balances ?? {},
         inputCurrency,
         setInputCurrency,
         inputCurrencyAmount,

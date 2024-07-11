@@ -1,6 +1,6 @@
-import { Meta, StoryObj } from '@storybook/react'
-
 import '../styles/globals.css'
+import { Meta, StoryObj } from '@storybook/react'
+import { base } from 'viem/chains'
 
 import Panel from './panel'
 
@@ -15,6 +15,7 @@ export default {
 type Story = StoryObj<typeof Panel>
 export const Default: Story = {
   args: {
+    chainId: base.id,
     open: true,
     setOpen: () => {},
     // @ts-ignore

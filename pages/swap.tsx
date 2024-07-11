@@ -19,9 +19,7 @@ export default function Swap() {
         .filter((chainId) => chainId !== beraTestnetChain.id)
         .includes(selectedChain.id)
     ) {
-      router.replace(`/limit?chain=${selectedChain.id}`, undefined, {
-        shallow: true,
-      })
+      router.push(`/limit?chain=${selectedChain.id}`)
       return
     }
 

@@ -1,9 +1,4 @@
-import {
-  CHAIN_IDS,
-  getChartLogs,
-  getLatestChartLog,
-  Market,
-} from '@clober/v2-sdk'
+import { CHAIN_IDS, getChartLogs, getLatestChartLog } from '@clober/v2-sdk'
 
 import {
   Bar,
@@ -19,8 +14,10 @@ import {
   SearchSymbolsCallback,
   SubscribeBarsCallback,
 } from '../public/static/charting_library'
+import { Currency } from '../model/currency'
 
 import { SUPPORTED_INTERVALS } from './chart'
+import { getPriceDecimals } from './prices'
 
 const configurationData: Partial<DatafeedConfiguration> &
   Required<
@@ -50,15 +47,21 @@ const configurationData: Partial<DatafeedConfiguration> &
 
 export default class DataFeed implements IBasicDataFeed {
   private chainId: CHAIN_IDS
-  private market: Market
+  private baseCurrency: Currency
+  private quoteCurrency: Currency
 
-  constructor(chainId: CHAIN_IDS, market: Market) {
+  constructor(
+    chainId: CHAIN_IDS,
+    baseCurrency: Currency,
+    quoteCurrency: Currency,
+  ) {
     this.chainId = chainId
-    this.market = market
+    this.baseCurrency = baseCurrency
+    this.quoteCurrency = quoteCurrency
   }
 
   onReady(callback: OnReadyCallback) {
-    setTimeout(() => callback(configurationData))
+    setTimeout(() => callback(configurationData), 0)
   }
 
   async searchSymbols(
@@ -70,9 +73,7 @@ export default class DataFeed implements IBasicDataFeed {
     symbolType: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onResult: SearchSymbolsCallback,
-  ) {
-    onResult([])
-  }
+  ) {}
 
   async resolveSymbol(
     symbolName: string,
@@ -81,14 +82,14 @@ export default class DataFeed implements IBasicDataFeed {
   ) {
     const { close } = await getLatestChartLog({
       chainId: this.chainId.valueOf(),
-      base: this.market.base.address,
-      quote: this.market.quote.address,
+      base: this.baseCurrency.address,
+      quote: this.quoteCurrency.address,
     })
     if (close === '0') {
       onError('cannot resolve symbol')
       return
     }
-
+    const priceDecimal = getPriceDecimals(Number(close)) + 1
     onResolve({
       name: symbolName, // display name for users
       ticker: symbolName,
@@ -98,9 +99,11 @@ export default class DataFeed implements IBasicDataFeed {
       session: '24x7',
       timezone: 'Etc/UTC',
       exchange: 'Clober',
+      minmov: 1 / 10 ** priceDecimal,
+      pricescale: 10 ** priceDecimal,
       listed_exchange: 'Clober',
       has_intraday: true, // has minutes historical data
-      has_weekly_and_monthly: false, // has weekly data
+      has_weekly_and_monthly: true, // has weekly data
       visible_plots_set: 'ohlcv',
       supported_resolutions: configurationData.supported_resolutions,
       volume_precision: 2,
@@ -123,14 +126,16 @@ export default class DataFeed implements IBasicDataFeed {
         (interval) => interval[0] === resolution,
       ) || SUPPORTED_INTERVALS[0])[1]
 
-      const chartLogs = await getChartLogs({
-        chainId: this.chainId.valueOf(),
-        quote: this.market.quote.address,
-        base: this.market.base.address,
-        intervalType: resolutionKey,
-        from,
-        to,
-      })
+      const chartLogs = (
+        await getChartLogs({
+          chainId: this.chainId.valueOf(),
+          quote: this.quoteCurrency.address,
+          base: this.baseCurrency.address,
+          intervalType: resolutionKey,
+          from,
+          to,
+        })
+      ).filter((v) => Number(v.close) > 0 && Number(v.open) > 0)
       console.log('getBars', {
         resolution,
         resolutionKey,
@@ -140,7 +145,7 @@ export default class DataFeed implements IBasicDataFeed {
       })
       if (chartLogs.length === 0) {
         onResult([], {
-          noData: false,
+          noData: true,
         })
         return
       }

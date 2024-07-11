@@ -26,8 +26,27 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
           href="https://clober.io"
           rel="noreferrer"
         >
-          <img className="h-5 md:h-7" src="logo.svg" alt="logo" />
+          <img className="h-5 md:h-7" src="/logo.svg" alt="logo" />
         </Link>
+        <div className="hidden lg:flex items-center gap-8">
+          <button
+            disabled={
+              router.pathname === '/limit' || router.pathname === '/swap'
+            }
+            onClick={() => router.push(`/limit?chain=${selectedChain.id}`)}
+            className="text-sm text-gray-500 font-semibold disabled:text-white"
+          >
+            Limit order / Swap
+          </button>
+          <button
+            disabled={true /*TODO: router.pathname.includes('/pool')*/}
+            onClick={() => router.push(`/pool?chain=${selectedChain.id}`)}
+            // className="text-sm text-gray-500 font-semibold disabled:text-white"
+            className="text-sm text-gray-500 font-semibold"
+          >
+            Pool
+          </button>
+        </div>
       </div>
       <div className="flex gap-2 w-auto md:gap-4 ml-auto">
         <div className="hidden lg:flex items-center justify-center mr-2 gap-4">

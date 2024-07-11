@@ -2,14 +2,20 @@ import React, { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
+import { NextRouter } from 'next/router'
+import { CHAIN_IDS } from '@clober/v2-sdk'
 
 const Panel = ({
+  chainId,
   open,
   setOpen,
+  router,
 }: {
+  chainId: CHAIN_IDS
   open: boolean
   setOpen: (open: boolean) => void
-}) => {
+  router: NextRouter
+} & React.PropsWithChildren) => {
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-[10000]" onClose={setOpen}>
@@ -46,6 +52,47 @@ const Panel = ({
                     </div>
                     <div className="flex flex-col text-white justify-center text-base font-bold relative mb-6 flex-1 pl-6 pr-16 gap-8">
                       <div className="flex flex-col gap-4 items-start w-[192px]">
+                        <button
+                          disabled={
+                            router.pathname === '/limit' ||
+                            router.pathname === '/swap'
+                          }
+                          onClick={() => {
+                            router.push(`/limit?chain=${chainId}`)
+                            setOpen(false)
+                          }}
+                          className="text-gray-500 font-semibold disabled:text-white"
+                        >
+                          Limit order / Swap
+                        </button>
+                        <button
+                          disabled={
+                            true
+                            /*TODO: router.pathname.includes('/pool')*/
+                          }
+                          onClick={() => {
+                            router.push(`/pool?chain=${chainId}`)
+                            setOpen(false)
+                          }}
+                          // className="text-gray-500 font-semibold disabled:text-white"
+                          className="text-gray-500 font-semibold"
+                        >
+                          Pool
+                        </button>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="192"
+                          height="2"
+                          viewBox="0 0 192 2"
+                          fill="none"
+                        >
+                          <path
+                            d="M0 1H192"
+                            strokeWidth="1.5"
+                            className="stroke-gray-600"
+                          />
+                        </svg>
+
                         <Link
                           className="link"
                           target="_blank"
