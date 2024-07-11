@@ -4,6 +4,7 @@ import { getAddress, isAddressEqual } from 'viem'
 import { Currency } from '../../model/currency'
 import { useChainContext } from '../chain-context'
 import {
+  deduplicateCurrencies,
   fetchCurrenciesDone,
   fetchCurrency,
   LOCAL_STORAGE_INPUT_CURRENCY_KEY,
@@ -125,17 +126,12 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
         : DEFAULT_OUTPUT_CURRENCY[selectedChain.id]
 
       setCurrencies(
-        [...whitelistCurrencies]
-          .concat(
+        deduplicateCurrencies(
+          [...whitelistCurrencies].concat(
             _inputCurrency ? [_inputCurrency] : [],
             _outputCurrency ? [_outputCurrency] : [],
-          )
-          .filter(
-            (currency, index, self) =>
-              self.findIndex((c) =>
-                isAddressEqual(c.address, currency.address),
-              ) === index,
           ),
+        ),
       )
       setInputCurrency(_inputCurrency)
       setOutputCurrency(_outputCurrency)
