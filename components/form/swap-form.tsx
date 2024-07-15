@@ -170,8 +170,8 @@ export const SwapForm = ({
           </button>
         </div>
       </div>
-      <div className="flex justify-between items-center">
-        <div className="flex text-xs sm:text-sm text-white">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-0.5 sm:gap-0">
+        <div className="flex text-xs sm:text-sm text-white mr-auto gap-1">
           1 {inputCurrency?.symbol ?? 'IN'} ={' '}
           {isLoadingResults ? (
             <span className="w-[100px] mx-1 rounded animate-pulse bg-gray-500" />
@@ -194,7 +194,7 @@ export const SwapForm = ({
           )}
         </div>
         {!Number.isNaN(gasEstimateValue) ? (
-          <div className="flex relative items-center text-xs sm:text-sm text-white">
+          <div className="flex relative items-center text-xs sm:text-sm text-white ml-auto">
             <div className="flex items-center h-full mr-0.5">
               <GasSvg />
             </div>
