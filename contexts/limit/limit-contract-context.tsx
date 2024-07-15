@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { useQueryClient, useWalletClient } from 'wagmi'
-import { isAddressEqual, zeroAddress } from 'viem'
+import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 import {
   cancelOrders,
   claimOrders,
@@ -20,6 +20,7 @@ import {
   setApprovalOfOpenOrdersForAll,
 } from '../../utils/wallet'
 import { RPC_URL } from '../../constants/rpc-urls'
+import { LOCAL_STORAGE_IS_OPENED } from '../../utils/market'
 
 type LimitContractContext = {
   limit: (
@@ -28,6 +29,7 @@ type LimitContractContext = {
     amount: string,
     price: string,
     postOnly: boolean,
+    isBid: boolean,
   ) => Promise<void>
   cancels: (openOrders: OpenOrder[]) => Promise<void>
   claims: (openOrders: OpenOrder[]) => Promise<void>
@@ -55,32 +57,47 @@ export const LimitContractProvider = ({
       amount: string,
       price: string,
       postOnly: boolean,
+      isBid: boolean,
     ) => {
       if (!walletClient || !selectedChain) {
         return
       }
-      setConfirmation({
-        title: `Checking Book Availability`,
-        body: '',
-        fields: [],
-      })
+
+      const cachedIsOpened = localStorage.getItem(
+        LOCAL_STORAGE_IS_OPENED(
+          'market',
+          selectedChain,
+          [
+            getAddress(inputCurrency.address),
+            getAddress(outputCurrency.address),
+          ],
+          isBid,
+        ),
+      )
       try {
-        const openTransaction = await openMarket({
-          chainId: selectedChain.id,
-          userAddress: walletClient.account.address,
-          inputToken: inputCurrency.address,
-          outputToken: outputCurrency.address,
-          options: {
-            rpcUrl: RPC_URL[selectedChain.id],
-          },
-        })
-        if (openTransaction) {
+        if (cachedIsOpened !== 'open') {
           setConfirmation({
-            title: `Open Book`,
-            body: 'Please confirm in your wallet.',
+            title: `Checking Book Availability`,
+            body: '',
             fields: [],
           })
-          await sendTransaction(walletClient, openTransaction)
+          const openTransaction = await openMarket({
+            chainId: selectedChain.id,
+            userAddress: walletClient.account.address,
+            inputToken: inputCurrency.address,
+            outputToken: outputCurrency.address,
+            options: {
+              rpcUrl: RPC_URL[selectedChain.id],
+            },
+          })
+          if (openTransaction) {
+            setConfirmation({
+              title: `Open Book`,
+              body: 'Please confirm in your wallet.',
+              fields: [],
+            })
+            await sendTransaction(walletClient, openTransaction)
+          }
         }
 
         setConfirmation({

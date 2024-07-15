@@ -142,7 +142,7 @@ export const LimitForm = ({
           </div>
           <NumberInput
             onBlur={() => {
-              setPriceInput(toPlacesString(priceInput, minimumDecimalPlaces))
+              setPriceInput(priceInput)
             }}
             value={priceInput}
             onValueChange={setPriceInput}
