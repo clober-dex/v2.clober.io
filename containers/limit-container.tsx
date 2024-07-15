@@ -194,6 +194,7 @@ export const LimitContainer = () => {
                     inputCurrencyAmount,
                     priceInput,
                     isPostOnly,
+                    isBid,
                   )
                 },
                 text: !walletClient

@@ -4,7 +4,7 @@ import { useQuery } from 'wagmi'
 import BigNumber from 'bignumber.js'
 import { getAddress } from 'viem'
 
-import { isMarketEqual } from '../../utils/market'
+import { isMarketEqual, LOCAL_STORAGE_IS_OPENED } from '../../utils/market'
 import {
   calculateInputCurrencyAmountString,
   calculateOutputCurrencyAmountString,
@@ -103,7 +103,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     ],
     async () => {
       if (inputCurrencyAddress && outputCurrencyAddress) {
-        return getMarket({
+        const updatedMarket = await getMarket({
           chainId: selectedChain.id,
           token0: getAddress(inputCurrencyAddress),
           token1: getAddress(outputCurrencyAddress),
@@ -112,6 +112,35 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
             useSubgraph: false,
           },
         })
+        if (updatedMarket.bidBook.isOpened) {
+          localStorage.setItem(
+            LOCAL_STORAGE_IS_OPENED(
+              'market',
+              selectedChain,
+              [
+                getAddress(inputCurrencyAddress),
+                getAddress(outputCurrencyAddress),
+              ],
+              true,
+            ),
+            'open',
+          )
+        }
+        if (updatedMarket.askBook.isOpened) {
+          localStorage.setItem(
+            LOCAL_STORAGE_IS_OPENED(
+              'market',
+              selectedChain,
+              [
+                getAddress(inputCurrencyAddress),
+                getAddress(outputCurrencyAddress),
+              ],
+              false,
+            ),
+            'open',
+          )
+        }
+        return updatedMarket
       } else {
         return null
       }

@@ -159,6 +159,7 @@ export const IframeContainer = () => {
                     inputCurrencyAmount,
                     priceInput,
                     isPostOnly,
+                    isBid,
                   )
                 },
                 text: !walletClient
