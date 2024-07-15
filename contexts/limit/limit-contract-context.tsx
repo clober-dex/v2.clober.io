@@ -14,13 +14,10 @@ import { useChainContext } from '../chain-context'
 import { Currency } from '../../model/currency'
 import { Confirmation, useTransactionContext } from '../transaction-context'
 import { toPlacesString } from '../../utils/bignumber'
-import {
-  approve20,
-  sendTransaction,
-  setApprovalOfOpenOrdersForAll,
-} from '../../utils/wallet'
+import { approve20, sendTransaction } from '../../utils/wallet'
 import { RPC_URL } from '../../constants/rpc-urls'
 import { LOCAL_STORAGE_IS_OPENED } from '../../utils/market'
+import { setApprovalOfOpenOrdersForAll } from '../../utils/approve721'
 
 type LimitContractContext = {
   limit: (
