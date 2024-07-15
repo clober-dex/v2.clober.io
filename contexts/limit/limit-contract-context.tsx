@@ -7,7 +7,6 @@ import {
   limitOrder,
   openMarket,
   OpenOrder,
-  signERC20Permit,
 } from '@clober/v2-sdk'
 
 import { useChainContext } from '../chain-context'
@@ -103,21 +102,7 @@ export const LimitContractProvider = ({
           fields: [],
         })
 
-        const erc20PermitParam = await signERC20Permit({
-          chainId: selectedChain.id,
-          walletClient: walletClient as any,
-          token: inputCurrency.address,
-          amount: !isAddressEqual(inputCurrency.address, zeroAddress)
-            ? amount
-            : '0',
-          options: {
-            rpcUrl: RPC_URL[selectedChain.id],
-          },
-        })
-        if (
-          erc20PermitParam === undefined &&
-          !isAddressEqual(inputCurrency.address, zeroAddress)
-        ) {
+        if (!isAddressEqual(inputCurrency.address, zeroAddress)) {
           setConfirmation({
             title: 'Approve',
             body: 'Please confirm in your wallet.',
@@ -139,7 +124,6 @@ export const LimitContractProvider = ({
           amount: amount,
           price: price,
           options: {
-            erc20PermitParam,
             postOnly,
             rpcUrl: RPC_URL[selectedChain.id],
             roundingDownTakenBid: true,
