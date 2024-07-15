@@ -101,6 +101,7 @@ export const fetchCurrenciesByName = async (
     fetchCurrencyJobId = null
   }
   const previousCode = fetchCurrencyJobResultCode
+  // @ts-ignore
   fetchCurrencyJobId = setTimeout(async () => {
     fetchCurrencyJobResult = await fetchCurrencyByNameImpl(chainId, name)
     fetchCurrencyJobResultCode = Math.random()
