@@ -33,13 +33,17 @@ export default function OrderBook({
     <div {...props}>
       <div className="flex items-center justify-between">
         <div className="text-sm sm:text-base text-white font-bold">{name}</div>
-        <div className="flex items-center gap-2">
-          <DecimalsSelector
-            availableDecimalPlacesGroups={availableDecimalPlacesGroups}
-            value={selectedDecimalPlaces}
-            onValueChange={setSelectedDecimalPlaces}
-          />
-        </div>
+        {availableDecimalPlacesGroups.length > 0 ? (
+          <div className="flex items-center gap-2">
+            <DecimalsSelector
+              availableDecimalPlacesGroups={availableDecimalPlacesGroups}
+              value={selectedDecimalPlaces}
+              onValueChange={setSelectedDecimalPlaces}
+            />
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
 
       <div className="flex text-xs">

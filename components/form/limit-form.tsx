@@ -13,6 +13,7 @@ import { Balances } from '../../model/balances'
 import { Prices } from '../../model/prices'
 import CheckIcon from '../icon/check-icon'
 import { toPlacesString } from '../../utils/bignumber'
+import { getPriceDecimals } from '../../utils/prices'
 
 export const LimitForm = ({
   chainId,
@@ -70,9 +71,12 @@ export const LimitForm = ({
   setOutputCurrencyAmount: (outputCurrencyAmount: string) => void
   availableOutputCurrencyBalance: bigint
   swapInputCurrencyAndOutputCurrency: () => void
-  minimumDecimalPlaces: number
+  minimumDecimalPlaces: number | undefined
   actionButtonProps: ActionButtonProps
 }) => {
+  minimumDecimalPlaces = minimumDecimalPlaces
+    ? minimumDecimalPlaces
+    : getPriceDecimals(Number(priceInput))
   const minimumPrice = toPlacesString(
     new BigNumber(0.1).pow(minimumDecimalPlaces).toString(),
     minimumDecimalPlaces,

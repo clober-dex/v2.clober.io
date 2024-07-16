@@ -114,13 +114,12 @@ export const LimitContainer = () => {
         {showOrderBook &&
         quoteCurrency &&
         baseCurrency &&
-        availableDecimalPlacesGroups &&
         selectedDecimalPlaces ? (
           <OrderBook
             name={`${baseCurrency.symbol}/${quoteCurrency.symbol}`}
             bids={bids}
             asks={asks}
-            availableDecimalPlacesGroups={availableDecimalPlacesGroups}
+            availableDecimalPlacesGroups={availableDecimalPlacesGroups ?? []}
             selectedDecimalPlaces={selectedDecimalPlaces}
             setSelectedDecimalPlaces={setSelectedDecimalPlaces}
             setDepthClickedIndex={setDepthClickedIndex}
@@ -130,89 +129,85 @@ export const LimitContainer = () => {
           <></>
         )}
         <div className="flex flex-col rounded-2xl bg-gray-900 p-6 w-[360px] sm:w-[480px] h-[391px] sm:h-[459px] md:h-[459px] lg:h-[460px]">
-          {availableDecimalPlacesGroups ? (
-            <LimitForm
-              chainId={selectedChain.id}
-              prices={prices}
-              balances={balances}
-              currencies={currencies}
-              setCurrencies={setCurrencies}
-              priceInput={priceInput}
-              setPriceInput={setPriceInput}
-              selectedMarket={selectedMarket}
-              isBid={isBid}
-              isPostOnly={isPostOnly}
-              setIsPostOnly={setIsPostOnly}
-              showInputCurrencySelect={showInputCurrencySelect}
-              setShowInputCurrencySelect={setShowInputCurrencySelect}
-              inputCurrency={inputCurrency}
-              setInputCurrency={setInputCurrency}
-              inputCurrencyAmount={inputCurrencyAmount}
-              setInputCurrencyAmount={setInputCurrencyAmount}
-              availableInputCurrencyBalance={
-                inputCurrency
-                  ? balances[getAddress(inputCurrency.address)] ?? 0n
-                  : 0n
-              }
-              showOutputCurrencySelect={showOutputCurrencySelect}
-              setShowOutputCurrencySelect={setShowOutputCurrencySelect}
-              outputCurrency={outputCurrency}
-              setOutputCurrency={setOutputCurrency}
-              outputCurrencyAmount={outputCurrencyAmount}
-              setOutputCurrencyAmount={setOutputCurrencyAmount}
-              availableOutputCurrencyBalance={
-                outputCurrency
-                  ? balances[getAddress(outputCurrency.address)] ?? 0n
-                  : 0n
-              }
-              swapInputCurrencyAndOutputCurrency={() => {
-                setIsBid((prevState) => !prevState)
-                setDepthClickedIndex(undefined)
-                setInputCurrencyAmount(outputCurrencyAmount)
+          <LimitForm
+            chainId={selectedChain.id}
+            prices={prices}
+            balances={balances}
+            currencies={currencies}
+            setCurrencies={setCurrencies}
+            priceInput={priceInput}
+            setPriceInput={setPriceInput}
+            selectedMarket={selectedMarket}
+            isBid={isBid}
+            isPostOnly={isPostOnly}
+            setIsPostOnly={setIsPostOnly}
+            showInputCurrencySelect={showInputCurrencySelect}
+            setShowInputCurrencySelect={setShowInputCurrencySelect}
+            inputCurrency={inputCurrency}
+            setInputCurrency={setInputCurrency}
+            inputCurrencyAmount={inputCurrencyAmount}
+            setInputCurrencyAmount={setInputCurrencyAmount}
+            availableInputCurrencyBalance={
+              inputCurrency
+                ? balances[getAddress(inputCurrency.address)] ?? 0n
+                : 0n
+            }
+            showOutputCurrencySelect={showOutputCurrencySelect}
+            setShowOutputCurrencySelect={setShowOutputCurrencySelect}
+            outputCurrency={outputCurrency}
+            setOutputCurrency={setOutputCurrency}
+            outputCurrencyAmount={outputCurrencyAmount}
+            setOutputCurrencyAmount={setOutputCurrencyAmount}
+            availableOutputCurrencyBalance={
+              outputCurrency
+                ? balances[getAddress(outputCurrency.address)] ?? 0n
+                : 0n
+            }
+            swapInputCurrencyAndOutputCurrency={() => {
+              setIsBid((prevState) => !prevState)
+              setDepthClickedIndex(undefined)
+              setInputCurrencyAmount(outputCurrencyAmount)
 
-                // swap currencies
-                const _inputCurrency = inputCurrency
-                setInputCurrency(outputCurrency)
-                setOutputCurrency(_inputCurrency)
-              }}
-              minimumDecimalPlaces={availableDecimalPlacesGroups[0].value}
-              actionButtonProps={{
-                disabled:
-                  (!walletClient ||
-                    !inputCurrency ||
-                    !outputCurrency ||
-                    amount === 0n ||
-                    amount > balances[getAddress(inputCurrency.address)]) ??
-                  0n,
-                onClick: async () => {
-                  if (!inputCurrency || !outputCurrency || !selectedMarket) {
-                    return
-                  }
-                  await limit(
-                    inputCurrency,
-                    outputCurrency,
-                    inputCurrencyAmount,
-                    priceInput,
-                    isPostOnly,
-                    selectedMarket,
-                  )
-                },
-                text: !walletClient
-                  ? 'Connect wallet'
-                  : !inputCurrency
-                  ? 'Select input currency'
-                  : !outputCurrency
-                  ? 'Select output currency'
-                  : amount === 0n
-                  ? 'Enter amount'
-                  : amount > balances[getAddress(inputCurrency.address)]
-                  ? 'Insufficient balance'
-                  : `Place Order`,
-              }}
-            />
-          ) : (
-            <></>
-          )}
+              // swap currencies
+              const _inputCurrency = inputCurrency
+              setInputCurrency(outputCurrency)
+              setOutputCurrency(_inputCurrency)
+            }}
+            minimumDecimalPlaces={availableDecimalPlacesGroups?.[0]?.value}
+            actionButtonProps={{
+              disabled:
+                (!walletClient ||
+                  !inputCurrency ||
+                  !outputCurrency ||
+                  amount === 0n ||
+                  amount > balances[getAddress(inputCurrency.address)]) ??
+                0n,
+              onClick: async () => {
+                if (!inputCurrency || !outputCurrency || !selectedMarket) {
+                  return
+                }
+                await limit(
+                  inputCurrency,
+                  outputCurrency,
+                  inputCurrencyAmount,
+                  priceInput,
+                  isPostOnly,
+                  selectedMarket,
+                )
+              },
+              text: !walletClient
+                ? 'Connect wallet'
+                : !inputCurrency
+                ? 'Select input currency'
+                : !outputCurrency
+                ? 'Select output currency'
+                : amount === 0n
+                ? 'Enter amount'
+                : amount > balances[getAddress(inputCurrency.address)]
+                ? 'Insufficient balance'
+                : `Place Order`,
+            }}
+          />
         </div>
       </div>
       {userAddress ? (

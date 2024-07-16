@@ -12,7 +12,10 @@ import {
   parseDepth,
 } from '../../utils/order-book'
 import { getPriceDecimals } from '../../utils/prices'
-import { Decimals, DEFAULT_DECIMAL_PLACES_GROUPS } from '../../model/decimals'
+import {
+  Decimals,
+  DEFAULT_DECIMAL_PLACE_GROUP_LENGTH,
+} from '../../model/decimals'
 import { useChainContext } from '../chain-context'
 import { getCurrencyAddress } from '../../utils/currency'
 import { toPlacesString } from '../../utils/bignumber'
@@ -25,7 +28,7 @@ type MarketContext = {
   setSelectedMarket: (market: Market | undefined) => void
   selectedDecimalPlaces: Decimals | undefined
   setSelectedDecimalPlaces: (decimalPlaces: Decimals | undefined) => void
-  availableDecimalPlacesGroups: Decimals[]
+  availableDecimalPlacesGroups: Decimals[] | null
   depthClickedIndex:
     | {
         isBid: boolean
@@ -55,7 +58,7 @@ const Context = React.createContext<MarketContext>({
   setSelectedMarket: (_) => _,
   selectedDecimalPlaces: undefined,
   setSelectedDecimalPlaces: () => {},
-  availableDecimalPlacesGroups: [],
+  availableDecimalPlacesGroups: null,
   depthClickedIndex: undefined,
   setDepthClickedIndex: () => {},
   bids: [],
@@ -135,8 +138,10 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   }, [market, selectedMarket])
 
   const availableDecimalPlacesGroups = useMemo(() => {
-    const availableDecimalPlacesGroups = selectedMarket
-      ? (Array.from(Array(DEFAULT_DECIMAL_PLACES_GROUPS.length).keys())
+    return selectedMarket &&
+      selectedMarket.bids.length > 0 &&
+      selectedMarket.asks.length > 0
+      ? (Array.from(Array(DEFAULT_DECIMAL_PLACE_GROUP_LENGTH).keys())
           .map((i) => {
             const minPrice = Math.min(
               Number(
@@ -162,10 +167,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
             }
           })
           .filter((x) => x) as Decimals[])
-      : []
-    return availableDecimalPlacesGroups.length > 0
-      ? availableDecimalPlacesGroups
-      : DEFAULT_DECIMAL_PLACES_GROUPS
+      : null
   }, [selectedMarket])
 
   const [bids, asks] = useMemo(
@@ -181,6 +183,12 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
   // once
   useEffect(() => {
+    if (
+      !availableDecimalPlacesGroups ||
+      availableDecimalPlacesGroups.length === 0
+    ) {
+      return
+    }
     setSelectedDecimalPlaces(availableDecimalPlacesGroups[0])
   }, [availableDecimalPlacesGroups])
 
@@ -196,6 +204,12 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
   // When depthClickedIndex is changed, reset the priceInput
   useEffect(() => {
+    if (
+      !availableDecimalPlacesGroups ||
+      availableDecimalPlacesGroups.length === 0
+    ) {
+      return
+    }
     const minimumDecimalPlaces = availableDecimalPlacesGroups[0].value
 
     if (depthClickedIndex && inputCurrency && outputCurrency) {
