@@ -13,6 +13,7 @@ import { Balances } from '../../model/balances'
 import { Prices } from '../../model/prices'
 import CheckIcon from '../icon/check-icon'
 import { toPlacesString } from '../../utils/bignumber'
+import { getPriceDecimals } from '../../utils/prices'
 
 export const LimitForm = ({
   chainId,
@@ -70,9 +71,12 @@ export const LimitForm = ({
   setOutputCurrencyAmount: (outputCurrencyAmount: string) => void
   availableOutputCurrencyBalance: bigint
   swapInputCurrencyAndOutputCurrency: () => void
-  minimumDecimalPlaces: number
+  minimumDecimalPlaces: number | undefined
   actionButtonProps: ActionButtonProps
 }) => {
+  minimumDecimalPlaces = minimumDecimalPlaces
+    ? minimumDecimalPlaces
+    : getPriceDecimals(Number(priceInput))
   const minimumPrice = toPlacesString(
     new BigNumber(0.1).pow(minimumDecimalPlaces).toString(),
     minimumDecimalPlaces,
@@ -141,9 +145,6 @@ export const LimitForm = ({
             {isBid ? 'Buy' : 'Sell'} {selectedMarket?.base.symbol} at rate
           </div>
           <NumberInput
-            onBlur={() => {
-              setPriceInput(priceInput)
-            }}
             value={priceInput}
             onValueChange={setPriceInput}
             className="text-xl w-full sm:text-2xl bg-transparent placeholder-gray-500 text-white outline-none"
