@@ -182,7 +182,7 @@ export const LimitContractProvider = ({
         await Promise.all([
           queryClient.invalidateQueries(['balances']),
           queryClient.invalidateQueries(['open-orders']),
-          queryClient.invalidateQueries(['markets']),
+          queryClient.invalidateQueries(['market']),
           queryClient.invalidateQueries(['allowances']),
         ])
         setConfirmation(undefined)
@@ -242,7 +242,7 @@ export const LimitContractProvider = ({
         await Promise.all([
           queryClient.invalidateQueries(['balances']),
           queryClient.invalidateQueries(['open-orders']),
-          queryClient.invalidateQueries(['markets']),
+          queryClient.invalidateQueries(['market']),
           queryClient.invalidateQueries(['allowances']),
         ])
         setConfirmation(undefined)
@@ -308,7 +308,7 @@ export const LimitContractProvider = ({
         await Promise.all([
           queryClient.invalidateQueries(['balances']),
           queryClient.invalidateQueries(['open-orders']),
-          queryClient.invalidateQueries(['markets']),
+          queryClient.invalidateQueries(['market']),
           queryClient.invalidateQueries(['allowances']),
         ])
         setConfirmation(undefined)
