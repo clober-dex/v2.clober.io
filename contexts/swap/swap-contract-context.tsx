@@ -10,7 +10,7 @@ import { AGGREGATORS } from '../../constants/aggregators'
 import { useChainContext } from '../chain-context'
 import { useTransactionContext } from '../transaction-context'
 import { toPlacesString } from '../../utils/bignumber'
-import { sendTransaction } from '../../utils/wallet'
+import { sendTransaction } from '../../utils/transaction'
 import { useCurrencyContext } from '../currency-context'
 import { maxApprove } from '../../utils/approve20'
 
