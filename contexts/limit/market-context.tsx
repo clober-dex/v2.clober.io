@@ -184,20 +184,15 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     setSelectedDecimalPlaces(availableDecimalPlacesGroups[0])
   }, [availableDecimalPlacesGroups])
 
-  // When depth is changed
+  // When selectedMarket is changed
   useEffect(() => {
     setDepthClickedIndex(undefined)
-    const minimumDecimalPlaces = availableDecimalPlacesGroups[0].value
-
-    setPriceInput(
-      toPlacesString(
-        isBid
-          ? asks[0]?.price ?? bids[0]?.price ?? '1'
-          : bids[0]?.price ?? asks[0]?.price ?? '1',
-        minimumDecimalPlaces,
-      ),
-    )
-  }, [asks, availableDecimalPlacesGroups, bids, isBid, setPriceInput])
+    setPriceInput('')
+  }, [
+    setPriceInput,
+    selectedMarket?.quote.address,
+    selectedMarket?.base.address,
+  ])
 
   // When depthClickedIndex is changed, reset the priceInput
   useEffect(() => {
