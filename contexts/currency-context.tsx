@@ -133,9 +133,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
     },
   )
 
-  const {
-    data: { allowances, isOpenOrderApproved },
-  } = useQuery(
+  const { data } = useQuery(
     ['allowances', userAddress, selectedChain, currencies],
     async () => {
       const spenders: `0x${string}`[] = [
@@ -145,7 +143,10 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
         ),
       ]
       if (!userAddress) {
-        return {}
+        return {
+          allowances: {},
+          isOpenOrderApproved: false,
+        }
       }
       const contracts = [
         ...spenders
@@ -213,8 +214,8 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
         whitelistCurrencies,
         prices: prices ?? {},
         balances: balances ?? {},
-        allowances: allowances ?? {},
-        isOpenOrderApproved,
+        allowances: data?.allowances ?? {},
+        isOpenOrderApproved: data?.isOpenOrderApproved ?? false,
         currencies,
         setCurrencies,
       }}
