@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useAccount, useBalance, useQuery } from 'wagmi'
 import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 import { readContracts } from '@wagmi/core'
+import { getContractAddresses } from '@clober/v2-sdk'
 
 import { Currency } from '../model/currency'
 import { Prices } from '../model/prices'
@@ -10,6 +11,7 @@ import { fetchWhitelistCurrencies } from '../apis/currencies'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { fetchPrices } from '../apis/swap/prices'
 import { AGGREGATORS } from '../constants/aggregators'
+import { Allowances } from '../model/allowances'
 
 import { useChainContext } from './chain-context'
 
@@ -19,6 +21,8 @@ type CurrencyContext = {
   setCurrencies: (currencies: Currency[]) => void
   prices: Prices
   balances: Balances
+  allowances: Allowances
+  isOpenOrderApproved: boolean
 }
 
 const Context = React.createContext<CurrencyContext>({
@@ -27,7 +31,36 @@ const Context = React.createContext<CurrencyContext>({
   setCurrencies: () => {},
   prices: {},
   balances: {},
+  allowances: {},
+  isOpenOrderApproved: false,
 })
+
+const _abi = [
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'operator',
+        type: 'address',
+      },
+    ],
+    name: 'isApprovedForAll',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+] as const
 
 export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { address: userAddress } = useAccount()
@@ -100,12 +133,88 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
     },
   )
 
+  const {
+    data: { allowances, isOpenOrderApproved },
+  } = useQuery(
+    ['allowances', userAddress, selectedChain, currencies],
+    async () => {
+      const spenders: `0x${string}`[] = [
+        getContractAddresses({ chainId: selectedChain.id }).Controller,
+        ...AGGREGATORS[selectedChain.id].map(
+          (aggregator) => aggregator.contract,
+        ),
+      ]
+      if (!userAddress) {
+        return {}
+      }
+      const contracts = [
+        ...spenders
+          .map((spender) => {
+            return currencies.map((currency) => ({
+              address: currency.address,
+              abi: ERC20_PERMIT_ABI,
+              functionName: 'allowance',
+              args: [userAddress, spender],
+            }))
+          }, [])
+          .flat(),
+        {
+          address: getContractAddresses({ chainId: selectedChain.id })
+            .BookManager,
+          abi: _abi,
+          functionName: 'isApprovedForAll',
+          args: [
+            userAddress,
+            getContractAddresses({ chainId: selectedChain.id }).Controller,
+          ],
+        },
+      ]
+      const results = await readContracts({
+        contracts,
+      })
+      return {
+        isOpenOrderApproved: results.slice(-1)?.[0]?.result ?? false,
+        allowances: results.slice(0, -1).reduce(
+          (
+            acc: {
+              [key in `0x${string}`]: { [key in `0x${string}`]: bigint }
+            },
+            { result },
+            i,
+          ) => {
+            const currency = currencies[i % currencies.length]
+            const spender = getAddress(
+              spenders[Math.floor(i / currencies.length)],
+            )
+            const resultValue = (result ?? 0n) as bigint
+            return {
+              ...acc,
+              [spender]: {
+                ...acc[spender],
+                [getAddress(currency.address)]: resultValue,
+              },
+            }
+          },
+          spenders.reduce((acc, spender) => ({ ...acc, [spender]: {} }), {}),
+        ),
+      }
+    },
+    {
+      refetchInterval: 5 * 1000,
+      refetchIntervalInBackground: true,
+    },
+  ) as {
+    data: { allowances: Allowances; isOpenOrderApproved: boolean }
+  }
+
   return (
     <Context.Provider
       value={{
         whitelistCurrencies,
         prices: prices ?? {},
         balances: balances ?? {},
+        allowances: allowances ?? {},
+        isOpenOrderApproved,
         currencies,
         setCurrencies,
       }}
