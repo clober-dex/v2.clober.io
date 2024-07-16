@@ -4,23 +4,22 @@ import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 import {
   cancelOrders,
   claimOrders,
+  getContractAddresses,
   limitOrder,
   openMarket,
   OpenOrder,
-  signERC20Permit,
+  setApprovalOfOpenOrdersForAll,
 } from '@clober/v2-sdk'
 
 import { useChainContext } from '../chain-context'
 import { Currency } from '../../model/currency'
 import { Confirmation, useTransactionContext } from '../transaction-context'
 import { toPlacesString } from '../../utils/bignumber'
-import {
-  approve20,
-  sendTransaction,
-  setApprovalOfOpenOrdersForAll,
-} from '../../utils/wallet'
+import { sendTransaction, waitTransaction } from '../../utils/transaction'
 import { RPC_URL } from '../../constants/rpc-urls'
 import { LOCAL_STORAGE_IS_OPENED } from '../../utils/market'
+import { useCurrencyContext } from '../currency-context'
+import { maxApprove } from '../../utils/approve20'
 
 type LimitContractContext = {
   limit: (
@@ -49,6 +48,7 @@ export const LimitContractProvider = ({
   const { data: walletClient } = useWalletClient()
   const { setConfirmation } = useTransactionContext()
   const { selectedChain } = useChainContext()
+  const { isOpenOrderApproved, allowances } = useCurrencyContext()
 
   const limit = useCallback(
     async (
@@ -106,20 +106,12 @@ export const LimitContractProvider = ({
           fields: [],
         })
 
-        const erc20PermitParam = await signERC20Permit({
+        const spender = getContractAddresses({
           chainId: selectedChain.id,
-          walletClient: walletClient as any,
-          token: inputCurrency.address,
-          amount: !isAddressEqual(inputCurrency.address, zeroAddress)
-            ? amount
-            : '0',
-          options: {
-            rpcUrl: RPC_URL[selectedChain.id],
-          },
-        })
+        }).Controller
         if (
-          erc20PermitParam === undefined &&
-          !isAddressEqual(inputCurrency.address, zeroAddress)
+          !isAddressEqual(inputCurrency.address, zeroAddress) &&
+          allowances[spender][inputCurrency.address] === 0n
         ) {
           setConfirmation({
             title: 'Approve',
@@ -132,7 +124,8 @@ export const LimitContractProvider = ({
               },
             ],
           })
-          await approve20(walletClient, inputCurrency, amount)
+          await maxApprove(walletClient, inputCurrency, spender)
+          await queryClient.invalidateQueries(['allowances'])
         }
         const args = {
           chainId: selectedChain.id,
@@ -142,7 +135,6 @@ export const LimitContractProvider = ({
           amount: amount,
           price: price,
           options: {
-            erc20PermitParam,
             postOnly,
             rpcUrl: RPC_URL[selectedChain.id],
             roundingDownTakenBid: true,
@@ -200,7 +192,7 @@ export const LimitContractProvider = ({
         setConfirmation(undefined)
       }
     },
-    [queryClient, selectedChain, setConfirmation, walletClient],
+    [allowances, queryClient, selectedChain, setConfirmation, walletClient],
   )
 
   const cancels = useCallback(
@@ -215,7 +207,19 @@ export const LimitContractProvider = ({
           body: 'Please confirm in your wallet.',
           fields: [],
         })
-        await setApprovalOfOpenOrdersForAll(walletClient)
+        if (!isOpenOrderApproved) {
+          const hash = await setApprovalOfOpenOrdersForAll({
+            chainId: walletClient.chain.id,
+            walletClient: walletClient as any,
+            options: {
+              rpcUrl: RPC_URL[walletClient.chain.id],
+            },
+          })
+          if (hash) {
+            await waitTransaction(walletClient.chain.id, hash)
+            await queryClient.invalidateQueries(['allowances'])
+          }
+        }
 
         const { transaction, result } = await cancelOrders({
           chainId: selectedChain.id,
@@ -248,7 +252,13 @@ export const LimitContractProvider = ({
         setConfirmation(undefined)
       }
     },
-    [queryClient, selectedChain, setConfirmation, walletClient],
+    [
+      isOpenOrderApproved,
+      queryClient,
+      selectedChain,
+      setConfirmation,
+      walletClient,
+    ],
   )
 
   const claims = useCallback(
@@ -263,7 +273,19 @@ export const LimitContractProvider = ({
           body: 'Please confirm in your wallet.',
           fields: [],
         })
-        await setApprovalOfOpenOrdersForAll(walletClient)
+        if (!isOpenOrderApproved) {
+          const hash = await setApprovalOfOpenOrdersForAll({
+            chainId: walletClient.chain.id,
+            walletClient: walletClient as any,
+            options: {
+              rpcUrl: RPC_URL[walletClient.chain.id],
+            },
+          })
+          if (hash) {
+            await waitTransaction(walletClient.chain.id, hash)
+            await queryClient.invalidateQueries(['allowances'])
+          }
+        }
 
         const { transaction, result } = await claimOrders({
           chainId: selectedChain.id,
@@ -296,7 +318,13 @@ export const LimitContractProvider = ({
         setConfirmation(undefined)
       }
     },
-    [queryClient, selectedChain, setConfirmation, walletClient],
+    [
+      isOpenOrderApproved,
+      queryClient,
+      selectedChain,
+      setConfirmation,
+      walletClient,
+    ],
   )
 
   return (

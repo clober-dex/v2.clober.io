@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { isAddressEqual, zeroAddress } from 'viem'
+import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 import { useQueryClient, useWalletClient } from 'wagmi'
 import { Transaction } from '@clober/v2-sdk'
 
@@ -7,11 +7,12 @@ import { Currency } from '../../model/currency'
 import { formatUnits } from '../../utils/bigint'
 import { fetchSwapData } from '../../apis/swap/data'
 import { AGGREGATORS } from '../../constants/aggregators'
-import { approve20 } from '../../utils/approve20'
 import { useChainContext } from '../chain-context'
 import { useTransactionContext } from '../transaction-context'
 import { toPlacesString } from '../../utils/bignumber'
-import { sendTransaction } from '../../utils/wallet'
+import { sendTransaction } from '../../utils/transaction'
+import { useCurrencyContext } from '../currency-context'
+import { maxApprove } from '../../utils/approve20'
 
 type SwapContractContext = {
   swap: (
@@ -36,6 +37,7 @@ export const SwapContractProvider = ({
   const { selectedChain } = useChainContext()
   const { data: walletClient } = useWalletClient()
   const { setConfirmation } = useTransactionContext()
+  const { allowances } = useCurrencyContext()
 
   const swap = useCallback(
     async (
@@ -67,7 +69,11 @@ export const SwapContractProvider = ({
           userAddress,
         )
 
-        if (!isAddressEqual(inputCurrency.address, zeroAddress)) {
+        const spender = getAddress(swapData.transaction.to)
+        if (
+          !isAddressEqual(inputCurrency.address, zeroAddress) &&
+          allowances[spender][inputCurrency.address] === 0n
+        ) {
           setConfirmation({
             title: 'Approve',
             body: 'Please confirm in your wallet.',
@@ -81,14 +87,8 @@ export const SwapContractProvider = ({
               },
             ],
           })
-          await approve20(
-            selectedChain.id,
-            walletClient,
-            inputCurrency,
-            userAddress,
-            swapData.transaction.to,
-            amountIn,
-          )
+          await maxApprove(walletClient, inputCurrency, spender)
+          await queryClient.invalidateQueries(['allowances'])
 
           swapData = await fetchSwapData(
             AGGREGATORS[selectedChain.id],
@@ -131,7 +131,7 @@ export const SwapContractProvider = ({
         setConfirmation(undefined)
       }
     },
-    [walletClient, selectedChain.id, setConfirmation, queryClient],
+    [walletClient, setConfirmation, selectedChain.id, allowances, queryClient],
   )
 
   return (
