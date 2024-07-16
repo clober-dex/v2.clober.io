@@ -139,8 +139,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
   const availableDecimalPlacesGroups = useMemo(() => {
     return selectedMarket &&
-      selectedMarket.bids.length > 0 &&
-      selectedMarket.asks.length > 0
+      selectedMarket.bids.length + selectedMarket.asks.length > 0
       ? (Array.from(Array(DEFAULT_DECIMAL_PLACE_GROUP_LENGTH).keys())
           .map((i) => {
             const minPrice = Math.min(
