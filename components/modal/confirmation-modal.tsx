@@ -35,15 +35,15 @@ const ConfirmationModal = ({
           {confirmation.fields.map((field, index) => (
             <div key={index} className="flex flex-row gap-1">
               {field.direction === 'in' ? (
-                <div className="flex text-sm w-9 items-center justify-center bg-green-500 bg-opacity-10 font-bold text-green-500 px-6 rounded-lg">
-                  IN
+                <div className="flex text-sm w-9 items-center justify-center bg-red-500 bg-opacity-10 font-bold text-red-500 px-6 rounded-lg">
+                  -
                 </div>
               ) : (
                 <></>
               )}
               {field.direction === 'out' ? (
-                <div className="flex text-sm w-9 items-center justify-center bg-red-500 bg-opacity-10 font-bold text-red-500 px-6 rounded-lg">
-                  OUT
+                <div className="flex text-sm w-9 items-center justify-center bg-green-500 bg-opacity-10 font-bold text-green-500 px-6 rounded-lg">
+                  +
                 </div>
               ) : (
                 <></>
