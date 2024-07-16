@@ -88,7 +88,6 @@ export const SwapContractProvider = ({
             ],
           })
           await maxApprove(walletClient, inputCurrency, spender)
-          await queryClient.invalidateQueries(['allowances'])
 
           swapData = await fetchSwapData(
             AGGREGATORS[selectedChain.id],
@@ -127,7 +126,10 @@ export const SwapContractProvider = ({
       } catch (e) {
         console.error(e)
       } finally {
-        await queryClient.invalidateQueries(['swap-balances'])
+        await Promise.all([
+          queryClient.invalidateQueries(['balances']),
+          queryClient.invalidateQueries(['allowances']),
+        ])
         setConfirmation(undefined)
       }
     },

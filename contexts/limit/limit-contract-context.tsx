@@ -121,7 +121,6 @@ export const LimitContractProvider = ({
             ],
           })
           await maxApprove(walletClient, inputCurrency, spender)
-          await queryClient.invalidateQueries(['allowances'])
         }
         const args = {
           chainId: selectedChain.id,
@@ -181,9 +180,10 @@ export const LimitContractProvider = ({
         console.error(e)
       } finally {
         await Promise.all([
-          queryClient.invalidateQueries(['limit-balances']),
+          queryClient.invalidateQueries(['balances']),
           queryClient.invalidateQueries(['open-orders']),
           queryClient.invalidateQueries(['markets']),
+          queryClient.invalidateQueries(['allowances']),
         ])
         setConfirmation(undefined)
       }
@@ -213,7 +213,6 @@ export const LimitContractProvider = ({
           })
           if (hash) {
             await waitTransaction(walletClient.chain.id, hash)
-            await queryClient.invalidateQueries(['allowances'])
           }
         }
 
@@ -241,9 +240,10 @@ export const LimitContractProvider = ({
         console.error(e)
       } finally {
         await Promise.all([
-          queryClient.invalidateQueries(['limit-balances']),
+          queryClient.invalidateQueries(['balances']),
           queryClient.invalidateQueries(['open-orders']),
           queryClient.invalidateQueries(['markets']),
+          queryClient.invalidateQueries(['allowances']),
         ])
         setConfirmation(undefined)
       }
@@ -279,7 +279,6 @@ export const LimitContractProvider = ({
           })
           if (hash) {
             await waitTransaction(walletClient.chain.id, hash)
-            await queryClient.invalidateQueries(['allowances'])
           }
         }
 
@@ -307,9 +306,10 @@ export const LimitContractProvider = ({
         console.error(e)
       } finally {
         await Promise.all([
-          queryClient.invalidateQueries(['limit-balances']),
+          queryClient.invalidateQueries(['balances']),
           queryClient.invalidateQueries(['open-orders']),
           queryClient.invalidateQueries(['markets']),
+          queryClient.invalidateQueries(['allowances']),
         ])
         setConfirmation(undefined)
       }
