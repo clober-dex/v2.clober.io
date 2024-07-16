@@ -1,41 +1,8 @@
 import { createPublicClient, Hash, http } from 'viem'
 import { GetWalletClientResult } from '@wagmi/core'
-import {
-  approveERC20,
-  setApprovalOfOpenOrdersForAll as setApprovalOfOpenOrdersForAllInSdk,
-  Transaction,
-} from '@clober/v2-sdk'
+import { CHAIN_IDS, Transaction } from '@clober/v2-sdk'
 
 import { supportChains } from '../constants/chain'
-import { Currency } from '../model/currency'
-import { RPC_URL } from '../constants/rpc-urls'
-
-export const approve20 = async (
-  walletClient: GetWalletClientResult,
-  currency: Currency,
-  amount: string,
-): Promise<Hash | undefined> => {
-  if (!walletClient) {
-    return
-  }
-  const publicClient = createPublicClient({
-    chain: supportChains.find((chain) => chain.id === walletClient.chain.id),
-    transport: http(),
-  })
-  const hash = await approveERC20({
-    chainId: walletClient.chain.id,
-    walletClient: walletClient as any,
-    token: currency.address,
-    amount,
-    options: {
-      rpcUrl: RPC_URL[walletClient.chain.id],
-    },
-  })
-  if (hash) {
-    await publicClient.waitForTransactionReceipt({ hash })
-  }
-  return hash
-}
 
 export async function sendTransaction(
   walletClient: GetWalletClientResult,
@@ -58,27 +25,13 @@ export async function sendTransaction(
   return hash
 }
 
-export async function setApprovalOfOpenOrdersForAll(
-  walletClient: GetWalletClientResult,
-): Promise<Hash | undefined> {
-  if (!walletClient) {
-    return
-  }
+export async function waitTransaction(
+  chainId: CHAIN_IDS,
+  hash: Hash,
+): Promise<void> {
   const publicClient = createPublicClient({
-    chain: supportChains.find((chain) => chain.id === walletClient.chain.id),
+    chain: supportChains.find((chain) => chain.id === chainId),
     transport: http(),
   })
-  const hash = await setApprovalOfOpenOrdersForAllInSdk({
-    chainId: walletClient.chain.id,
-    walletClient: walletClient as any,
-    options: {
-      rpcUrl: RPC_URL[walletClient.chain.id],
-    },
-  })
-  if (hash) {
-    await publicClient.waitForTransactionReceipt({
-      hash,
-    })
-  }
-  return hash
+  await publicClient.waitForTransactionReceipt({ hash })
 }

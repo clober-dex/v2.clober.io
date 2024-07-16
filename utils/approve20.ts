@@ -1,22 +1,16 @@
 import { GetWalletClientResult } from '@wagmi/core'
 import { createPublicClient, http } from 'viem'
-import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Currency } from '../model/currency'
 import { supportChains } from '../constants/chain'
-import { fetchAllowance } from '../apis/allowance'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 
-export const approve20 = async (
-  chainId: CHAIN_IDS,
+export const maxApprove = async (
   walletClient: GetWalletClientResult,
   currency: Currency,
-  owner: `0x${string}`,
   spender: `0x${string}`,
-  value: bigint,
 ): Promise<`0x${string}` | undefined> => {
-  const allowance = await fetchAllowance(chainId, currency, owner, spender)
-  if (!walletClient || allowance >= value) {
+  if (!walletClient) {
     return
   }
   const publicClient = createPublicClient({
@@ -27,7 +21,7 @@ export const approve20 = async (
     address: currency.address,
     abi: ERC20_PERMIT_ABI,
     functionName: 'approve',
-    args: [spender, value],
+    args: [spender, 2n ** 256n - 1n],
     account: walletClient.account,
   })
   await publicClient.waitForTransactionReceipt({ hash })
