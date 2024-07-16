@@ -88,6 +88,7 @@ export const SwapContractProvider = ({
             ],
           })
           await maxApprove(walletClient, inputCurrency, spender)
+          await queryClient.invalidateQueries(['allowances'])
 
           swapData = await fetchSwapData(
             AGGREGATORS[selectedChain.id],

@@ -125,6 +125,7 @@ export const LimitContractProvider = ({
             ],
           })
           await maxApprove(walletClient, inputCurrency, spender)
+          await queryClient.invalidateQueries(['allowances'])
         }
         const args = {
           chainId: selectedChain.id,
@@ -216,6 +217,7 @@ export const LimitContractProvider = ({
           })
           if (hash) {
             await waitTransaction(walletClient.chain.id, hash)
+            await queryClient.invalidateQueries(['allowances'])
           }
         }
 
@@ -281,6 +283,7 @@ export const LimitContractProvider = ({
           })
           if (hash) {
             await waitTransaction(walletClient.chain.id, hash)
+            await queryClient.invalidateQueries(['allowances'])
           }
         }
 
