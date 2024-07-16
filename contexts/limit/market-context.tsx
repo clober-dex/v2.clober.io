@@ -103,44 +103,49 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     ],
     async () => {
       if (inputCurrencyAddress && outputCurrencyAddress) {
-        const updatedMarket = await getMarket({
-          chainId: selectedChain.id,
-          token0: getAddress(inputCurrencyAddress),
-          token1: getAddress(outputCurrencyAddress),
-          options: {
-            rpcUrl: RPC_URL[selectedChain.id],
-            useSubgraph: false,
-          },
-        })
-        if (updatedMarket.bidBook.isOpened) {
-          localStorage.setItem(
-            LOCAL_STORAGE_IS_OPENED(
-              'market',
-              selectedChain,
-              [
-                getAddress(inputCurrencyAddress),
-                getAddress(outputCurrencyAddress),
-              ],
-              true,
-            ),
-            'open',
-          )
+        try {
+          const updatedMarket = await getMarket({
+            chainId: selectedChain.id,
+            token0: getAddress(inputCurrencyAddress),
+            token1: getAddress(outputCurrencyAddress),
+            options: {
+              rpcUrl: RPC_URL[selectedChain.id],
+              useSubgraph: false,
+            },
+          })
+          if (updatedMarket.bidBook.isOpened) {
+            localStorage.setItem(
+              LOCAL_STORAGE_IS_OPENED(
+                'market',
+                selectedChain,
+                [
+                  getAddress(inputCurrencyAddress),
+                  getAddress(outputCurrencyAddress),
+                ],
+                true,
+              ),
+              'open',
+            )
+          }
+          if (updatedMarket.askBook.isOpened) {
+            localStorage.setItem(
+              LOCAL_STORAGE_IS_OPENED(
+                'market',
+                selectedChain,
+                [
+                  getAddress(inputCurrencyAddress),
+                  getAddress(outputCurrencyAddress),
+                ],
+                false,
+              ),
+              'open',
+            )
+          }
+          return updatedMarket
+        } catch (e: any) {
+          console.error(`Failed to get market: ${e.message}`)
+          return null
         }
-        if (updatedMarket.askBook.isOpened) {
-          localStorage.setItem(
-            LOCAL_STORAGE_IS_OPENED(
-              'market',
-              selectedChain,
-              [
-                getAddress(inputCurrencyAddress),
-                getAddress(outputCurrencyAddress),
-              ],
-              false,
-            ),
-            'open',
-          )
-        }
-        return updatedMarket
       } else {
         return null
       }
