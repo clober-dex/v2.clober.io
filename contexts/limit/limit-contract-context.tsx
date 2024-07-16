@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react'
 import { useQueryClient, useWalletClient } from 'wagmi'
-import { getAddress, isAddressEqual, zeroAddress } from 'viem'
+import { isAddressEqual, zeroAddress } from 'viem'
 import {
   cancelOrders,
   claimOrders,
   getContractAddresses,
   limitOrder,
+  Market,
   openMarket,
   OpenOrder,
   setApprovalOfOpenOrdersForAll,
@@ -17,7 +18,6 @@ import { Confirmation, useTransactionContext } from '../transaction-context'
 import { toPlacesString } from '../../utils/bignumber'
 import { sendTransaction, waitTransaction } from '../../utils/transaction'
 import { RPC_URL } from '../../constants/rpc-urls'
-import { LOCAL_STORAGE_IS_OPENED } from '../../utils/market'
 import { useCurrencyContext } from '../currency-context'
 import { maxApprove } from '../../utils/approve20'
 
@@ -28,7 +28,7 @@ type LimitContractContext = {
     amount: string,
     price: string,
     postOnly: boolean,
-    isBid: boolean,
+    selectedMarket: Market,
   ) => Promise<void>
   cancels: (openOrders: OpenOrder[]) => Promise<void>
   claims: (openOrders: OpenOrder[]) => Promise<void>
@@ -57,25 +57,21 @@ export const LimitContractProvider = ({
       amount: string,
       price: string,
       postOnly: boolean,
-      isBid: boolean,
+      selectedMarket: Market,
     ) => {
       if (!walletClient || !selectedChain) {
         return
       }
 
-      const cachedIsOpened = localStorage.getItem(
-        LOCAL_STORAGE_IS_OPENED(
-          'market',
-          selectedChain,
-          [
-            getAddress(inputCurrency.address),
-            getAddress(outputCurrency.address),
-          ],
-          isBid,
-        ),
-      )
       try {
-        if (cachedIsOpened !== 'open') {
+        const isBid = isAddressEqual(
+          selectedMarket.quote.address,
+          inputCurrency.address,
+        )
+        if (
+          (isBid && !selectedMarket.bidBook.isOpened) ||
+          (!isBid && !selectedMarket.askBook.isOpened)
+        ) {
           setConfirmation({
             title: `Checking Book Availability`,
             body: '',
@@ -125,7 +121,6 @@ export const LimitContractProvider = ({
             ],
           })
           await maxApprove(walletClient, inputCurrency, spender)
-          await queryClient.invalidateQueries(['allowances'])
         }
         const args = {
           chainId: selectedChain.id,
@@ -185,9 +180,10 @@ export const LimitContractProvider = ({
         console.error(e)
       } finally {
         await Promise.all([
-          queryClient.invalidateQueries(['limit-balances']),
+          queryClient.invalidateQueries(['balances']),
           queryClient.invalidateQueries(['open-orders']),
-          queryClient.invalidateQueries(['markets']),
+          queryClient.invalidateQueries(['market']),
+          queryClient.invalidateQueries(['allowances']),
         ])
         setConfirmation(undefined)
       }
@@ -217,7 +213,6 @@ export const LimitContractProvider = ({
           })
           if (hash) {
             await waitTransaction(walletClient.chain.id, hash)
-            await queryClient.invalidateQueries(['allowances'])
           }
         }
 
@@ -245,9 +240,10 @@ export const LimitContractProvider = ({
         console.error(e)
       } finally {
         await Promise.all([
-          queryClient.invalidateQueries(['limit-balances']),
+          queryClient.invalidateQueries(['balances']),
           queryClient.invalidateQueries(['open-orders']),
-          queryClient.invalidateQueries(['markets']),
+          queryClient.invalidateQueries(['market']),
+          queryClient.invalidateQueries(['allowances']),
         ])
         setConfirmation(undefined)
       }
@@ -283,7 +279,6 @@ export const LimitContractProvider = ({
           })
           if (hash) {
             await waitTransaction(walletClient.chain.id, hash)
-            await queryClient.invalidateQueries(['allowances'])
           }
         }
 
@@ -311,9 +306,10 @@ export const LimitContractProvider = ({
         console.error(e)
       } finally {
         await Promise.all([
-          queryClient.invalidateQueries(['limit-balances']),
+          queryClient.invalidateQueries(['balances']),
           queryClient.invalidateQueries(['open-orders']),
-          queryClient.invalidateQueries(['markets']),
+          queryClient.invalidateQueries(['market']),
+          queryClient.invalidateQueries(['allowances']),
         ])
         setConfirmation(undefined)
       }

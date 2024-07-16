@@ -185,7 +185,7 @@ export const LimitContainer = () => {
                     amount > balances[getAddress(inputCurrency.address)]) ??
                   0n,
                 onClick: async () => {
-                  if (!inputCurrency || !outputCurrency) {
+                  if (!inputCurrency || !outputCurrency || !selectedMarket) {
                     return
                   }
                   await limit(
@@ -194,7 +194,7 @@ export const LimitContainer = () => {
                     inputCurrencyAmount,
                     priceInput,
                     isPostOnly,
-                    isBid,
+                    selectedMarket,
                   )
                 },
                 text: !walletClient
