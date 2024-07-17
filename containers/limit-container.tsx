@@ -14,6 +14,7 @@ import { ActionButton } from '../components/button/action-button'
 import { OpenOrderCard } from '../components/card/open-order-card'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
 import { useCurrencyContext } from '../contexts/currency-context'
+import { isAddressesEqual } from '../utils/address'
 
 import { ChartContainer } from './chart-container'
 
@@ -179,6 +180,14 @@ export const LimitContainer = () => {
                 (!walletClient ||
                   !inputCurrency ||
                   !outputCurrency ||
+                  (selectedMarket &&
+                    !isAddressesEqual(
+                      [inputCurrency.address, outputCurrency.address],
+                      [
+                        selectedMarket.base.address,
+                        selectedMarket.quote.address,
+                      ],
+                    )) ||
                   amount === 0n ||
                   amount > balances[getAddress(inputCurrency.address)]) ??
                 0n,
