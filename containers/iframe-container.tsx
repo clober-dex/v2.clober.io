@@ -11,6 +11,7 @@ import { useMarketContext } from '../contexts/limit/market-context'
 import { useLimitContext } from '../contexts/limit/limit-context'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
 import { useCurrencyContext } from '../contexts/currency-context'
+import { isAddressesEqual } from '../utils/address'
 
 export const IframeContainer = () => {
   const { selectedChain } = useChainContext()
@@ -142,6 +143,14 @@ export const IframeContainer = () => {
                 (!walletClient ||
                   !inputCurrency ||
                   !outputCurrency ||
+                  (selectedMarket &&
+                    !isAddressesEqual(
+                      [inputCurrency.address, outputCurrency.address],
+                      [
+                        selectedMarket.base.address,
+                        selectedMarket.quote.address,
+                      ],
+                    )) ||
                   amount === 0n ||
                   amount > balances[getAddress(inputCurrency.address)]) ??
                 0n,
