@@ -143,6 +143,7 @@ export const IframeContainer = () => {
                 (!walletClient ||
                   !inputCurrency ||
                   !outputCurrency ||
+                  priceInput === '' ||
                   (selectedMarket &&
                     !isAddressesEqual(
                       [inputCurrency.address, outputCurrency.address],

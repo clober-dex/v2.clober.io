@@ -35,15 +35,39 @@ const ConfirmationModal = ({
           {confirmation.fields.map((field, index) => (
             <div key={index} className="flex flex-row gap-1">
               {field.direction === 'in' ? (
-                <div className="flex text-sm sm:text-base w-9 items-center justify-center bg-red-500 bg-opacity-10 font-bold text-red-500 px-6 rounded-lg">
-                  -
+                <div className="flex text-sm sm:text-base w-9 sm:w-12 items-center justify-center bg-red-500 bg-opacity-10 font-bold text-red-500 rounded-lg">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 12 4"
+                    fill="none"
+                    className="stroke-red-500 w-2 sm:w-3 h-1"
+                  >
+                    <path
+                      d="M1.66669 2H20.3334"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </div>
               ) : (
                 <></>
               )}
               {field.direction === 'out' ? (
-                <div className="flex text-sm sm:text-base w-9 items-center justify-center bg-green-500 bg-opacity-10 font-bold text-green-500 px-6 rounded-lg">
-                  +
+                <div className="flex text-sm sm:text-base w-9 sm:w-12 items-center justify-center bg-green-500 bg-opacity-10 font-bold text-green-500 rounded-lg">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    className="stroke-green-500 w-3 h-3 sm:w-4 sm:h-4"
+                  >
+                    <path
+                      d="M8.00001 3.33331V12.6666M3.33334 7.99998H12.6667"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </div>
               ) : (
                 <></>

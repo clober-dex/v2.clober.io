@@ -180,6 +180,7 @@ export const LimitContainer = () => {
                 (!walletClient ||
                   !inputCurrency ||
                   !outputCurrency ||
+                  priceInput === '' ||
                   (selectedMarket &&
                     !isAddressesEqual(
                       [inputCurrency.address, outputCurrency.address],
