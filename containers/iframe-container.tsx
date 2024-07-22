@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { getAddress, isAddressEqual, parseUnits } from 'viem'
-import { useWalletClient } from 'wagmi'
+import { useFeeData, useWalletClient } from 'wagmi'
 import Link from 'next/link'
 import { getQuoteToken } from '@clober/v2-sdk'
+import BigNumber from 'bignumber.js'
 
 import { LimitForm } from '../components/form/limit-form'
 import OrderBook from '../components/order-book'
@@ -12,6 +13,10 @@ import { useLimitContext } from '../contexts/limit/limit-context'
 import { useLimitContractContext } from '../contexts/limit/limit-contract-context'
 import { useCurrencyContext } from '../contexts/currency-context'
 import { isAddressesEqual } from '../utils/address'
+import { fetchQuotes } from '../apis/swap/quotes'
+import { AGGREGATORS } from '../constants/aggregators'
+import { formatUnits } from '../utils/bigint'
+import { toPlacesString } from '../utils/bignumber'
 
 export const IframeContainer = () => {
   const { selectedChain } = useChainContext()
@@ -47,6 +52,8 @@ export const IframeContainer = () => {
     setPriceInput,
   } = useLimitContext()
   const { balances, prices, currencies, setCurrencies } = useCurrencyContext()
+  const { data: feeData } = useFeeData()
+  const [isFetchingQuotes, setIsFetchingQuotes] = useState(false)
 
   const [quoteCurrency, baseCurrency] = useMemo(() => {
     if (inputCurrency && outputCurrency) {
@@ -138,6 +145,49 @@ export const IframeContainer = () => {
               setOutputCurrency(_inputCurrency)
             }}
             minimumDecimalPlaces={availableDecimalPlacesGroups?.[0]?.value}
+            setMarketRateAction={{
+              isLoading: isFetchingQuotes,
+              action: async () => {
+                if (
+                  feeData &&
+                  feeData.gasPrice &&
+                  inputCurrency &&
+                  outputCurrency
+                ) {
+                  setIsFetchingQuotes(true)
+                  const quoteToken = getQuoteToken({
+                    chainId: selectedChain.id,
+                    token0: inputCurrency.address,
+                    token1: outputCurrency.address,
+                  })
+                  const [quoteCurrency, baseCurrency] = isAddressEqual(
+                    quoteToken,
+                    inputCurrency.address,
+                  )
+                    ? [inputCurrency, outputCurrency]
+                    : [outputCurrency, inputCurrency]
+                  const { amountOut } = await fetchQuotes(
+                    AGGREGATORS[selectedChain.id],
+                    baseCurrency,
+                    parseUnits('1', baseCurrency.decimals),
+                    quoteCurrency,
+                    20,
+                    feeData.gasPrice,
+                  )
+                  const price = new BigNumber(
+                    formatUnits(amountOut, quoteCurrency.decimals),
+                  )
+                  const minimumDecimalPlaces =
+                    availableDecimalPlacesGroups?.[0]?.value
+                  setPriceInput(
+                    minimumDecimalPlaces
+                      ? toPlacesString(price, minimumDecimalPlaces)
+                      : price.toFixed(),
+                  )
+                  setIsFetchingQuotes(false)
+                }
+              },
+            }}
             actionButtonProps={{
               disabled:
                 (!walletClient ||
