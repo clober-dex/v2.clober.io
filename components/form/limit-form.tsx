@@ -141,8 +141,13 @@ export const LimitForm = ({
     <>
       <div className="hover:ring-1 hover:ring-gray-700 flex rounded-lg border-solid border-[1.5px] border-gray-700 p-4 mb-3 sm:mb-4">
         <div className="flex flex-col flex-1 gap-2">
-          <div className="text-gray-500 text-xs sm:text-sm">
-            {isBid ? 'Buy' : 'Sell'} {selectedMarket?.base.symbol} at rate
+          <div className="flex flex-row">
+            <div className="text-gray-500 text-xs sm:text-sm">
+              {isBid ? 'Buy' : 'Sell'} {selectedMarket?.base.symbol} at rate
+            </div>
+            <button className="flex ml-auto mr-[10px] sm:mr-[16px] text-center text-blue-500 text-xs sm:text-sm font-semibold">
+              Set as market rate
+            </button>
           </div>
           <NumberInput
             value={priceInput}
