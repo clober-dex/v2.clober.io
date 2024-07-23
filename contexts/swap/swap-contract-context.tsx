@@ -9,7 +9,6 @@ import { fetchSwapData } from '../../apis/swap/data'
 import { AGGREGATORS } from '../../constants/aggregators'
 import { useChainContext } from '../chain-context'
 import { useTransactionContext } from '../transaction-context'
-import { toPlacesString } from '../../utils/bignumber'
 import { sendTransaction } from '../../utils/transaction'
 import { useCurrencyContext } from '../currency-context'
 import { maxApprove } from '../../utils/approve20'
@@ -81,9 +80,7 @@ export const SwapContractProvider = ({
               {
                 currency: inputCurrency,
                 label: inputCurrency.symbol,
-                value: toPlacesString(
-                  formatUnits(amountIn, inputCurrency.decimals),
-                ),
+                value: formatUnits(amountIn, inputCurrency.decimals),
               },
             ],
           })
@@ -108,17 +105,13 @@ export const SwapContractProvider = ({
               currency: inputCurrency,
               label: inputCurrency.symbol,
               direction: 'in',
-              value: toPlacesString(
-                formatUnits(amountIn, inputCurrency.decimals),
-              ),
+              value: formatUnits(amountIn, inputCurrency.decimals),
             },
             {
               currency: outputCurrency,
               label: outputCurrency.symbol,
               direction: 'out',
-              value: toPlacesString(
-                formatUnits(swapData.amountOut, outputCurrency.decimals),
-              ),
+              value: formatUnits(swapData.amountOut, outputCurrency.decimals),
             },
           ],
         })
