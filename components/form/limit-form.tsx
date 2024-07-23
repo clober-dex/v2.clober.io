@@ -43,6 +43,7 @@ export const LimitForm = ({
   availableOutputCurrencyBalance,
   swapInputCurrencyAndOutputCurrency,
   minimumDecimalPlaces,
+  setMarketRateAction,
   actionButtonProps,
 }: {
   chainId: number
@@ -72,6 +73,10 @@ export const LimitForm = ({
   availableOutputCurrencyBalance: bigint
   swapInputCurrencyAndOutputCurrency: () => void
   minimumDecimalPlaces: number | undefined
+  setMarketRateAction: {
+    isLoading: boolean
+    action: () => Promise<void>
+  }
   actionButtonProps: ActionButtonProps
 }) => {
   minimumDecimalPlaces = minimumDecimalPlaces
@@ -141,14 +146,29 @@ export const LimitForm = ({
     <>
       <div className="hover:ring-1 hover:ring-gray-700 flex rounded-lg border-solid border-[1.5px] border-gray-700 p-4 mb-3 sm:mb-4">
         <div className="flex flex-col flex-1 gap-2">
-          <div className="text-gray-500 text-xs sm:text-sm">
-            {isBid ? 'Buy' : 'Sell'} {selectedMarket?.base.symbol} at rate
+          <div className="flex flex-row">
+            <div className="text-gray-500 text-xs sm:text-sm">
+              {isBid ? 'Buy' : 'Sell'} {selectedMarket?.base.symbol} at rate
+            </div>
+            <button
+              disabled={setMarketRateAction.isLoading}
+              onClick={async () => {
+                await setMarketRateAction.action()
+              }}
+              className="flex ml-auto mr-[10px] sm:mr-[16px] text-center text-blue-500 text-xs sm:text-sm font-semibold disabled:opacity-50"
+            >
+              Set as market rate
+            </button>
           </div>
-          <NumberInput
-            value={priceInput}
-            onValueChange={setPriceInput}
-            className="text-xl w-full sm:text-2xl bg-transparent placeholder-gray-500 text-white outline-none"
-          />
+          {setMarketRateAction.isLoading ? (
+            <span className="w-[235px] sm:w-[340px] h-7 sm:h-8 rounded animate-pulse bg-gray-500" />
+          ) : (
+            <NumberInput
+              value={priceInput}
+              onValueChange={setPriceInput}
+              className="text-xl w-full sm:text-2xl bg-transparent placeholder-gray-500 text-white outline-none"
+            />
+          )}
         </div>
         <div className="flex w-[34px] sm:w-11 h-12 sm:h-[60px] flex-col gap-[6px] md:gap-2">
           <button
