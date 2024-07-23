@@ -15,7 +15,6 @@ import {
 import { useChainContext } from '../chain-context'
 import { Currency } from '../../model/currency'
 import { Confirmation, useTransactionContext } from '../transaction-context'
-import { toPlacesString } from '../../utils/bignumber'
 import { sendTransaction, waitTransaction } from '../../utils/transaction'
 import { RPC_URL } from '../../constants/rpc-urls'
 import { useCurrencyContext } from '../currency-context'
@@ -149,7 +148,7 @@ export const LimitContractProvider = ({
                 direction: result.make.direction,
                 currency: result.make.currency,
                 label: result.make.currency.symbol,
-                value: toPlacesString(result.make.amount),
+                value: result.make.amount,
               },
             ] as Confirmation['fields'],
           })
@@ -162,15 +161,13 @@ export const LimitContractProvider = ({
                 direction: result.make.direction,
                 currency: result.make.currency,
                 label: result.make.currency.symbol,
-                value: toPlacesString(
-                  Number(result.make.amount) + Number(result.spent.amount),
-                ),
+                value: Number(result.make.amount) + Number(result.spent.amount),
               },
               {
                 direction: result.taken.direction,
                 currency: result.taken.currency,
                 label: result.taken.currency.symbol,
-                value: toPlacesString(result.taken.amount),
+                value: result.taken.amount,
               },
             ] as Confirmation['fields'],
           })
@@ -231,7 +228,7 @@ export const LimitContractProvider = ({
           fields: result.map(({ currency, amount, direction }) => ({
             currency,
             label: currency.symbol,
-            value: toPlacesString(amount),
+            value: amount,
             direction,
           })),
         })
@@ -297,7 +294,7 @@ export const LimitContractProvider = ({
           fields: result.map(({ currency, amount, direction }) => ({
             currency,
             label: currency.symbol,
-            value: toPlacesString(amount),
+            value: amount,
             direction,
           })),
         })
