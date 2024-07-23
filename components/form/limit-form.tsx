@@ -157,7 +157,7 @@ export const LimitForm = ({
               }}
               className="flex ml-auto mr-[10px] sm:mr-[16px] text-center text-blue-500 text-xs sm:text-sm font-semibold disabled:opacity-50"
             >
-              Set as market rate
+              Set to market rate
             </button>
           </div>
           {setMarketRateAction.isLoading ? (
