@@ -63,7 +63,7 @@ const Panel = ({
                           }}
                           className="text-gray-500 font-semibold disabled:text-white"
                         >
-                          Limit order / Swap
+                          Trade
                         </button>
                         <button
                           disabled={
