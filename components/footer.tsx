@@ -1,8 +1,8 @@
 import React from 'react'
 import { useQuery } from 'wagmi'
+import { getSubgraphBlockNumber } from '@clober/v2-sdk'
 
 import { useChainContext } from '../contexts/chain-context'
-import { fetchLatestSubGraphBlockNumber } from '../apis/block-number'
 
 import { BlockNumberWidget } from './block-number-widget'
 
@@ -11,7 +11,7 @@ const Footer = () => {
   const { data: latestSubgraphBlockNumber } = useQuery(
     ['latest-subgraph-block-number', selectedChain.id],
     async () => {
-      return fetchLatestSubGraphBlockNumber()
+      return getSubgraphBlockNumber({ chainId: selectedChain.id })
     },
     {
       initialData: 0,

@@ -4,15 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "graphclient build && next build",
-    "build-graph": "graphclient build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@clober/v2-sdk": "^0.0.57",
+    "@clober/v2-sdk": "^0.0.58",
     "@headlessui/react": "^1.7.16",
     "@heroicons/react": "^2.0.18",
     "@rainbow-me/rainbowkit": "^1.0.7",
@@ -32,7 +31,6 @@
     "wagmi": "^1.4.12"
   },
   "devDependencies": {
-    "@graphprotocol/client-cli": "^3.0.0",
     "@nomiclabs/hardhat-ethers": "^2.2.0",
     "@storybook/addon-essentials": "^7.5.1",
     "@storybook/addon-interactions": "^7.5.1",
