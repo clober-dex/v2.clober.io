@@ -4,8 +4,8 @@ import { Pool } from '../../model/pool'
 import { Prices } from '../../model/prices'
 import { ActionButton, ActionButtonProps } from '../button/action-button'
 import { Currency } from '../../model/currency'
-import CurrencyAmountInput from '../input/currency-amount-input'
 import { formatDollarValue, formatUnits } from '../../utils/bigint'
+import LpCurrencyAmountInput from '../input/lp-currency-amount-input'
 
 export const RemoveLiquidityForm = ({
   pool,
@@ -24,14 +24,17 @@ export const RemoveLiquidityForm = ({
   receiveCurrencies: { currency: Currency; amount: bigint }[]
   actionButtonProps: ActionButtonProps
 }) => {
+  console.log('RemoveLiquidityForm', pool)
   return (
     <>
       <div className="flex flex-col relative gap-4 self-stretch">
         <div className="text-white text-sm md:text-base font-bold">
           Enter amount you’d like to withdraw.
         </div>
-        <CurrencyAmountInput
+        <LpCurrencyAmountInput
           currency={pool.lpCurrency}
+          currency0={pool.currency0}
+          currency1={pool.currency1}
           value={lpCurrencyAmount}
           onValueChange={setLpCurrencyAmount}
           availableAmount={availableLpCurrencyBalance}
