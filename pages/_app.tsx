@@ -9,7 +9,13 @@ import {
 } from '@rainbow-me/rainbowkit'
 import Head from 'next/head'
 import type { AppProps } from 'next/app'
-import { configureChains, createConfig, useAccount, WagmiConfig } from 'wagmi'
+import {
+  configureChains,
+  createConfig,
+  useAccount,
+  useQuery,
+  WagmiConfig,
+} from 'wagmi'
 import { jsonRpcProvider } from '@wagmi/core/providers/jsonRpc'
 import { identify } from '@web3analytic/funnel-sdk'
 import dynamic from 'next/dynamic'
@@ -23,6 +29,7 @@ import {
   xdefiWallet,
   zerionWallet,
 } from '@rainbow-me/rainbowkit/wallets'
+import { getSubgraphBlockNumber } from '@clober/v2-sdk'
 
 import HeaderContainer from '../containers/header-container'
 import Footer from '../components/footer'
@@ -202,6 +209,23 @@ const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
   )
 }
 
+const FooterWrapper = () => {
+  const { selectedChain } = useChainContext()
+  const { data: latestSubgraphBlockNumber } = useQuery(
+    ['latest-subgraph-block-number', selectedChain.id],
+    async () => {
+      return getSubgraphBlockNumber({ chainId: selectedChain.id })
+    },
+    {
+      initialData: 0,
+      refetchInterval: 10 * 1000,
+      refetchIntervalInBackground: true,
+    },
+  )
+
+  return <Footer latestSubgraphBlockNumber={latestSubgraphBlockNumber} />
+}
+
 function App({ Component, pageProps }: AppProps) {
   const [open, setOpen] = useState(false)
   const [history, setHistory] = useState<string[]>([])
@@ -268,7 +292,7 @@ function App({ Component, pageProps }: AppProps) {
                           <MainComponentWrapper>
                             <Component {...pageProps} />
                           </MainComponentWrapper>
-                          <Footer />
+                          <FooterWrapper />
                         </div>
                       </SwapProvidersWrapper>
                     </LimitProvidersWrapper>
