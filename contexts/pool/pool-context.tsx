@@ -1,4 +1,9 @@
 import React from 'react'
+import { useQuery } from 'wagmi'
+
+import { Pool, PoolPosition } from '../../model/pool'
+import { useChainContext } from '../chain-context'
+import { fetchPools } from '../../apis/pools'
 
 type PoolContext = {
   lpCurrencyAmount: string
@@ -11,6 +16,8 @@ type PoolContext = {
   setAsRatio: (asRatio: boolean) => void
   slippageInput: string
   setSlippageInput: (slippageInput: string) => void
+  pools: Pool[]
+  poolPositions: PoolPosition[]
 }
 
 const Context = React.createContext<PoolContext>({
@@ -24,14 +31,29 @@ const Context = React.createContext<PoolContext>({
   setAsRatio: () => {},
   slippageInput: '1',
   setSlippageInput: () => {},
+  pools: [],
+  poolPositions: [],
 })
 
 export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
+  const { selectedChain } = useChainContext()
   const [lpCurrencyAmount, setLpCurrencyAmount] = React.useState('')
   const [currency0Amount, setCurrency0Amount] = React.useState('')
   const [currency1Amount, setCurrency1Amount] = React.useState('')
   const [asRatio, setAsRatio] = React.useState(false)
   const [slippageInput, setSlippageInput] = React.useState('1')
+
+  const { data: pools } = useQuery(
+    ['pools'],
+    async () => {
+      return fetchPools(selectedChain.id)
+    },
+    {
+      initialData: [],
+    },
+  ) as {
+    data: Pool[]
+  }
 
   return (
     <Context.Provider
@@ -46,6 +68,8 @@ export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
         setAsRatio,
         slippageInput,
         setSlippageInput,
+        pools,
+        poolPositions: [],
       }}
     >
       {children}

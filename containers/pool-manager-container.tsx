@@ -83,7 +83,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
           <div className="flex flex-col w-full sm:w-[480px] items-start gap-8 md:gap-12">
             <div className="flex flex-col item-st gap-3 md:gap-4 self-stretch">
               <div className="text-white text-sm md:text-base font-bold">
-                Token Price
+                Reserve
               </div>
               <div className="flex h-14 px-8 py-4 bg-gray-800 rounded-xl justify-center items-center gap-8 md:gap-12">
                 <div className="flex justify-center gap-2 md:gap-4">
@@ -97,7 +97,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                     </div>
                   </div>
                   <div className="text-center text-white text-sm md:text-lg font-bold ">
-                    $612,384
+                    612,384
                   </div>
                 </div>
                 <div className="flex justify-center gap-2 md:gap-4">
@@ -111,7 +111,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                     </div>
                   </div>
                   <div className="text-center text-white text-sm md:text-lg font-bold ">
-                    $1.00
+                    1.00
                   </div>
                 </div>
               </div>
