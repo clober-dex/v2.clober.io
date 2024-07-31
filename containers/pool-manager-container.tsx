@@ -27,8 +27,6 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
     setSlippageInput,
     lpCurrencyAmount,
     setLpCurrencyAmount,
-    removeLiquidityType,
-    setRemoveLiquidityType,
   } = usePoolContext()
 
   return (
@@ -148,7 +146,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
               <div className="flex justify-center w-full h-[240px] sm:h-[320px] bg-gray-700 rounded-2xl" />
             </div>
           </div>
-          <div className="flex flex-col w-full sm:w-[480px] justify-start items-start gap-4">
+          <div className="h-full md:h-[576px] flex flex-col w-full sm:w-[480px] justify-start items-start gap-4">
             <div className="w-full sm:h-14 p-1.5 sm:px-2 rounded-xl md:rounded-2xl border-2 border-slate-800 border-solid justify-center items-center inline-flex">
               <button
                 disabled={tab === 'add-liquidity'}
@@ -234,8 +232,6 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                   availableLpCurrencyBalance={
                     balances[pool.lpCurrency.address] ?? 0n
                   }
-                  removeLiquidityType={removeLiquidityType}
-                  setRemoveLiquidityType={setRemoveLiquidityType}
                   receiveCurrencies={[
                     {
                       currency: {

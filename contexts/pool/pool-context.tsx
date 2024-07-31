@@ -11,10 +11,6 @@ type PoolContext = {
   setAsRatio: (asRatio: boolean) => void
   slippageInput: string
   setSlippageInput: (slippageInput: string) => void
-  removeLiquidityType: 'mixed' | 'currency0' | 'currency1'
-  setRemoveLiquidityType: (
-    removeLiquidityType: 'mixed' | 'currency0' | 'currency1',
-  ) => void
 }
 
 const Context = React.createContext<PoolContext>({
@@ -28,8 +24,6 @@ const Context = React.createContext<PoolContext>({
   setAsRatio: () => {},
   slippageInput: '1',
   setSlippageInput: () => {},
-  removeLiquidityType: 'mixed',
-  setRemoveLiquidityType: () => {},
 })
 
 export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
@@ -38,9 +32,6 @@ export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [currency1Amount, setCurrency1Amount] = React.useState('')
   const [asRatio, setAsRatio] = React.useState(false)
   const [slippageInput, setSlippageInput] = React.useState('1')
-  const [removeLiquidityType, setRemoveLiquidityType] = React.useState<
-    'mixed' | 'currency0' | 'currency1'
-  >('mixed')
 
   return (
     <Context.Provider
@@ -55,8 +46,6 @@ export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
         setAsRatio,
         slippageInput,
         setSlippageInput,
-        removeLiquidityType,
-        setRemoveLiquidityType,
       }}
     >
       {children}

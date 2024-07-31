@@ -52,8 +52,6 @@ export const Default: Story = {
     lpCurrencyAmount: '1',
     setLpCurrencyAmount: () => {},
     availableLpCurrencyBalance: 1000999999999999900n,
-    removeLiquidityType: 'mixed',
-    setRemoveLiquidityType: () => {},
     receiveCurrencies: [
       {
         currency: {
@@ -115,8 +113,6 @@ export const One: Story = {
     lpCurrencyAmount: '1',
     setLpCurrencyAmount: () => {},
     availableLpCurrencyBalance: 1000999999999999900n,
-    removeLiquidityType: 'mixed',
-    setRemoveLiquidityType: () => {},
     receiveCurrencies: [
       {
         currency: {
@@ -169,8 +165,6 @@ export const Zero: Story = {
     lpCurrencyAmount: '1',
     setLpCurrencyAmount: () => {},
     availableLpCurrencyBalance: 1000999999999999900n,
-    removeLiquidityType: 'mixed',
-    setRemoveLiquidityType: () => {},
     receiveCurrencies: [],
     actionButtonProps: {
       disabled: false,
