@@ -7,6 +7,8 @@ export type Pool = {
   apy: number
   tvl: number
   volume24h: number
+  reserve0: number
+  reserve1: number
 }
 
 export type PoolPosition = {

@@ -9,8 +9,10 @@ import { toPlacesString } from '../../utils/bignumber'
 
 import NumberInput from './number-input'
 
-const CurrencyAmountInput = ({
+const LpCurrencyAmountInput = ({
   currency,
+  currency0,
+  currency1,
   value,
   onValueChange,
   availableAmount,
@@ -18,7 +20,9 @@ const CurrencyAmountInput = ({
   onCurrencyClick,
   ...props
 }: {
-  currency?: Currency
+  currency: Currency
+  currency0: Currency
+  currency1: Currency
   value: string
   onValueChange: (value: string) => void
   availableAmount: bigint
@@ -60,8 +64,15 @@ const CurrencyAmountInput = ({
               className="flex w-fit items-center rounded-full bg-gray-700 py-1 pl-2 pr-3 gap-2"
               onClick={onCurrencyClick}
             >
-              <div className="w-5 h-5 relative">
-                <CurrencyIcon currency={currency} />
+              <div className="w-8 h-5 shrink-0 relative">
+                <CurrencyIcon
+                  currency={currency0}
+                  className="w-5 h-5 absolute left-0 top-0 z-[1]"
+                />
+                <CurrencyIcon
+                  currency={currency1}
+                  className="w-5 h-5 absolute left-4 top-0"
+                />
               </div>
               <div className="text-sm sm:text-base text-white">
                 {currency.symbol}
@@ -77,8 +88,15 @@ const CurrencyAmountInput = ({
           )
         ) : currency ? (
           <div className="flex w-fit items-center rounded-full bg-gray-700 py-1 pl-2 pr-3 gap-2">
-            <div className="w-5 h-5 relative">
-              <CurrencyIcon currency={currency} />
+            <div className="w-8 h-5 shrink-0 relative">
+              <CurrencyIcon
+                currency={currency0}
+                className="w-5 h-5 absolute left-0 top-0 z-[1]"
+              />
+              <CurrencyIcon
+                currency={currency1}
+                className="w-5 h-5 absolute left-4 top-0"
+              />
             </div>
             <div className="text-sm sm:text-base text-white">
               {currency.symbol}
@@ -118,4 +136,4 @@ const CurrencyAmountInput = ({
   )
 }
 
-export default CurrencyAmountInput
+export default LpCurrencyAmountInput
