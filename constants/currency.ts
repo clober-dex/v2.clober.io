@@ -46,10 +46,10 @@ export const DEFAULT_INPUT_CURRENCY: {
   },
   [CHAIN_IDS.BERACHAIN_TESTNET]: ETH,
   [CHAIN_IDS.BASE]: {
-    address: '0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA',
-    name: 'USD Base Coin',
-    symbol: 'USDbC',
-    decimals: 6,
+    address: '0x4200000000000000000000000000000000000006',
+    name: 'Wrapped Ether',
+    symbol: 'WETH',
+    decimals: 18,
   },
   [CHAIN_IDS.ZKSYNC]: ETH,
 }
