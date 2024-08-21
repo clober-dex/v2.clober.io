@@ -4,13 +4,15 @@ import { Chain } from '../model/chain'
 
 import { beraTestnetChain } from './dev-chain'
 
+export const DEFAULT_CHAIN_ID = base.id
+
 export const supportChains: Chain[] = [
+  base,
   arbitrumSepolia,
   {
     ...beraTestnetChain,
     icon: 'https://img.cryptorank.io/coins/berachain1681996075164.png',
   },
-  base,
   zkSync,
 ]
 
