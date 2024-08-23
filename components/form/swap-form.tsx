@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { getAddress, isAddressEqual, parseUnits } from 'viem'
 import BigNumber from 'bignumber.js'
 
@@ -14,6 +14,7 @@ import { ActionButton, ActionButtonProps } from '../button/action-button'
 import { Prices } from '../../model/prices'
 import { Balances } from '../../model/balances'
 import { ArrowDownSvg } from '../svg/arrow-down-svg'
+import { ExchangeSvg } from '../svg/exchange-svg'
 
 export const SwapForm = ({
   chainId,
@@ -77,6 +78,19 @@ export const SwapForm = ({
       parseUnits(outputCurrencyAmount, outputCurrency?.decimals ?? 18) === 0n
     )
   }, [inputCurrency, inputCurrencyAmount, outputCurrency, outputCurrencyAmount])
+
+  const swapCurrencies = useCallback(() => {
+    const prevInputCurrency = inputCurrency
+    setInputCurrency(outputCurrency)
+    setOutputCurrency(prevInputCurrency)
+    setInputCurrencyAmount('')
+  }, [
+    inputCurrency,
+    outputCurrency,
+    setInputCurrency,
+    setInputCurrencyAmount,
+    setOutputCurrency,
+  ])
 
   return showInputCurrencySelect ? (
     <CurrencySelect
@@ -159,19 +173,20 @@ export const SwapForm = ({
         <div className="absolute flex items-center justify-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gray-900 p-1 sm:p-1.5">
           <button
             className="flex items-center justify-center p-0 bg-gray-700 w-full h-full rounded-full transform hover:rotate-180 transition duration-300"
-            onClick={() => {
-              const prevInputCurrency = inputCurrency
-              setInputCurrency(outputCurrency)
-              setOutputCurrency(prevInputCurrency)
-              setInputCurrencyAmount('')
-            }}
+            onClick={swapCurrencies}
           >
             <ArrowDownSvg className="w-4 h-4 sm:w-6 sm:h-6" />
           </button>
         </div>
       </div>
       <div className="flex flex-col sm:flex-row justify-between items-center gap-0.5 sm:gap-0">
-        <div className="flex text-xs sm:text-sm text-white mr-auto gap-1">
+        <div className="flex text-xs sm:text-sm text-white mr-auto gap-1 items-center">
+          <button
+            onClick={swapCurrencies}
+            className="flex w-4 h-4 sm:w-6 sm:h-6"
+          >
+            <ExchangeSvg className="w-full h-full" />
+          </button>
           1 {inputCurrency?.symbol ?? 'IN'} ={' '}
           {isLoadingResults ? (
             <span className="w-[100px] mx-1 rounded animate-pulse bg-gray-500" />
