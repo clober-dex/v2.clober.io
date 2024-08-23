@@ -36,7 +36,7 @@ export const SwapContractProvider = ({
   const { selectedChain } = useChainContext()
   const { data: walletClient } = useWalletClient()
   const { setConfirmation } = useTransactionContext()
-  const { allowances } = useCurrencyContext()
+  const { allowances, prices } = useCurrencyContext()
 
   const swap = useCallback(
     async (
@@ -80,7 +80,11 @@ export const SwapContractProvider = ({
               {
                 currency: inputCurrency,
                 label: inputCurrency.symbol,
-                value: formatUnits(amountIn, inputCurrency.decimals),
+                value: formatUnits(
+                  amountIn,
+                  inputCurrency.decimals,
+                  prices[inputCurrency.address],
+                ),
               },
             ],
           })
@@ -105,13 +109,21 @@ export const SwapContractProvider = ({
               currency: inputCurrency,
               label: inputCurrency.symbol,
               direction: 'in',
-              value: formatUnits(amountIn, inputCurrency.decimals),
+              value: formatUnits(
+                amountIn,
+                inputCurrency.decimals,
+                prices[inputCurrency.address],
+              ),
             },
             {
               currency: outputCurrency,
               label: outputCurrency.symbol,
               direction: 'out',
-              value: formatUnits(swapData.amountOut, outputCurrency.decimals),
+              value: formatUnits(
+                swapData.amountOut,
+                outputCurrency.decimals,
+                prices[outputCurrency.address],
+              ),
             },
           ],
         })

@@ -25,3 +25,12 @@ export const toPlacesString = (
 ): string => {
   return new BigNumber(number).toFixed(places, roundingMode)
 }
+
+export const toPlacesAmountString = (
+  number: BigNumber.Value,
+  price: number,
+): string => {
+  const underHalfPennyDecimals =
+    Math.floor(Math.max(-Math.log10(0.005 / price), 0) / 2) * 2
+  return new BigNumber(number).toFixed(underHalfPennyDecimals)
+}

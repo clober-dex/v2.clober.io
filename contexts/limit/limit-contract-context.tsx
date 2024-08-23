@@ -19,6 +19,7 @@ import { sendTransaction, waitTransaction } from '../../utils/transaction'
 import { RPC_URL } from '../../constants/rpc-urls'
 import { useCurrencyContext } from '../currency-context'
 import { maxApprove } from '../../utils/approve20'
+import { toPlacesAmountString } from '../../utils/bignumber'
 
 type LimitContractContext = {
   limit: (
@@ -47,7 +48,7 @@ export const LimitContractProvider = ({
   const { data: walletClient } = useWalletClient()
   const { setConfirmation } = useTransactionContext()
   const { selectedChain } = useChainContext()
-  const { isOpenOrderApproved, allowances } = useCurrencyContext()
+  const { isOpenOrderApproved, allowances, prices } = useCurrencyContext()
 
   const limit = useCallback(
     async (
@@ -115,7 +116,10 @@ export const LimitContractProvider = ({
               {
                 currency: inputCurrency,
                 label: inputCurrency.symbol,
-                value: amount,
+                value: toPlacesAmountString(
+                  amount,
+                  prices[inputCurrency.address],
+                ),
               },
             ],
           })
@@ -148,7 +152,10 @@ export const LimitContractProvider = ({
                 direction: result.make.direction,
                 currency: result.make.currency,
                 label: result.make.currency.symbol,
-                value: result.make.amount,
+                value: toPlacesAmountString(
+                  result.make.amount,
+                  prices[inputCurrency.address],
+                ),
               },
             ] as Confirmation['fields'],
           })
@@ -161,13 +168,19 @@ export const LimitContractProvider = ({
                 direction: result.make.direction,
                 currency: result.make.currency,
                 label: result.make.currency.symbol,
-                value: Number(result.make.amount) + Number(result.spent.amount),
+                value: toPlacesAmountString(
+                  Number(result.make.amount) + Number(result.spent.amount),
+                  prices[inputCurrency.address],
+                ),
               },
               {
                 direction: result.taken.direction,
                 currency: result.taken.currency,
                 label: result.taken.currency.symbol,
-                value: result.taken.amount,
+                value: toPlacesAmountString(
+                  result.taken.amount,
+                  prices[outputCurrency.address],
+                ),
               },
             ] as Confirmation['fields'],
           })
