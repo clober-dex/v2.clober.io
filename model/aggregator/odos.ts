@@ -89,6 +89,7 @@ export class OdosAggregator implements Aggregator {
         slippageLimitPercent,
         sourceBlacklist: [],
         pathViz: true,
+        referralCode: '1939997089',
       }),
     })
     return {
@@ -141,6 +142,7 @@ export class OdosAggregator implements Aggregator {
         slippageLimitPercent,
         sourceBlacklist: [],
         pathViz: true,
+        referralCode: '1939997089',
       }),
     })
     if (!pathId) {
