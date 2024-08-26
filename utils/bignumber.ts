@@ -23,7 +23,15 @@ export const toPlacesString = (
   places: number = 4,
   roundingMode: BigNumber.RoundingMode = BigNumber.ROUND_FLOOR,
 ): string => {
-  return new BigNumber(number).toFixed(places, roundingMode)
+  const result = new BigNumber(number).toFixed(places, roundingMode)
+  if (new BigNumber(result).isZero()) {
+    return new BigNumber(number).toFixed(
+      findFirstNonZeroIndex(number),
+      roundingMode,
+    )
+  } else {
+    return result
+  }
 }
 
 export const toPlacesAmountString = (
