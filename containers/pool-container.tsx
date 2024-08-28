@@ -3,7 +3,7 @@ import { useAccount } from 'wagmi'
 import { useRouter } from 'next/router'
 
 import { Pool, PoolPosition } from '../model/pool'
-import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from '../constants/currencies/80085'
+import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from '../constants/currencies/80084'
 import { PoolCard } from '../components/card/pool-card'
 import { PoolPositionCard } from '../components/card/pool-position-card'
 import { useChainContext } from '../contexts/chain-context'

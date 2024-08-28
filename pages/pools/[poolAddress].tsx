@@ -6,7 +6,7 @@ import { useChainContext } from '../../contexts/chain-context'
 import { cleanAndSetQueryParams } from '../../utils/url'
 import { PoolManagerContainer } from '../../containers/pool-manager-container'
 import { Pool } from '../../model/pool'
-import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from '../../constants/currencies/80085'
+import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from '../../constants/currencies/80084'
 
 const pools: Pool[] = BERACHAIN_TESTNET_WHITELISTED_CURRENCIES.map(
   (currency) => {
