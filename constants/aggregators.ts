@@ -1,4 +1,4 @@
-import { getAddress, zeroAddress } from 'viem'
+import { getAddress } from 'viem'
 import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Aggregator } from '../model/aggregator'
@@ -13,7 +13,7 @@ export const AGGREGATORS: {
   [CHAIN_IDS.ARBITRUM_SEPOLIA]: [],
   [CHAIN_IDS.BERACHAIN_TESTNET]: [
     new OogaBoogaAggregator(
-      zeroAddress,
+      getAddress('0x7bC98B68bCBb16cEC81EdDcEa1A3746Fdc5025A4'),
       findSupportChain(CHAIN_IDS.BERACHAIN_TESTNET.valueOf())!,
     ),
   ],

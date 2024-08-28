@@ -62,12 +62,12 @@ export class OogaBoogaAggregator implements Aggregator {
       }`,
     )
     // const estimatedGas = await publicClient.estimateGas({
-    //   account: result['tx'].account,
+    //   account: userAddress,
     //   to: result['tx'].to,
     //   data: result['tx'].data,
     //   value: BigInt(result['tx'].value),
     // })
-    const estimatedGas = 1000000n // TODO: because of berachain issue
+    const estimatedGas = 5000000n // TODO: because of berachain issue
     const pathViz = {
       nodes: result['tokens'].map((token: any) => ({
         name: token.name,
@@ -138,6 +138,7 @@ export class OogaBoogaAggregator implements Aggregator {
     //   chain: this.chain,
     //   transport: http(),
     // })
+    userAddress = userAddress || zeroAddress
     const { result } = await fetchApi<{
       result: any
     }>(
@@ -149,12 +150,12 @@ export class OogaBoogaAggregator implements Aggregator {
       }`,
     )
     // const estimatedGas = await publicClient.estimateGas({
-    //   account: result['tx'].account,
+    //   account: userAddress,
     //   to: result['tx'].to,
     //   data: result['tx'].data,
     //   value: BigInt(result['tx'].value),
     // })
-    const estimatedGas = 1000000n // TODO: because of berachain issue
+    const estimatedGas = 5000000n // TODO: because of berachain issue
     return {
       data: result['tx'].data,
       gas: estimatedGas,
