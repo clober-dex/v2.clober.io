@@ -10,9 +10,11 @@ import { fetchQuotes } from '../apis/swap/quotes'
 import { AGGREGATORS } from '../constants/aggregators'
 import { useSwapContext } from '../contexts/swap/swap-context'
 import { useSwapContractContext } from '../contexts/swap/swap-contract-context'
-import { OdosLogoSvg } from '../components/svg/odos-logo-svg'
 import { testnetChainIds } from '../constants/chain'
 import { useCurrencyContext } from '../contexts/currency-context'
+import { OogaBoogaLogoSvg } from '../components/svg/ooga-booga-logo-svg'
+import { beraTestnetChain } from '../constants/dev-chain'
+import { OdosLogoSvg } from '../components/svg/odos-logo-svg'
 
 export const SwapContainer = () => {
   const {
@@ -70,6 +72,11 @@ export const SwapContainer = () => {
   useEffect(() => {
     setShowInputCurrencySelect(false)
   }, [selectedChain])
+
+  const poweredByLink =
+    selectedChain.id === beraTestnetChain.id
+      ? 'https://www.oogabooga.io/'
+      : 'https://www.odos.xyz/'
 
   return (
     <div className="flex flex-col w-fit mb-4 sm:mb-6">
@@ -157,11 +164,16 @@ export const SwapContainer = () => {
             <></>
           )}
         </div>
-        {!testnetChainIds.includes(selectedChain.id) ? (
+        {!testnetChainIds.includes(selectedChain.id) ||
+        selectedChain.id === beraTestnetChain.id ? (
           <div className="flex ml-auto text-white items-center gap-2">
             <div className="text-gray-400 text-xs font-medium">Powered by</div>
-            <a target="_blank" href="https://www.odos.xyz/" rel="noreferrer">
-              <OdosLogoSvg />
+            <a target="_blank" href={poweredByLink} rel="noreferrer">
+              {selectedChain.id === beraTestnetChain.id ? (
+                <OogaBoogaLogoSvg />
+              ) : (
+                <OdosLogoSvg />
+              )}
             </a>
           </div>
         ) : (
