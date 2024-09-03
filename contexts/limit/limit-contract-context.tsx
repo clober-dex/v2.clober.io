@@ -198,7 +198,14 @@ export const LimitContractProvider = ({
         setConfirmation(undefined)
       }
     },
-    [allowances, queryClient, selectedChain, setConfirmation, walletClient],
+    [
+      allowances,
+      prices,
+      queryClient,
+      selectedChain,
+      setConfirmation,
+      walletClient,
+    ],
   )
 
   const cancels = useCallback(
@@ -241,7 +248,7 @@ export const LimitContractProvider = ({
           fields: result.map(({ currency, amount, direction }) => ({
             currency,
             label: currency.symbol,
-            value: amount,
+            value: toPlacesAmountString(amount, prices[currency.address]),
             direction,
           })),
         })
@@ -260,6 +267,7 @@ export const LimitContractProvider = ({
     },
     [
       isOpenOrderApproved,
+      prices,
       queryClient,
       selectedChain,
       setConfirmation,
@@ -307,7 +315,7 @@ export const LimitContractProvider = ({
           fields: result.map(({ currency, amount, direction }) => ({
             currency,
             label: currency.symbol,
-            value: amount,
+            value: toPlacesAmountString(amount, prices[currency.address]),
             direction,
           })),
         })
@@ -326,6 +334,7 @@ export const LimitContractProvider = ({
     },
     [
       isOpenOrderApproved,
+      prices,
       queryClient,
       selectedChain,
       setConfirmation,
