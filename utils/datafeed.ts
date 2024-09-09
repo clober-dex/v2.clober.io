@@ -73,7 +73,13 @@ export default class DataFeed implements IBasicDataFeed {
     symbolType: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onResult: SearchSymbolsCallback,
-  ) {}
+  ) {
+    console.log('searchSymbols Start', {
+      userInput,
+      exchange,
+      symbolType,
+    })
+  }
 
   async resolveSymbol(
     symbolName: string,
@@ -120,6 +126,11 @@ export default class DataFeed implements IBasicDataFeed {
     onResult: HistoryCallback,
     onError: ErrorCallback,
   ) {
+    console.log('getBars Start', {
+      symbolInfo,
+      resolution,
+    })
+
     try {
       const { from, to } = periodParams
       const resolutionKey = (SUPPORTED_INTERVALS.find(
@@ -136,7 +147,7 @@ export default class DataFeed implements IBasicDataFeed {
           to,
         })
       ).filter((v) => Number(v.close) > 0 && Number(v.open) > 0)
-      console.log('getBars', {
+      console.log('getBars End', {
         resolution,
         resolutionKey,
         from,
