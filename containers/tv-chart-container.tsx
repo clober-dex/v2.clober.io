@@ -70,9 +70,8 @@ export const TvChartContainer = ({
         'header_widget',
         'header_symbol_search',
         'symbol_search_hot_key',
-        'header_compare',
-        'timeframes_toolbar',
-        'create_volume_indicator_by_default',
+        'use_localstorage_for_settings',
+        'popup_hints',
       ],
       enabled_features: ['study_templates', 'hide_left_toolbar_by_default'],
       charts_storage_url: 'https://saveload.tradingview.com',
@@ -88,9 +87,6 @@ export const TvChartContainer = ({
         backgroundColor: '#111827',
         foregroundColor: '#111827',
       },
-      overrides: {
-        'mainSeriesProperties.priceAxisProperties.log': true,
-      },
     })
 
     tvWidget.onChartReady(() => {
@@ -98,7 +94,6 @@ export const TvChartContainer = ({
         'paneProperties.backgroundGradientStartColor': '#111827',
         'paneProperties.backgroundGradientEndColor': '#111827',
       })
-      tvWidget.activeChart().createStudy('Volume', false, false)
     })
 
     return () => {
