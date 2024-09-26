@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useQuery } from 'wagmi'
 
 import { Pool, PoolPosition } from '../../model/pool'
 import { useChainContext } from '../chain-context'
 import { fetchPools } from '../../apis/pools'
 import { useCurrencyContext } from '../currency-context'
+import { deduplicateCurrencies } from '../../utils/currency'
 
 type PoolContext = {
   lpCurrencyAmount: string
@@ -38,7 +39,7 @@ const Context = React.createContext<PoolContext>({
 
 export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { selectedChain } = useChainContext()
-  const { prices } = useCurrencyContext()
+  const { prices, setCurrencies, whitelistCurrencies } = useCurrencyContext()
   const [lpCurrencyAmount, setLpCurrencyAmount] = React.useState('')
   const [currency0Amount, setCurrency0Amount] = React.useState('')
   const [currency1Amount, setCurrency1Amount] = React.useState('')
@@ -52,10 +53,19 @@ export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
     },
     {
       initialData: [],
+      refetchInterval: 5 * 1000,
+      refetchIntervalInBackground: true,
     },
   ) as {
     data: Pool[]
   }
+
+  useEffect(() => {
+    const action = async () => {
+      setCurrencies(deduplicateCurrencies(whitelistCurrencies))
+    }
+    action()
+  }, [setCurrencies, whitelistCurrencies])
 
   return (
     <Context.Provider

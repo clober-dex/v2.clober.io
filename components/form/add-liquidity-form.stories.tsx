@@ -60,9 +60,11 @@ export const Default: Story = {
     availableCurrency1Balance: 1000999n,
     asRatio: true,
     setAsRatio: () => {},
+    disableAsRatio: false,
     slippageInput: '0.5',
     setSlippageInput: () => {},
     receiveLpCurrencyAmount: 1000999999999999900n,
+    isCalculatingReceiveLpAmount: true,
     actionButtonProps: {
       disabled: false,
       onClick: () => {},

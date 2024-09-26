@@ -1,5 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { useAccount, useQuery, useWalletClient } from 'wagmi'
+import { addLiquidity, getQuoteToken } from '@clober/v2-sdk'
+import { isAddressEqual, parseUnits, zeroAddress, zeroHash } from 'viem'
 
 import { Pool } from '../model/pool'
 import { useChainContext } from '../contexts/chain-context'
@@ -8,12 +11,16 @@ import { AddLiquidityForm } from '../components/form/add-liquidity-form'
 import { usePoolContext } from '../contexts/pool/pool-context'
 import { useCurrencyContext } from '../contexts/currency-context'
 import { RemoveLiquidityForm } from '../components/form/remove-liquidity-form'
+import { RPC_URL } from '../constants/rpc-urls'
+import { usePoolContractContext } from '../contexts/pool/pool-contract-context'
 
 export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
   const [tab, setTab] = React.useState<'add-liquidity' | 'remove-liquidity'>(
     'add-liquidity',
   )
   const router = useRouter()
+  const { data: walletClient } = useWalletClient()
+  const { address: userAddress } = useAccount()
   const { selectedChain } = useChainContext()
   const { balances, prices } = useCurrencyContext()
   const {
@@ -28,6 +35,61 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
     lpCurrencyAmount,
     setLpCurrencyAmount,
   } = usePoolContext()
+  const { mint } = usePoolContractContext()
+
+  const { data: receiveLpAmount } = useQuery(
+    [
+      'calculate-receive-lp-amount',
+      selectedChain,
+      pool,
+      currency0Amount,
+      currency1Amount,
+      asRatio,
+      slippageInput,
+      prices,
+    ],
+    async () => {
+      if (Number(currency0Amount) === 0 && Number(currency1Amount) === 0) {
+        return 0n
+      }
+      const baseCurrency = isAddressEqual(
+        getQuoteToken({
+          chainId: selectedChain.id,
+          token0: pool.currency0.address,
+          token1: pool.currency1.address,
+        }),
+        pool.currency0.address,
+      )
+        ? pool.currency1
+        : pool.currency0
+
+      const { result } = await addLiquidity({
+        chainId: selectedChain.id,
+        token0: pool.currency0.address,
+        token1: pool.currency1.address,
+        salt: zeroHash,
+        userAddress: userAddress ?? zeroAddress,
+        amount0: currency0Amount,
+        amount1: currency1Amount,
+        options: {
+          useSubgraph: false,
+          rpcUrl: RPC_URL[selectedChain.id],
+          gasLimit: 1_000_000n,
+          disableSwap: asRatio,
+          slippage: Number(slippageInput),
+          testnetPrice: prices[baseCurrency.address],
+        },
+      })
+      return parseUnits(result.lpCurrency.amount, 18)
+    },
+    {
+      initialData: 0n,
+    },
+  )
+
+  useEffect(() => {
+    setAsRatio(pool.reserve0 + pool.reserve1 === 0)
+  }, [pool.reserve0, pool.reserve1, setAsRatio])
 
   return (
     <div className="flex w-full h-full justify-center mt-8 md:mt-16 mb-4 sm:mb-6">
@@ -97,7 +159,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                     </div>
                   </div>
                   <div className="text-center text-white text-sm md:text-lg font-bold ">
-                    612,384
+                    {pool.reserve0}
                   </div>
                 </div>
                 <div className="flex justify-center gap-2 md:gap-4">
@@ -111,7 +173,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                     </div>
                   </div>
                   <div className="text-center text-white text-sm md:text-lg font-bold ">
-                    1.00
+                    {pool.reserve1}
                   </div>
                 </div>
               </div>
@@ -214,13 +276,57 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                   }
                   asRatio={asRatio}
                   setAsRatio={setAsRatio}
+                  disableAsRatio={pool.reserve0 + pool.reserve1 === 0}
                   slippageInput={slippageInput}
                   setSlippageInput={setSlippageInput}
-                  receiveLpCurrencyAmount={1000999999999999900n}
+                  receiveLpCurrencyAmount={receiveLpAmount}
+                  isCalculatingReceiveLpAmount={
+                    (asRatio &&
+                      Number(currency0Amount) > 0 &&
+                      Number(currency1Amount) > 0 &&
+                      receiveLpAmount === 0n) ||
+                    (!asRatio &&
+                      Number(currency0Amount) + Number(currency1Amount) > 0 &&
+                      receiveLpAmount === 0n)
+                  }
                   actionButtonProps={{
-                    disabled: false,
-                    onClick: () => {},
-                    text: 'Add Liquidity',
+                    disabled:
+                      !walletClient ||
+                      (Number(currency0Amount) === 0 &&
+                        Number(currency1Amount) === 0) ||
+                      parseUnits(currency0Amount, pool.currency0.decimals) >
+                        balances[pool.currency0.address] ||
+                      parseUnits(currency1Amount, pool.currency1.decimals) >
+                        balances[pool.currency1.address] ||
+                      (asRatio &&
+                        (Number(currency0Amount) === 0 ||
+                          Number(currency1Amount) === 0)),
+                    onClick: async () => {
+                      await mint(
+                        pool.currency0,
+                        pool.currency1,
+                        currency0Amount,
+                        currency1Amount,
+                        asRatio,
+                        Number(slippageInput),
+                      )
+                    },
+                    text: !walletClient
+                      ? 'Connect wallet'
+                      : Number(currency0Amount) === 0 &&
+                        Number(currency1Amount) === 0
+                      ? 'Enter amount'
+                      : parseUnits(currency0Amount, pool.currency0.decimals) >
+                        balances[pool.currency0.address]
+                      ? `Insufficient ${pool.currency0.symbol} balance`
+                      : parseUnits(currency1Amount, pool.currency1.decimals) >
+                        balances[pool.currency1.address]
+                      ? `Insufficient ${pool.currency1.symbol} balance`
+                      : asRatio &&
+                        (Number(currency0Amount) === 0 ||
+                          Number(currency1Amount) === 0)
+                      ? `Enter amount`
+                      : `Place Order`,
                   }}
                 />
               ) : (

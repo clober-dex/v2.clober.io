@@ -22,9 +22,11 @@ export const AddLiquidityForm = ({
   availableCurrency1Balance,
   asRatio,
   setAsRatio,
+  disableAsRatio,
   slippageInput,
   setSlippageInput,
   receiveLpCurrencyAmount,
+  isCalculatingReceiveLpAmount,
   actionButtonProps,
 }: {
   pool: Pool
@@ -37,9 +39,11 @@ export const AddLiquidityForm = ({
   availableCurrency1Balance: bigint
   asRatio: boolean
   setAsRatio: (asRatio: boolean) => void
+  disableAsRatio: boolean
   slippageInput: string
   setSlippageInput: (slippageInput: string) => void
   receiveLpCurrencyAmount: bigint
+  isCalculatingReceiveLpAmount: boolean
   actionButtonProps: ActionButtonProps
 }) => {
   const { showDropdown, setShowDropdown } = useDropdown()
@@ -73,7 +77,9 @@ export const AddLiquidityForm = ({
               type="checkbox"
               value=""
               className="sr-only peer"
-              onClick={() => {
+              checked={asRatio}
+              disabled={disableAsRatio}
+              onChange={() => {
                 setAsRatio(!asRatio)
               }}
             />
@@ -87,27 +93,31 @@ export const AddLiquidityForm = ({
             You will receive
           </div>
           <div className="flex items-center gap-1 ml-auto">
-            <div className="flex items-center gap-1 text-white text-sm md:text-base font-semibold">
-              <div>
-                {toPlacesString(
-                  formatUnits(
+            {isCalculatingReceiveLpAmount ? (
+              <span className="w-[100px] h-6 mx-1 rounded animate-pulse bg-gray-500"></span>
+            ) : (
+              <div className="flex items-center gap-1 text-white text-sm md:text-base font-semibold">
+                <div>
+                  {toPlacesString(
+                    formatUnits(
+                      receiveLpCurrencyAmount,
+                      pool.lpCurrency.decimals,
+                      prices[pool.lpCurrency.address],
+                    ),
+                  )}{' '}
+                  {pool.lpCurrency.symbol}
+                </div>
+                <div className="text-gray-400">
+                  (
+                  {formatDollarValue(
                     receiveLpCurrencyAmount,
                     pool.lpCurrency.decimals,
                     prices[pool.lpCurrency.address],
-                  ),
-                )}{' '}
-                {pool.lpCurrency.symbol}
+                  )}
+                  )
+                </div>
               </div>
-              <div className="text-gray-400">
-                (
-                {formatDollarValue(
-                  receiveLpCurrencyAmount,
-                  pool.lpCurrency.decimals,
-                  prices[pool.lpCurrency.address],
-                )}
-                )
-              </div>
-            </div>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-2 self-stretch">

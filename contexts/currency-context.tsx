@@ -143,6 +143,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
     async () => {
       const spenders: `0x${string}`[] = [
         getContractAddresses({ chainId: selectedChain.id }).Controller,
+        getContractAddresses({ chainId: selectedChain.id }).Minter,
         ...AGGREGATORS[selectedChain.id].map(
           (aggregator) => aggregator.contract,
         ),
