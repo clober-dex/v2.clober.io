@@ -13,6 +13,7 @@ import { useCurrencyContext } from '../contexts/currency-context'
 import { RemoveLiquidityForm } from '../components/form/remove-liquidity-form'
 import { RPC_URL } from '../constants/rpc-urls'
 import { usePoolContractContext } from '../contexts/pool/pool-contract-context'
+import { toPlacesAmountString } from '../utils/bignumber'
 
 export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
   const [tab, setTab] = React.useState<'add-liquidity' | 'remove-liquidity'>(
@@ -159,7 +160,10 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                     </div>
                   </div>
                   <div className="text-center text-white text-sm md:text-lg font-bold ">
-                    {pool.reserve0}
+                    {toPlacesAmountString(
+                      pool.reserve0.toString(),
+                      prices[pool.currency0.address],
+                    )}
                   </div>
                 </div>
                 <div className="flex justify-center gap-2 md:gap-4">
@@ -173,7 +177,10 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                     </div>
                   </div>
                   <div className="text-center text-white text-sm md:text-lg font-bold ">
-                    {pool.reserve1}
+                    {toPlacesAmountString(
+                      pool.reserve1.toString(),
+                      prices[pool.currency1.address],
+                    )}
                   </div>
                 </div>
               </div>
