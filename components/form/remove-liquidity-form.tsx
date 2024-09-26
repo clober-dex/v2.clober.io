@@ -20,6 +20,7 @@ export const RemoveLiquidityForm = ({
   receiveCurrencies,
   slippageInput,
   setSlippageInput,
+  isCalculatingReceiveCurrencies,
   actionButtonProps,
 }: {
   pool: Pool
@@ -30,6 +31,7 @@ export const RemoveLiquidityForm = ({
   receiveCurrencies: { currency: Currency; amount: bigint }[]
   slippageInput: string
   setSlippageInput: (slippageInput: string) => void
+  isCalculatingReceiveCurrencies: boolean
   actionButtonProps: ActionButtonProps
 }) => {
   const { showDropdown, setShowDropdown } = useDropdown()
@@ -59,29 +61,33 @@ export const RemoveLiquidityForm = ({
             {receiveCurrencies.map((receiveCurrency, index) => (
               <div
                 key={index}
-                className="flex items-center gap-1 ml-2 text-white text-sm md:text-base font-semibold"
+                className="flex ml-auto items-center gap-1 ml-2 text-white text-sm md:text-base font-semibold"
               >
-                <div className="flex items-center gap-1">
-                  <div className="flex items-center gap-1 text-white text-sm md:text-base font-bold">
-                    <div>
-                      {formatUnits(
+                {isCalculatingReceiveCurrencies ? (
+                  <span className="w-[100px] h-6 mx-1 rounded animate-pulse bg-gray-500"></span>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 text-white text-sm md:text-base font-bold">
+                      <div>
+                        {formatUnits(
+                          receiveCurrency.amount,
+                          receiveCurrency.currency.decimals,
+                          prices[receiveCurrency.currency.address],
+                        )}
+                      </div>
+                      <div>{receiveCurrency.currency.symbol}</div>
+                    </div>
+                    <div className="text-gray-400 text-sm md:text-base font-semibold">
+                      (
+                      {formatDollarValue(
                         receiveCurrency.amount,
                         receiveCurrency.currency.decimals,
                         prices[receiveCurrency.currency.address],
                       )}
+                      )
                     </div>
-                    <div>{receiveCurrency.currency.symbol}</div>
                   </div>
-                  <div className="text-gray-400 text-sm md:text-base font-semibold">
-                    (
-                    {formatDollarValue(
-                      receiveCurrency.amount,
-                      receiveCurrency.currency.decimals,
-                      prices[receiveCurrency.currency.address],
-                    )}
-                    )
-                  </div>
-                </div>
+                )}
               </div>
             ))}
           </div>
