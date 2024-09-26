@@ -251,11 +251,13 @@ function App({ Component, pageProps }: AppProps) {
     <>
       <ErrorBoundary>
         <Head>
+          <title>Clober | Fully On-chain Order Book</title>
           <meta
             content="Join Clober DEX and Start Trading on a Fully On-chain Order Book. Eliminate Counterparty Risk. Place Limit Orders. Low Transaction Costs Powered by LOBSTER."
             name="description"
           />
-          <link href="/favicon.svg" rel="icon" />
+          <link rel="apple-touch-icon" href="/favicon.png" />
+          <link rel="icon" type="image/png" href="/favicon.png" />
         </Head>
         <WalletProvider>
           <Web3AnalyticWrapper>

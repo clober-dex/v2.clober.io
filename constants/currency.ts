@@ -3,7 +3,7 @@ import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Currency } from '../model/currency'
 
-import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from './currencies/80085'
+import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from './currencies/80084'
 
 export const ETH: Currency = {
   address: zeroAddress,
@@ -44,12 +44,18 @@ export const DEFAULT_INPUT_CURRENCY: {
     symbol: 'WETH',
     decimals: 18,
   },
-  [CHAIN_IDS.BERACHAIN_TESTNET]: ETH,
+  [CHAIN_IDS.BERACHAIN_TESTNET]: {
+    name: 'BERA Token',
+    symbol: 'BERA',
+    decimals: 18,
+    icon: 'https://internal-oogabooga.up.railway.app/static/bera.png',
+    address: '0x0000000000000000000000000000000000000000',
+  },
   [CHAIN_IDS.BASE]: {
-    address: '0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA',
-    name: 'USD Base Coin',
-    symbol: 'USDbC',
-    decimals: 6,
+    address: '0x4200000000000000000000000000000000000006',
+    name: 'Wrapped Ether',
+    symbol: 'WETH',
+    decimals: 18,
   },
   [CHAIN_IDS.ZKSYNC]: ETH,
 }
@@ -64,10 +70,11 @@ export const DEFAULT_OUTPUT_CURRENCY: {
     decimals: 6,
   },
   [CHAIN_IDS.BERACHAIN_TESTNET]: {
-    address: '0x7EeCA4205fF31f947EdBd49195a7A88E6A91161B',
-    name: 'Honey',
+    address: '0x0E4aaF1351de4c0264C5c7056Ef3777b41BD8e03',
+    name: 'HONEY',
     symbol: 'HONEY',
     decimals: 18,
+    icon: 'https://internal-oogabooga.up.railway.app/static/honey.png',
   },
   [CHAIN_IDS.BASE]: {
     address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',

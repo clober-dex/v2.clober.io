@@ -1,9 +1,12 @@
 import React, { useCallback, useEffect } from 'react'
 import { useNetwork, useSwitchNetwork } from 'wagmi'
-import { arbitrumSepolia } from 'viem/chains'
 
 import { Chain } from '../model/chain'
-import { findSupportChain, supportChains } from '../constants/chain'
+import {
+  DEFAULT_CHAIN_ID,
+  findSupportChain,
+  supportChains,
+} from '../constants/chain'
 import { setQueryParams } from '../utils/url'
 
 type ChainContext = {
@@ -12,9 +15,7 @@ type ChainContext = {
 }
 
 const Context = React.createContext<ChainContext>({
-  selectedChain: supportChains.find(
-    (chain) => chain.id === arbitrumSepolia.id,
-  )!,
+  selectedChain: supportChains.find((chain) => chain.id === DEFAULT_CHAIN_ID)!,
   setSelectedChain: (_) => _,
 })
 
@@ -24,7 +25,7 @@ const QUERY_PARAM_CHAIN_KEY = 'chain'
 export const ChainProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { chain: connectedChain } = useNetwork()
   const [selectedChain, _setSelectedChain] = React.useState<Chain>(
-    supportChains[0],
+    supportChains.find((chain) => chain.id === DEFAULT_CHAIN_ID)!,
   )
   const { switchNetwork } = useSwitchNetwork({
     onSuccess(data) {

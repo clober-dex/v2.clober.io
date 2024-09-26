@@ -61,7 +61,8 @@ export default class DataFeed implements IBasicDataFeed {
   }
 
   onReady(callback: OnReadyCallback) {
-    setTimeout(() => callback(configurationData), 0)
+    console.log('[onReady]: Method call')
+    setTimeout(() => callback(configurationData))
   }
 
   async searchSymbols(
@@ -73,13 +74,16 @@ export default class DataFeed implements IBasicDataFeed {
     symbolType: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onResult: SearchSymbolsCallback,
-  ) {}
+  ) {
+    console.log('[searchSymbols]: Method call')
+  }
 
   async resolveSymbol(
     symbolName: string,
     onResolve: ResolveCallback,
     onError: ErrorCallback,
   ) {
+    console.log('[resolveSymbol]: Method call', symbolName)
     const { close } = await getLatestChartLog({
       chainId: this.chainId.valueOf(),
       base: this.baseCurrency.address,
@@ -99,16 +103,16 @@ export default class DataFeed implements IBasicDataFeed {
       session: '24x7',
       timezone: 'Etc/UTC',
       exchange: 'Clober',
-      minmov: 1 / 10 ** priceDecimal,
+      minmov: 1,
       pricescale: 10 ** priceDecimal,
       listed_exchange: 'Clober',
-      has_intraday: true, // has minutes historical data
-      has_weekly_and_monthly: true, // has weekly data
+      has_intraday: true,
+      has_daily: true,
+      has_weekly_and_monthly: false, // has weekly data
       visible_plots_set: 'ohlcv',
       supported_resolutions: configurationData.supported_resolutions,
       volume_precision: 2,
       data_status: 'streaming',
-      format: 'price',
     } as LibrarySymbolInfo)
   }
 
@@ -120,6 +124,8 @@ export default class DataFeed implements IBasicDataFeed {
     onResult: HistoryCallback,
     onError: ErrorCallback,
   ) {
+    console.log('[getBars]: Method call', symbolInfo)
+
     try {
       const { from, to } = periodParams
       const resolutionKey = (SUPPORTED_INTERVALS.find(
@@ -136,13 +142,6 @@ export default class DataFeed implements IBasicDataFeed {
           to,
         })
       ).filter((v) => Number(v.close) > 0 && Number(v.open) > 0)
-      console.log('getBars', {
-        resolution,
-        resolutionKey,
-        from,
-        to,
-        chartLogs,
-      })
       if (chartLogs.length === 0) {
         onResult([], {
           noData: true,
