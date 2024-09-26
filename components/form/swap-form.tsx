@@ -236,6 +236,7 @@ export const SwapForm = ({
             <SwapSettingModal
               slippageInput={slippageInput}
               setSlippageInput={setSlippageInput}
+              position="left"
             />
           ) : (
             <></>

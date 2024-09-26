@@ -125,6 +125,7 @@ export const AddLiquidityForm = ({
                 <SwapSettingModal
                   slippageInput={slippageInput}
                   setSlippageInput={setSlippageInput}
+                  position="right"
                 />
               ) : (
                 <></>

@@ -252,6 +252,8 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                       amount: 500499999999999950n,
                     },
                   ]}
+                  slippageInput={slippageInput}
+                  setSlippageInput={setSlippageInput}
                   actionButtonProps={{
                     disabled: false,
                     onClick: () => {},
