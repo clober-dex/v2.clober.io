@@ -22,6 +22,9 @@ type Story = StoryObj<typeof AddLiquidityForm>
 export const Default: Story = {
   args: {
     pool: {
+      key: '0x',
+      reserve0: 0,
+      reserve1: 0,
       lpCurrency: {
         address: '0x0000000000000000000000000000000000000001',
         name: 'ETH-USDC-LP',

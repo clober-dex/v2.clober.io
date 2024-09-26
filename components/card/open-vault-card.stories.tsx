@@ -23,6 +23,7 @@ export const Default: Story = {
   args: {
     poolPosition: {
       pool: {
+        key: '0x',
         lpCurrency: {
           address: '0x0000000000000000000000000000000000000003',
           name: 'ETH-USDC-LP',
