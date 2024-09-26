@@ -7,8 +7,13 @@ import {
 
 import { Pool } from '../model/pool'
 import { POOL_KEY_INFOS } from '../constants/pool'
+import { RPC_URL } from '../constants/rpc-urls'
+import { Prices } from '../model/prices'
 
-export async function fetchPools(chainId: CHAIN_IDS): Promise<Pool[]> {
+export async function fetchPools(
+  chainId: CHAIN_IDS,
+  prices: Prices,
+): Promise<Pool[]> {
   const pools: SdkPool[] = await Promise.all(
     POOL_KEY_INFOS[chainId].map(({ token0, token1, salt }) => {
       return getPool({
@@ -18,12 +23,14 @@ export async function fetchPools(chainId: CHAIN_IDS): Promise<Pool[]> {
         salt,
         options: {
           useSubgraph: false,
+          rpcUrl: RPC_URL[chainId],
         },
       })
     }),
   )
   return pools.map((pool) => {
     return {
+      key: pool.key,
       lpCurrency: {
         address: getContractAddresses({ chainId }).Rebalancer,
         name: `Clober LP ${pool.currencyA.symbol}/${pool.currencyB.symbol}`,
@@ -32,12 +39,14 @@ export async function fetchPools(chainId: CHAIN_IDS): Promise<Pool[]> {
       },
       currency0: pool.currencyA,
       currency1: pool.currencyB,
-      // TODO
-      apy: 69.69,
-      tvl: 69.69,
-      volume24h: 69.69,
       reserve0: Number(pool.reserveA),
       reserve1: Number(pool.reserveB),
+      tvl:
+        (prices[pool.currencyA.address] ?? 0) * Number(pool.reserveA) +
+        (prices[pool.currencyB.address] ?? 0) * Number(pool.reserveB),
+      // TODO
+      apy: 69696969,
+      volume24h: 69696969,
     }
   })
 }

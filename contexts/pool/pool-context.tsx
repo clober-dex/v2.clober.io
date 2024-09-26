@@ -4,6 +4,7 @@ import { useQuery } from 'wagmi'
 import { Pool, PoolPosition } from '../../model/pool'
 import { useChainContext } from '../chain-context'
 import { fetchPools } from '../../apis/pools'
+import { useCurrencyContext } from '../currency-context'
 
 type PoolContext = {
   lpCurrencyAmount: string
@@ -37,6 +38,7 @@ const Context = React.createContext<PoolContext>({
 
 export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { selectedChain } = useChainContext()
+  const { prices } = useCurrencyContext()
   const [lpCurrencyAmount, setLpCurrencyAmount] = React.useState('')
   const [currency0Amount, setCurrency0Amount] = React.useState('')
   const [currency1Amount, setCurrency1Amount] = React.useState('')
@@ -44,9 +46,9 @@ export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [slippageInput, setSlippageInput] = React.useState('1')
 
   const { data: pools } = useQuery(
-    ['pools'],
+    ['pools', selectedChain],
     async () => {
-      return fetchPools(selectedChain.id)
+      return fetchPools(selectedChain.id, prices)
     },
     {
       initialData: [],

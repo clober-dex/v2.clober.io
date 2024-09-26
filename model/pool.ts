@@ -1,6 +1,7 @@
 import { Currency } from './currency'
 
 export type Pool = {
+  key: `0x${string}`
   lpCurrency: Currency
   currency0: Currency
   currency1: Currency

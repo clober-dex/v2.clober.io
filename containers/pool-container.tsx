@@ -7,16 +7,20 @@ import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from '../constants/currencie
 import { PoolCard } from '../components/card/pool-card'
 import { PoolPositionCard } from '../components/card/pool-position-card'
 import { useChainContext } from '../contexts/chain-context'
+import { usePoolContext } from '../contexts/pool/pool-context'
 
-const pools: Pool[] = BERACHAIN_TESTNET_WHITELISTED_CURRENCIES.map(
+const _pools: Pool[] = BERACHAIN_TESTNET_WHITELISTED_CURRENCIES.map(
   (currency) => {
     return {
+      key: '0x',
       lpCurrency: currency,
       currency0: currency,
       currency1: currency,
       apy: 120.5434,
       tvl: 43123123.0123455,
       volume24h: 123123.123411,
+      reserve0: 123123.123411,
+      reserve1: 123123.123411,
     }
   },
 )
@@ -25,7 +29,7 @@ const poolPositions: PoolPosition[] = Array.from({ length: 5 }).map(
   (_, index) => {
     return {
       lp: BERACHAIN_TESTNET_WHITELISTED_CURRENCIES[index],
-      pool: pools[index],
+      pool: _pools[index],
       amount: 1001234000000000000n,
       value: 123441.3241,
     }
@@ -35,6 +39,7 @@ const poolPositions: PoolPosition[] = Array.from({ length: 5 }).map(
 export const PoolContainer = () => {
   const router = useRouter()
   const { address: userAddress } = useAccount()
+  const { pools } = usePoolContext()
   const { selectedChain } = useChainContext()
 
   const [tab, setTab] = React.useState<'my-liquidity' | 'pool'>('pool')
