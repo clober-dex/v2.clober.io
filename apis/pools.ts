@@ -29,6 +29,9 @@ export async function fetchPools(
     }),
   )
   return pools.map((pool) => {
+    const tvl =
+      (prices[pool.currencyA.address] ?? 0) * Number(pool.reserveA) +
+      (prices[pool.currencyB.address] ?? 0) * Number(pool.reserveB)
     return {
       key: pool.key,
       lpCurrency: {
@@ -37,13 +40,12 @@ export async function fetchPools(
         symbol: `${pool.currencyA.symbol}/${pool.currencyB.symbol}`,
         decimals: 18,
       },
+      lpUsdValue: tvl / Number(1), // TODO add total supply
       currency0: pool.currencyA,
       currency1: pool.currencyB,
       reserve0: Number(pool.reserveA),
       reserve1: Number(pool.reserveB),
-      tvl:
-        (prices[pool.currencyA.address] ?? 0) * Number(pool.reserveA) +
-        (prices[pool.currencyB.address] ?? 0) * Number(pool.reserveB),
+      tvl,
       // TODO
       apy: 69696969,
       volume24h: 69696969,

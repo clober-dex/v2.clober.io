@@ -76,9 +76,7 @@ export const PoolCard = ({
             </div>
           </div>
           <button
-            onClick={() =>
-              router.push(`/pools/${pool.lpCurrency.address}?chain=${chainId}`)
-            }
+            onClick={() => router.push(`/pools/${pool.key}?chain=${chainId}`)}
             className="flex ml-auto"
             rel="noreferrer"
           >

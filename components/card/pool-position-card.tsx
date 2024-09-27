@@ -1,4 +1,6 @@
 import React from 'react'
+import { CHAIN_IDS } from '@clober/v2-sdk'
+import { NextRouter } from 'next/router'
 
 import { PoolPosition } from '../../model/pool'
 import { CurrencyIcon } from '../icon/currency-icon'
@@ -6,9 +8,13 @@ import { formatUnits } from '../../utils/bigint'
 import { toCommaSeparated } from '../../utils/number'
 
 export const PoolPositionCard = ({
+  chainId,
   poolPosition,
+  router,
 }: {
+  chainId: CHAIN_IDS
   poolPosition: PoolPosition
+  router: NextRouter
 }) => {
   return (
     <>
@@ -42,6 +48,7 @@ export const PoolPositionCard = ({
                 {formatUnits(
                   poolPosition.amount,
                   poolPosition.pool.lpCurrency.decimals,
+                  poolPosition.pool.lpUsdValue,
                 )}
               </div>
               <div className="text-center text-gray-400 text-sm font-semibold">
@@ -51,9 +58,15 @@ export const PoolPositionCard = ({
           </div>
         </div>
         <div className="flex self-stretch h-8 px-3 py-2 rounded-lg border-2 border-blue-500 border-solid justify-center items-center gap-1">
-          <div className="grow shrink basis-0 opacity-90 text-center text-blue-500 text-sm font-bold">
+          <button
+            onClick={() =>
+              router.push(`/pools/${poolPosition.pool.key}?chain=${chainId}`)
+            }
+            className="grow shrink basis-0 opacity-90 text-center text-blue-500 text-sm font-bold"
+            rel="noreferrer"
+          >
             Manage Position
-          </div>
+          </button>
         </div>
       </div>
       <div className="flex lg:hidden w-full h-[164px] p-4 bg-gray-800 rounded-xl flex-col justify-center items-start gap-4">
@@ -87,6 +100,7 @@ export const PoolPositionCard = ({
               {formatUnits(
                 poolPosition.amount,
                 poolPosition.pool.lpCurrency.decimals,
+                poolPosition.pool.lpUsdValue,
               )}
             </div>
             <div className="text-gray-400 text-xs font-semibold">
@@ -95,9 +109,15 @@ export const PoolPositionCard = ({
           </div>
         </div>
         <div className="flex self-stretch h-8 px-3 py-2 rounded-lg border border-solid border-blue-500 justify-center items-center gap-1">
-          <div className="grow shrink basis-0 opacity-90 text-center text-blue-500 text-sm font-bold">
+          <button
+            onClick={() =>
+              router.push(`/pools/${poolPosition.pool.key}?chain=${chainId}`)
+            }
+            className="grow shrink basis-0 opacity-90 text-center text-blue-500 text-sm font-bold"
+            rel="noreferrer"
+          >
             Manage Position
-          </div>
+          </button>
         </div>
       </div>
     </>

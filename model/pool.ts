@@ -3,6 +3,7 @@ import { Currency } from './currency'
 export type Pool = {
   key: `0x${string}`
   lpCurrency: Currency
+  lpUsdValue: number
   currency0: Currency
   currency1: Currency
   apy: number
