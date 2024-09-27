@@ -3,7 +3,6 @@ import { CHAIN_IDS, getChartLogs, getLatestChartLog } from '@clober/v2-sdk'
 import {
   Bar,
   DatafeedConfiguration,
-  ErrorCallback,
   HistoryCallback,
   IBasicDataFeed,
   LibrarySymbolInfo,
@@ -78,11 +77,7 @@ export default class DataFeed implements IBasicDataFeed {
     console.log('[searchSymbols]: Method call')
   }
 
-  async resolveSymbol(
-    symbolName: string,
-    onResolve: ResolveCallback,
-    onError: ErrorCallback,
-  ) {
+  async resolveSymbol(symbolName: string, onResolve: ResolveCallback) {
     console.log('[resolveSymbol]: Method call', symbolName)
     const { close } = await getLatestChartLog({
       chainId: this.chainId.valueOf(),
@@ -90,7 +85,7 @@ export default class DataFeed implements IBasicDataFeed {
       quote: this.quoteCurrency.address,
     })
     if (close === '0') {
-      onError('cannot resolve symbol')
+      console.error('cannot resolve symbol')
       return
     }
     const priceDecimal = getPriceDecimals(Number(close)) + 1
@@ -113,6 +108,7 @@ export default class DataFeed implements IBasicDataFeed {
       supported_resolutions: configurationData.supported_resolutions,
       volume_precision: 2,
       data_status: 'streaming',
+      format: 'price',
     } as LibrarySymbolInfo)
   }
 
@@ -122,12 +118,22 @@ export default class DataFeed implements IBasicDataFeed {
     resolution: ResolutionString,
     periodParams: PeriodParams,
     onResult: HistoryCallback,
-    onError: ErrorCallback,
   ) {
-    console.log('[getBars]: Method call', symbolInfo)
-
     try {
       const { from, to } = periodParams
+      console.log(
+        '[getBars]: Method call',
+        symbolInfo.name,
+        resolution,
+        from,
+        to,
+      )
+      if (to === 0) {
+        onResult([], {
+          noData: true,
+        })
+        return
+      }
       const resolutionKey = (SUPPORTED_INTERVALS.find(
         (interval) => interval[0] === resolution,
       ) || SUPPORTED_INTERVALS[0])[1]
@@ -162,7 +168,7 @@ export default class DataFeed implements IBasicDataFeed {
         noData: false,
       })
     } catch (error) {
-      onError((error as Error).message)
+      console.error((error as Error).message)
     }
   }
 
