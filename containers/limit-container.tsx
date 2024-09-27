@@ -94,19 +94,23 @@ export const LimitContainer = () => {
 
   return (
     <div className="flex flex-col w-fit mb-4 sm:mb-6">
-      <button
-        className="rounded bg-blue-500 bg-opacity-20 text-blue-500 px-2 py-1 w-fit mb-3 text-xs sm:text-sm"
-        onClick={() => setShowOrderBook(!showOrderBook)}
-      >
-        {showOrderBook ? 'View Chart' : 'View Order Book'}
-      </button>
+      {selectedDecimalPlaces ? (
+        <button
+          className="rounded bg-blue-500 bg-opacity-20 text-blue-500 px-2 py-1 w-fit mb-3 text-xs sm:text-sm"
+          onClick={() => setShowOrderBook(!showOrderBook)}
+        >
+          {showOrderBook ? 'View Chart' : 'View Order Book'}
+        </button>
+      ) : (
+        <></>
+      )}
       <div className="flex flex-col w-full lg:flex-row gap-4">
         {!showOrderBook && !selectedMarket ? (
           <div className="flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[704px]" />
         ) : (
           <></>
         )}
-        {!showOrderBook && selectedMarket ? (
+        {!showOrderBook && selectedMarket && selectedDecimalPlaces ? (
           <ChartContainer
             selectedMarket={selectedMarket}
             setShowOrderBook={setShowOrderBook}

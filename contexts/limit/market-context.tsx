@@ -186,10 +186,16 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
       !availableDecimalPlacesGroups ||
       availableDecimalPlacesGroups.length === 0
     ) {
+      setSelectedDecimalPlaces(undefined)
       return
     }
     setSelectedDecimalPlaces(availableDecimalPlacesGroups[0])
-  }, [availableDecimalPlacesGroups])
+  }, [
+    selectedChain.id,
+    availableDecimalPlacesGroups,
+    selectedMarket?.quote.address,
+    selectedMarket?.base.address,
+  ])
 
   // When selectedMarket is changed
   useEffect(() => {

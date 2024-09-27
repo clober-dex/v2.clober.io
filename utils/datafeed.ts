@@ -79,37 +79,42 @@ export default class DataFeed implements IBasicDataFeed {
 
   async resolveSymbol(symbolName: string, onResolve: ResolveCallback) {
     console.log('[resolveSymbol]: Method call', symbolName)
-    const { close } = await getLatestChartLog({
-      chainId: this.chainId.valueOf(),
-      base: this.baseCurrency.address,
-      quote: this.quoteCurrency.address,
-    })
-    if (close === '0') {
-      console.error('cannot resolve symbol')
-      return
+    try {
+      const { close } = await getLatestChartLog({
+        chainId: this.chainId.valueOf(),
+        base: this.baseCurrency.address,
+        quote: this.quoteCurrency.address,
+      })
+      if (close === '0') {
+        console.error('cannot resolve symbol')
+        return
+      }
+      const priceDecimal = getPriceDecimals(Number(close)) + 1
+      onResolve({
+        name: symbolName, // display name for users
+        ticker: symbolName,
+        full_name: symbolName,
+        description: symbolName,
+        type: 'crypto',
+        session: '24x7',
+        timezone: 'Etc/UTC',
+        exchange: 'Clober',
+        minmov: 1,
+        pricescale: 10 ** priceDecimal,
+        listed_exchange: 'Clober',
+        has_intraday: true,
+        has_daily: true,
+        has_weekly_and_monthly: false, // has weekly data
+        visible_plots_set: 'ohlcv',
+        supported_resolutions: configurationData.supported_resolutions,
+        volume_precision: 2,
+        data_status: 'streaming',
+        format: 'price',
+      } as LibrarySymbolInfo)
+    } catch (error) {
+      console.error((error as Error).message)
+      await this.resolveSymbol(symbolName, onResolve)
     }
-    const priceDecimal = getPriceDecimals(Number(close)) + 1
-    onResolve({
-      name: symbolName, // display name for users
-      ticker: symbolName,
-      full_name: symbolName,
-      description: symbolName,
-      type: 'crypto',
-      session: '24x7',
-      timezone: 'Etc/UTC',
-      exchange: 'Clober',
-      minmov: 1,
-      pricescale: 10 ** priceDecimal,
-      listed_exchange: 'Clober',
-      has_intraday: true,
-      has_daily: true,
-      has_weekly_and_monthly: false, // has weekly data
-      visible_plots_set: 'ohlcv',
-      supported_resolutions: configurationData.supported_resolutions,
-      volume_precision: 2,
-      data_status: 'streaming',
-      format: 'price',
-    } as LibrarySymbolInfo)
   }
 
   async getBars(
@@ -169,6 +174,7 @@ export default class DataFeed implements IBasicDataFeed {
       })
     } catch (error) {
       console.error((error as Error).message)
+      await this.getBars(symbolInfo, resolution, periodParams, onResult)
     }
   }
 
