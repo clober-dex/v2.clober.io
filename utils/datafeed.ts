@@ -113,6 +113,7 @@ export default class DataFeed implements IBasicDataFeed {
       } as LibrarySymbolInfo)
     } catch (error) {
       console.error((error as Error).message)
+      await this.resolveSymbol(symbolName, onResolve)
     }
   }
 
@@ -173,6 +174,7 @@ export default class DataFeed implements IBasicDataFeed {
       })
     } catch (error) {
       console.error((error as Error).message)
+      await this.getBars(symbolInfo, resolution, periodParams, onResult)
     }
   }
 
