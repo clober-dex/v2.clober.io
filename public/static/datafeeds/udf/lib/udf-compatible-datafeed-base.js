@@ -9,15 +9,15 @@ function extractField(data, field, arrayIndex) {
 }
 /**
  * This class implements interaction with UDF-compatible datafeed.
- * See UDF protocol reference at https://github.com/tradingview/charting_library/wiki/UDF
+ * See [UDF protocol reference](@docs/connecting_data/UDF.md)
  */
 export class UDFCompatibleDatafeedBase {
-    constructor(datafeedURL, quotesProvider, requester, updateFrequency = 10 * 1000) {
+    constructor(datafeedURL, quotesProvider, requester, updateFrequency = 10 * 1000, limitedServerResponse) {
         this._configuration = defaultConfiguration();
         this._symbolsStorage = null;
         this._datafeedURL = datafeedURL;
         this._requester = requester;
-        this._historyProvider = new HistoryProvider(datafeedURL, this._requester);
+        this._historyProvider = new HistoryProvider(datafeedURL, this._requester, limitedServerResponse);
         this._quotesProvider = quotesProvider;
         this._dataPulseProvider = new DataPulseProvider(this._historyProvider, updateFrequency);
         this._quotesPulseProvider = new QuotesPulseProvider(this._quotesProvider);
@@ -66,6 +66,10 @@ export class UDFCompatibleDatafeedBase {
                         label: extractField(response, 'label', i),
                         labelFontColor: extractField(response, 'labelFontColor', i),
                         minSize: extractField(response, 'minSize', i),
+                        borderWidth: extractField(response, 'borderWidth', i),
+                        hoveredBorderWidth: extractField(response, 'hoveredBorderWidth', i),
+                        imageUrl: extractField(response, 'imageUrl', i),
+                        showLabelWhenImageLoaded: extractField(response, 'showLabelWhenImageLoaded', i),
                     });
                 }
                 response = result;
@@ -98,6 +102,8 @@ export class UDFCompatibleDatafeedBase {
                         color: extractField(response, 'color', i),
                         label: extractField(response, 'label', i),
                         tooltip: extractField(response, 'tooltip', i),
+                        imageUrl: extractField(response, 'imageUrl', i),
+                        showLabelWhenImageLoaded: extractField(response, 'showLabelWhenImageLoaded', i),
                     });
                 }
                 response = result;
@@ -127,7 +133,7 @@ export class UDFCompatibleDatafeedBase {
     searchSymbols(userInput, exchange, symbolType, onResult) {
         if (this._configuration.supports_search) {
             const params = {
-                limit: 30 /* SearchItemsLimit */,
+                limit: 30 /* Constants.SearchItemsLimit */,
                 query: userInput.toUpperCase(),
                 type: symbolType,
                 exchange: exchange,
@@ -150,7 +156,7 @@ export class UDFCompatibleDatafeedBase {
             if (this._symbolsStorage === null) {
                 throw new Error('UdfCompatibleDatafeed: inconsistent configuration (symbols storage)');
             }
-            this._symbolsStorage.searchSymbols(userInput, exchange, symbolType, 30 /* SearchItemsLimit */)
+            this._symbolsStorage.searchSymbols(userInput, exchange, symbolType, 30 /* Constants.SearchItemsLimit */)
                 .then(onResult)
                 .catch(onResult.bind(null, []));
         }
@@ -176,11 +182,41 @@ export class UDFCompatibleDatafeedBase {
             }
             this._send('symbols', params)
                 .then((response) => {
+                var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1;
                 if (response.s !== undefined) {
                     onError('unknown_symbol');
                 }
                 else {
-                    onResultReady(response);
+                    const symbol = response.name;
+                    const listedExchange = (_a = response.listed_exchange) !== null && _a !== void 0 ? _a : response['exchange-listed'];
+                    const tradedExchange = (_b = response.exchange) !== null && _b !== void 0 ? _b : response['exchange-traded'];
+                    const result = {
+                        ...response,
+                        name: symbol,
+                        base_name: [listedExchange + ':' + symbol],
+                        listed_exchange: listedExchange,
+                        exchange: tradedExchange,
+                        ticker: response.ticker,
+                        currency_code: (_c = response.currency_code) !== null && _c !== void 0 ? _c : response['currency-code'],
+                        original_currency_code: (_d = response.original_currency_code) !== null && _d !== void 0 ? _d : response['original-currency-code'],
+                        unit_id: (_e = response.unit_id) !== null && _e !== void 0 ? _e : response['unit-id'],
+                        original_unit_id: (_f = response.original_unit_id) !== null && _f !== void 0 ? _f : response['original-unit-id'],
+                        unit_conversion_types: (_g = response.unit_conversion_types) !== null && _g !== void 0 ? _g : response['unit-conversion-types'],
+                        has_intraday: (_j = (_h = response.has_intraday) !== null && _h !== void 0 ? _h : response['has-intraday']) !== null && _j !== void 0 ? _j : false,
+                        visible_plots_set: (_k = response.visible_plots_set) !== null && _k !== void 0 ? _k : response['visible-plots-set'],
+                        minmov: (_m = (_l = response.minmovement) !== null && _l !== void 0 ? _l : response.minmov) !== null && _m !== void 0 ? _m : 0,
+                        minmove2: (_o = response.minmovement2) !== null && _o !== void 0 ? _o : response.minmove2,
+                        session: (_p = response.session) !== null && _p !== void 0 ? _p : response['session-regular'],
+                        session_holidays: (_q = response.session_holidays) !== null && _q !== void 0 ? _q : response['session-holidays'],
+                        supported_resolutions: (_t = (_s = (_r = response.supported_resolutions) !== null && _r !== void 0 ? _r : response['supported-resolutions']) !== null && _s !== void 0 ? _s : this._configuration.supported_resolutions) !== null && _t !== void 0 ? _t : [],
+                        has_daily: (_v = (_u = response.has_daily) !== null && _u !== void 0 ? _u : response['has-daily']) !== null && _v !== void 0 ? _v : true,
+                        intraday_multipliers: (_x = (_w = response.intraday_multipliers) !== null && _w !== void 0 ? _w : response['intraday-multipliers']) !== null && _x !== void 0 ? _x : ['1', '5', '15', '30', '60'],
+                        has_weekly_and_monthly: (_y = response.has_weekly_and_monthly) !== null && _y !== void 0 ? _y : response['has-weekly-and-monthly'],
+                        has_empty_bars: (_z = response.has_empty_bars) !== null && _z !== void 0 ? _z : response['has-empty-bars'],
+                        volume_precision: (_0 = response.volume_precision) !== null && _0 !== void 0 ? _0 : response['volume-precision'],
+                        format: (_1 = response.format) !== null && _1 !== void 0 ? _1 : 'price',
+                    };
+                    onResultReady(result);
                 }
             })
                 .catch((reason) => {
@@ -202,7 +238,7 @@ export class UDFCompatibleDatafeedBase {
         })
             .catch(onError);
     }
-    subscribeBars(symbolInfo, resolution, onTick, listenerGuid, onResetCacheNeededCallback) {
+    subscribeBars(symbolInfo, resolution, onTick, listenerGuid, _onResetCacheNeededCallback) {
         this._dataPulseProvider.subscribeBars(symbolInfo, resolution, onTick, listenerGuid);
     }
     unsubscribeBars(listenerGuid) {
