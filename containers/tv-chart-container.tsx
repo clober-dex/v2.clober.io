@@ -78,7 +78,7 @@ export const TvChartContainer = ({
       charts_storage_api_version: '1.1',
       client_id: 'tradingview.com',
       user_id: 'public_user_id',
-      theme: 'Dark',
+      theme: 'dark',
       timezone: Intl.DateTimeFormat().resolvedOptions()
         .timeZone as CustomTimezones,
       autosize: true,
