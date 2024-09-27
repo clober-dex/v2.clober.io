@@ -19,6 +19,7 @@ export const Default: Story = {
     chainId: base.id,
     pool: {
       key: '0x',
+      lpUsdValue: 12344.3241,
       lpCurrency: {
         address: '0x0000000000000000000000000000000000000003',
         name: 'ETH-USDC-LP',

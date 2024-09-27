@@ -25,6 +25,7 @@ export const Default: Story = {
       key: '0x',
       reserve0: 0,
       reserve1: 0,
+      lpUsdValue: 12344.3241,
       lpCurrency: {
         address: '0x0000000000000000000000000000000000000001',
         name: 'ETH-USDC-LP',
