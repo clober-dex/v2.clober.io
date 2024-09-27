@@ -119,10 +119,21 @@ export default class DataFeed implements IBasicDataFeed {
     periodParams: PeriodParams,
     onResult: HistoryCallback,
   ) {
-    console.log('[getBars]: Method call', symbolInfo)
-
     try {
       const { from, to } = periodParams
+      console.log(
+        '[getBars]: Method call',
+        symbolInfo.name,
+        resolution,
+        from,
+        to,
+      )
+      if (to === 0) {
+        onResult([], {
+          noData: true,
+        })
+        return
+      }
       const resolutionKey = (SUPPORTED_INTERVALS.find(
         (interval) => interval[0] === resolution,
       ) || SUPPORTED_INTERVALS[0])[1]
