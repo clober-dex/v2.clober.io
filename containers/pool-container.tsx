@@ -2,39 +2,15 @@ import React from 'react'
 import { useAccount } from 'wagmi'
 import { useRouter } from 'next/router'
 
-import { Pool, PoolPosition } from '../model/pool'
-import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from '../constants/currencies/80084'
 import { PoolCard } from '../components/card/pool-card'
 import { PoolPositionCard } from '../components/card/pool-position-card'
 import { useChainContext } from '../contexts/chain-context'
-
-const pools: Pool[] = BERACHAIN_TESTNET_WHITELISTED_CURRENCIES.map(
-  (currency) => {
-    return {
-      lpCurrency: currency,
-      currency0: currency,
-      currency1: currency,
-      apy: 120.5434,
-      tvl: 43123123.0123455,
-      volume24h: 123123.123411,
-    }
-  },
-)
-
-const poolPositions: PoolPosition[] = Array.from({ length: 5 }).map(
-  (_, index) => {
-    return {
-      lp: BERACHAIN_TESTNET_WHITELISTED_CURRENCIES[index],
-      pool: pools[index],
-      amount: 1001234000000000000n,
-      value: 123441.3241,
-    }
-  },
-)
+import { usePoolContext } from '../contexts/pool/pool-context'
 
 export const PoolContainer = () => {
   const router = useRouter()
   const { address: userAddress } = useAccount()
+  const { pools, lpBalances } = usePoolContext()
   const { selectedChain } = useChainContext()
 
   const [tab, setTab] = React.useState<'my-liquidity' | 'pool'>('pool')
@@ -158,9 +134,24 @@ export const PoolContainer = () => {
             </>
           ) : (
             <div className="w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-[18px]">
-              {poolPositions.map((poolPosition, index) => (
-                <PoolPositionCard key={index} poolPosition={poolPosition} />
-              ))}
+              {Object.entries(lpBalances).map(([poolKey, amount]) => {
+                const pool = pools.find((pool) => pool.key === poolKey)
+                if (!pool) {
+                  return <></>
+                }
+                return (
+                  <PoolPositionCard
+                    key={pool.key}
+                    chainId={selectedChain.id}
+                    poolPosition={{
+                      pool,
+                      amount,
+                      value: 123441.3241,
+                    }}
+                    router={router}
+                  />
+                )
+              })}
             </div>
           )}
         </div>

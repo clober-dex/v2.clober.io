@@ -12,6 +12,8 @@ import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { fetchPrices } from '../apis/swap/prices'
 import { AGGREGATORS } from '../constants/aggregators'
 import { Allowances } from '../model/allowances'
+import { testnetChainIds } from '../constants/chain'
+import { TESTNET_PRICES } from '../constants/testnet-price'
 
 import { useChainContext } from './chain-context'
 
@@ -125,6 +127,9 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { data: prices } = useQuery(
     ['prices', selectedChain],
     async () => {
+      if (testnetChainIds.includes(selectedChain.id)) {
+        return TESTNET_PRICES[selectedChain.id] as Prices
+      }
       return fetchPrices(AGGREGATORS[selectedChain.id])
     },
     {
@@ -138,6 +143,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
     async () => {
       const spenders: `0x${string}`[] = [
         getContractAddresses({ chainId: selectedChain.id }).Controller,
+        getContractAddresses({ chainId: selectedChain.id }).Minter,
         ...AGGREGATORS[selectedChain.id].map(
           (aggregator) => aggregator.contract,
         ),

@@ -22,6 +22,10 @@ type Story = StoryObj<typeof AddLiquidityForm>
 export const Default: Story = {
   args: {
     pool: {
+      key: '0x',
+      reserve0: 0,
+      reserve1: 0,
+      lpUsdValue: 12344.3241,
       lpCurrency: {
         address: '0x0000000000000000000000000000000000000001',
         name: 'ETH-USDC-LP',
@@ -57,9 +61,11 @@ export const Default: Story = {
     availableCurrency1Balance: 1000999n,
     asRatio: true,
     setAsRatio: () => {},
+    disableAsRatio: false,
     slippageInput: '0.5',
     setSlippageInput: () => {},
     receiveLpCurrencyAmount: 1000999999999999900n,
+    isCalculatingReceiveLpAmount: true,
     actionButtonProps: {
       disabled: false,
       onClick: () => {},
