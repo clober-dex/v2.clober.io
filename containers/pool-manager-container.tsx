@@ -85,7 +85,10 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
           testnetPrice: prices[baseCurrency.address],
         },
       })
-      return parseUnits(result.lpCurrency.amount, 18)
+      return parseUnits(
+        result.lpCurrency.amount,
+        result.lpCurrency.currency.decimals,
+      )
     },
     {
       initialData: 0n,
