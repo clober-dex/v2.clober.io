@@ -11,7 +11,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@clober/v2-sdk": "^0.0.68",
+    "@clober/v2-sdk": "^0.0.71",
     "@headlessui/react": "^1.7.16",
     "@heroicons/react": "^2.0.18",
     "@rainbow-me/rainbowkit": "^1.0.7",
