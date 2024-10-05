@@ -15,6 +15,8 @@ import { RPC_URL } from '../constants/rpc-urls'
 import { usePoolContractContext } from '../contexts/pool/pool-contract-context'
 import { toPlacesAmountString } from '../utils/bignumber'
 
+import { VaultChartContainer } from './vault-chart-container'
+
 export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
   const [tab, setTab] = React.useState<'add-liquidity' | 'remove-liquidity'>(
     'add-liquidity',
@@ -231,30 +233,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
               <div className="text-white text-sm md:text-base font-bold">
                 Performance Chart
               </div>
-              <div className="flex w-full items-center gap-2 sm:gap-3 self-stretch">
-                <div className="flex text-gray-500 text-xs md:text-sm font-semibold">
-                  Sort by date
-                </div>
-                <button className="w-20 sm:w-[118px] h-9 px-4 py-2 bg-gray-800 rounded-xl justify-center items-center gap-2 flex">
-                  <div className="opacity-90 text-center text-white text-xs md:text-sm font-semibold">
-                    13.05.24
-                  </div>
-                </button>
-                <div className="w-[10px] opacity-90 text-center text-white text-xs md:text-sm font-semibold">
-                  ~
-                </div>
-                <button className="w-20 sm:w-[118px] h-9 px-4 py-2 bg-gray-800 rounded-xl justify-center items-center gap-2 flex">
-                  <div className="opacity-90 text-center text-white text-xs md:text-sm font-semibold">
-                    13.05.24
-                  </div>
-                </button>
-                <button className="w-[58px] sm:w-[102px] h-9 px-4 py-2 rounded-xl border-2 border-blue-500 border-solid justify-center items-center gap-2 flex">
-                  <div className="opacity-90 text-center text-blue-500 text-xs md:text-sm font-bold">
-                    View
-                  </div>
-                </button>
-              </div>
-              <div className="flex justify-center w-full h-[240px] sm:h-[320px] bg-gray-700 rounded-2xl" />
+              <VaultChartContainer />
             </div>
           </div>
           <div className="h-full md:h-[576px] flex flex-col w-full sm:w-[480px] justify-start items-start gap-4">
