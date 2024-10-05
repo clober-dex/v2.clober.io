@@ -12,7 +12,10 @@ export function Legend({ data }: { data: LegendInfo[] }) {
         .map(({ value: display, label, color }) => {
           return (
             !!display && (
-              <div className="flex text-xs lg:text-sm px-2 items-center gap-2">
+              <div
+                className="flex text-xs lg:text-sm px-2 items-center gap-2"
+                key={label}
+              >
                 <div>{label}</div>
                 <div className="w-2 h-2" style={{ backgroundColor: color }} />
                 <div>{(display % 100).toFixed(2)}</div>

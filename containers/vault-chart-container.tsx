@@ -6492,7 +6492,7 @@ export const VaultChartContainer = () => {
             {(crosshairData) => (
               <ChartHeader
                 value={((crosshairData ?? lastEntry) as any)?.values.reduce(
-                  (v, sum) => (sum += v),
+                  (v: number, sum: number) => (sum += v),
                   0,
                 )}
                 time={crosshairData?.time as any}

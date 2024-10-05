@@ -51,33 +51,21 @@ export function ChartHeader({
     <View
       position="absolute"
       width="100%"
-      gap="$gap8"
       alignItems="flex-start"
       animation="fast"
-      zIndex="$tooltip"
       id="chart-header"
     >
-      <View
-        position="absolute"
-        gap="$gap4"
-        pb={14}
-        pointerEvents="none"
-        width="70%"
-      >
+      <div className="absolute pointer-events-none w-[70%]">
         <span className="text-xl md:text-2xl font-bold text-gray-100">
-          {/*{TODO}*/}${(value % 100).toFixed(2)}
+          {/*{TODO}*/}
+          {(Number(value) % 100).toFixed(2)}
         </span>
-        <View
-          gap="$gap8"
-          whiteSpace="nowrap"
-          overflow="hidden"
-          textOverflow="ellipsis"
-        >
+        <div className="overflow-hidden">
           {additionalFields}
           <HeaderTimeDisplay time={time} timePlaceholder={timePlaceholder} />
-        </View>
+        </div>
         {isHovered && detailData && <Legend data={detailData} />}
-      </View>
+      </div>
     </View>
   )
 }

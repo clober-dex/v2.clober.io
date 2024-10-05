@@ -46,11 +46,6 @@ interface ChartDataParams<TDataType extends SeriesDataItemType> {
 export type ChartModelParams<TDataType extends SeriesDataItemType> =
   ChartUtilParams<TDataType> & ChartDataParams<TDataType>
 
-type ChartTooltipBodyComponent<TDataType extends SeriesDataItemType> =
-  React.FunctionComponent<{
-    data: TDataType
-  }>
-
 export type ChartHoverData<TDataType extends SeriesDataItemType> = {
   item: TDataType
   x: number

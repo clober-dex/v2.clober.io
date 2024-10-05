@@ -229,7 +229,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col items-start gap-3 md:gap-4 self-stretch">
+            <div className="flex-col items-start gap-3 md:gap-4 self-stretch hidden sm:flex">
               <div className="text-white text-sm md:text-base font-bold">
                 Performance Chart
               </div>
