@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { useAccount, useQuery, useWalletClient } from 'wagmi'
+import { useQuery, useWalletClient } from 'wagmi'
 import { addLiquidity, getQuoteToken, removeLiquidity } from '@clober/v2-sdk'
 import { isAddressEqual, parseUnits, zeroAddress, zeroHash } from 'viem'
 
@@ -14,6 +14,8 @@ import { RemoveLiquidityForm } from '../components/form/remove-liquidity-form'
 import { RPC_URL } from '../constants/rpc-urls'
 import { usePoolContractContext } from '../contexts/pool/pool-contract-context'
 import { toPlacesAmountString } from '../utils/bignumber'
+import { fetchHistoricalPriceIndex } from '../apis/pools'
+import { StackedLineData } from '../components/chart/stacked/stacked-chart-model'
 
 import { VaultChartContainer } from './vault-chart-container'
 
@@ -39,6 +41,16 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
     lpBalances,
   } = usePoolContext()
   const { mint, burn } = usePoolContractContext()
+
+  const { data: historicalPriceIndex } = useQuery(
+    ['historical-price-index', selectedChain],
+    async () => {
+      return fetchHistoricalPriceIndex(selectedChain.id)
+    },
+    {
+      initialData: [] as StackedLineData[],
+    },
+  )
 
   const { data: receiveLpAmount } = useQuery(
     [
@@ -233,7 +245,9 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
               <div className="text-white text-sm md:text-base font-bold">
                 Performance Chart
               </div>
-              <VaultChartContainer />
+              <VaultChartContainer
+                historicalPriceIndex={historicalPriceIndex}
+              />
             </div>
           </div>
           <div className="h-full md:h-[576px] flex flex-col w-full sm:w-[480px] justify-start items-start gap-4">

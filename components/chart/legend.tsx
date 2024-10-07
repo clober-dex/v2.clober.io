@@ -18,7 +18,7 @@ export function Legend({ data }: { data: LegendInfo[] }) {
               >
                 <div>{label}</div>
                 <div className="w-2 h-2" style={{ backgroundColor: color }} />
-                <div>{(display % 100).toFixed(2)}</div>
+                <div>{Number(display).toFixed(4)}</div>
               </div>
             )
           )

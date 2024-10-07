@@ -149,7 +149,7 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
       options.lineWidth *
       (isMultichainExploreEnabled ? 1 : renderingScope.verticalPixelRatio)
     ctx.lineJoin = 'round'
-
+    // @ts-ignore
     fullLinesMeshed.toReversed().forEach((linePath, index) => {
       const unreversedIndex = fullLinesMeshed.length - index
       const color = options.colors[unreversedIndex % colorsCount]
@@ -219,7 +219,7 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
 
       ctx.globalAlpha = 1
     })
-
+    // @ts-ignore
     highlightLinesMeshed.toReversed().forEach((linePath, index) => {
       if (!linePath) {
         ctx.globalAlpha = 1
