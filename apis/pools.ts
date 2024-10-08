@@ -6,9 +6,41 @@ import {
 } from '@clober/v2-sdk'
 
 import { Pool } from '../model/pool'
-import { POOL_KEY_INFOS } from '../constants/pool'
+import { POOL_KEY_INFOS, START_LP_PRICE } from '../constants/pool'
 import { RPC_URL } from '../constants/rpc-urls'
 import { Prices } from '../model/prices'
+import { StackedLineData } from '../components/chart/stacked/stacked-chart-model'
+
+const currentTimestampInSeconds = Math.floor(new Date().getTime() / 1000)
+const todayTimestampInSeconds =
+  currentTimestampInSeconds - (currentTimestampInSeconds % (24 * 60 * 60))
+const _dummyData = Array.from({ length: 33 }, (_, i) => {
+  return {
+    timestamp: todayTimestampInSeconds - i * 24 * 60 * 60,
+    price: (2377 - i).toString(),
+    volume: '93.479556487073258738',
+    liquidityA: '7610',
+    liquidityB: '2.01',
+    totalSupply: '7614',
+  }
+})
+
+export async function fetchHistoricalPriceIndex(
+  chainId: CHAIN_IDS,
+): Promise<StackedLineData[]> {
+  return (
+    _dummyData.map(
+      ({ liquidityA, liquidityB, price, totalSupply, timestamp }) => {
+        const usdValue = Number(liquidityA) + Number(liquidityB) * Number(price)
+        const lpPrice = usdValue / Number(totalSupply)
+        return {
+          values: [lpPrice / START_LP_PRICE[chainId], 0],
+          time: Number(timestamp),
+        }
+      },
+    ) as StackedLineData[]
+  ).sort((a, b) => a.time - b.time)
+}
 
 export async function fetchPools(
   chainId: CHAIN_IDS,
