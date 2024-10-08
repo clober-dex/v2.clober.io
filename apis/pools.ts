@@ -11,64 +11,19 @@ import { RPC_URL } from '../constants/rpc-urls'
 import { Prices } from '../model/prices'
 import { StackedLineData } from '../components/chart/stacked/stacked-chart-model'
 
-const _dummyData = [
-  {
-    timestamp: '1728014400',
-    price: '2372.771736203265425679627643970184',
-    volume: '34.703097727006981377',
-    liquidityA: '7610',
-    liquidityB: '2.01',
-    totalSupply: '7614',
-  },
-  {
-    timestamp: '1728010800',
-    price: '2365.191380695930953282084649568039',
-    volume: '23.677347712224983222',
-    liquidityA: '7610',
-    liquidityB: '2.01',
-    totalSupply: '7614',
-  },
-  {
-    timestamp: '1728007200',
-    price: '2372.771736203265425679627643970184',
-    volume: '55.857832933367875467',
-    liquidityA: '7610',
-    liquidityB: '2.01',
-    totalSupply: '7614',
-  },
-  {
-    timestamp: '1728003600',
-    price: '2377.759542827145305923797924880432',
+const currentTimestampInSeconds = Math.floor(new Date().getTime() / 1000)
+const todayTimestampInSeconds =
+  currentTimestampInSeconds - (currentTimestampInSeconds % (24 * 60 * 60))
+const _dummyData = Array.from({ length: 33 }, (_, i) => {
+  return {
+    timestamp: todayTimestampInSeconds - i * 24 * 60 * 60,
+    price: (2377 - i).toString(),
     volume: '93.479556487073258738',
     liquidityA: '7610',
     liquidityB: '2.01',
     totalSupply: '7614',
-  },
-  {
-    timestamp: '1728000000',
-    price: '2341.190242533472466167462989198456',
-    volume: '63.181031171827792248',
-    liquidityA: '7610',
-    liquidityB: '2.01',
-    totalSupply: '7614',
-  },
-  {
-    timestamp: '1727996400',
-    price: '2350.338254114457819405955364909487',
-    volume: '22.671547404446557357',
-    liquidityA: '7610',
-    liquidityB: '2.01',
-    totalSupply: '7614',
-  },
-  {
-    timestamp: '1727992800',
-    price: '2351.748809664674901992431561393098',
-    volume: '56.074034869695927658',
-    liquidityA: '7610',
-    liquidityB: '2.01',
-    totalSupply: '7614',
-  },
-]
+  }
+})
 
 export async function fetchHistoricalPriceIndex(
   chainId: CHAIN_IDS,
