@@ -43,6 +43,14 @@ function cumulativeBuildUp(arr: number[]): number[] {
   })
 }
 
+function moveYs(
+  firstYs: number,
+  ys: number,
+  verticalPixelRatio: number,
+): number {
+  return ys * verticalPixelRatio + (ys / firstYs - 1) * 50000
+}
+
 export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
   implements ICustomSeriesPaneRenderer
 {
@@ -258,6 +266,7 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
 
     // Modification: tracks and returns coordinates of where a glyph should be rendered for each line when a crosshair is drawn
     const hoverInfo = { points: new Array<number>(), x: 0 }
+    const firstYs = bars[0].ys[0]
 
     // Modification: updated loop to include one point above and below the visible range to ensure the line is drawn to edges of chart
     for (let i = visibleRange.from - 1; i < visibleRange.to + 1; i++) {
@@ -273,7 +282,7 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
         }
 
         const x = stack.x * horizontalPixelRatio
-        const y = yMedia * verticalPixelRatio
+        const y = moveYs(firstYs, yMedia, verticalPixelRatio)
 
         if (i === hoveredIndex) {
           hoverInfo.points[index] = y
@@ -322,7 +331,7 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
         }
 
         const x = stack.x * horizontalPixelRatio
-        const y = yMedia * verticalPixelRatio
+        const y = moveYs(firstYs, yMedia, verticalPixelRatio)
 
         if (i === hoveredIndex) {
           hoverInfo.points[index] = y
