@@ -112,7 +112,7 @@ const Panel = ({
                         <Link
                           className="link"
                           target="_blank"
-                          href="https://discord.gg/clober-coupon-finance"
+                          href="https://discord.gg/clober-dex"
                           rel="noreferrer"
                         >
                           Discord

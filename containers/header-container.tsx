@@ -61,7 +61,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
           <Link
             className="link"
             target="_blank"
-            href="https://discord.gg/clober-coupon-finance"
+            href="https://discord.gg/clober-dex"
             rel="noreferrer"
           >
             <DiscordIconSvg className="w-5 h-5" />
