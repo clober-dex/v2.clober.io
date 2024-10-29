@@ -23,6 +23,7 @@ export const Default: Story = {
   args: {
     poolPosition: {
       pool: {
+        historicalPriceIndex: [],
         key: '0x',
         lpUsdValue: 12344.3241,
         lpCurrency: {

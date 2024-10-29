@@ -1,7 +1,9 @@
 import {
   CHAIN_IDS,
+  CHART_LOG_INTERVALS,
   getContractAddresses,
   getPool,
+  getPoolPerformance,
   Pool as SdkPool,
 } from '@clober/v2-sdk'
 
@@ -46,9 +48,12 @@ export async function fetchPools(
   chainId: CHAIN_IDS,
   prices: Prices,
 ): Promise<Pool[]> {
+  const currentTimestampInSeconds = Math.floor(new Date().getTime() / 1000)
+  const todayTimestampInSeconds =
+    currentTimestampInSeconds - (currentTimestampInSeconds % (24 * 60 * 60))
   const pools: SdkPool[] = await Promise.all(
-    POOL_KEY_INFOS[chainId].map(({ token0, token1, salt }) => {
-      return getPool({
+    POOL_KEY_INFOS[chainId].map(async ({ token0, token1, salt }) => {
+      const pool = await getPool({
         chainId,
         token0,
         token1,
@@ -58,6 +63,28 @@ export async function fetchPools(
           rpcUrl: RPC_URL[chainId],
         },
       })
+      // const poolPerformanceData = await getPoolPerformance({
+      //   chainId,
+      //   token0,
+      //   token1,
+      //   salt,
+      //   // volume
+      //   volumeFromTimestamp: todayTimestampInSeconds,
+      //   volumeToTimestamp: currentTimestampInSeconds,
+      //   // performance chart
+      //   snapshotFromTimestamp: 0,
+      //   snapshotToTimestamp: currentTimestampInSeconds,
+      //   snapshotIntervalType: CHART_LOG_INTERVALS.oneHour,
+      //   // apy
+      //   spreadProfitFromTimestamp: todayTimestampInSeconds,
+      //   spreadProfitToTimestamp: currentTimestampInSeconds,
+      //   options: {
+      //     pool,
+      //     useSubgraph: true,
+      //     rpcUrl: RPC_URL[chainId],
+      //   },
+      // })
+      return pool
     }),
   )
   return pools.map((pool) => {
@@ -83,6 +110,7 @@ export async function fetchPools(
       // TODO
       apy: 69696969,
       volume24h: 69696969,
+      historicalPriceIndex: [] as StackedLineData[],
     }
   })
 }

@@ -1,3 +1,5 @@
+import { StackedLineData } from '../components/chart/stacked/stacked-chart-model'
+
 import { Currency } from './currency'
 
 export type Pool = {
@@ -11,6 +13,7 @@ export type Pool = {
   volume24h: number
   reserve0: number
   reserve1: number
+  historicalPriceIndex: StackedLineData[]
 }
 
 export type PoolPosition = {
