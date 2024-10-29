@@ -18,6 +18,7 @@ export const Default: Story = {
   args: {
     chainId: base.id,
     pool: {
+      historicalPriceIndex: [],
       key: '0x',
       lpUsdValue: 12344.3241,
       lpCurrency: {

@@ -243,6 +243,8 @@ export const PoolContractProvider = ({
             useSubgraph: false,
             rpcUrl: RPC_URL[selectedChain.id],
             slippage: Number(slippageInput),
+            // todo remove
+            gasLimit: 3_000_000n,
           },
         })
 

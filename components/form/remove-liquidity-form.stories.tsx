@@ -22,6 +22,7 @@ type Story = StoryObj<typeof RemoveLiquidityForm>
 export const Default: Story = {
   args: {
     pool: {
+      historicalPriceIndex: [],
       key: '0x',
       reserve0: 0,
       reserve1: 0,
