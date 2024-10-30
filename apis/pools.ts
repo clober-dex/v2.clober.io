@@ -5,89 +5,86 @@ import {
   getPool,
   getPoolPerformance,
   Pool as SdkPool,
+  PoolPerformanceData,
 } from '@clober/v2-sdk'
+import { isAddressEqual } from 'viem'
 
 import { Pool } from '../model/pool'
 import { POOL_KEY_INFOS, START_LP_PRICE } from '../constants/pool'
 import { RPC_URL } from '../constants/rpc-urls'
 import { Prices } from '../model/prices'
 import { StackedLineData } from '../components/chart/stacked/stacked-chart-model'
-
-const currentTimestampInSeconds = Math.floor(new Date().getTime() / 1000)
-const todayTimestampInSeconds =
-  currentTimestampInSeconds - (currentTimestampInSeconds % (24 * 60 * 60))
-const _dummyData = Array.from({ length: 33 }, (_, i) => {
-  return {
-    timestamp: todayTimestampInSeconds - i * 24 * 60 * 60,
-    price: (2377 - i).toString(),
-    volume: '93.479556487073258738',
-    liquidityA: '7610',
-    liquidityB: '2.01',
-    totalSupply: '7614',
-  }
-})
-
-export async function fetchHistoricalPriceIndex(
-  chainId: CHAIN_IDS,
-): Promise<StackedLineData[]> {
-  return (
-    _dummyData.map(
-      ({ liquidityA, liquidityB, price, totalSupply, timestamp }) => {
-        const usdValue = Number(liquidityA) + Number(liquidityB) * Number(price)
-        const lpPrice = usdValue / Number(totalSupply)
-        return {
-          values: [lpPrice / START_LP_PRICE[chainId], 0],
-          time: Number(timestamp),
-        }
-      },
-    ) as StackedLineData[]
-  ).sort((a, b) => a.time - b.time)
-}
+import { calculateApy } from '../utils/pool-apy'
 
 export async function fetchPools(
   chainId: CHAIN_IDS,
   prices: Prices,
 ): Promise<Pool[]> {
   const currentTimestampInSeconds = Math.floor(new Date().getTime() / 1000)
-  const todayTimestampInSeconds =
-    currentTimestampInSeconds - (currentTimestampInSeconds % (24 * 60 * 60))
-  const pools: SdkPool[] = await Promise.all(
-    POOL_KEY_INFOS[chainId].map(async ({ token0, token1, salt }) => {
-      const pool = await getPool({
-        chainId,
-        token0,
-        token1,
-        salt,
-        options: {
-          useSubgraph: false,
-          rpcUrl: RPC_URL[chainId],
-        },
+  const pools: { pool: SdkPool; poolPerformanceData: PoolPerformanceData }[] =
+    await Promise.all(
+      POOL_KEY_INFOS[chainId].map(async ({ token0, token1, salt }) => {
+        const pool = await getPool({
+          chainId,
+          token0,
+          token1,
+          salt,
+          options: {
+            useSubgraph: false,
+            rpcUrl: RPC_URL[chainId],
+          },
+        })
+        const poolPerformanceData = await getPoolPerformance({
+          chainId,
+          token0,
+          token1,
+          salt,
+          // volume
+          volumeFromTimestamp: currentTimestampInSeconds - 60 * 60 * 24,
+          volumeToTimestamp: currentTimestampInSeconds,
+          // performance chart
+          snapshotFromTimestamp: currentTimestampInSeconds - 60 * 60 * 24 * 90,
+          snapshotToTimestamp: currentTimestampInSeconds,
+          snapshotIntervalType: CHART_LOG_INTERVALS.oneHour,
+          // apy
+          spreadProfitFromTimestamp: currentTimestampInSeconds - 60 * 60 * 24,
+          spreadProfitToTimestamp: currentTimestampInSeconds,
+          options: {
+            pool,
+            useSubgraph: true,
+            rpcUrl: RPC_URL[chainId],
+          },
+        })
+        return { pool, poolPerformanceData }
+      }),
+    )
+  return pools.map(({ pool, poolPerformanceData }) => {
+    const base = pool.market.base
+    const quote = pool.market.quote
+    const spreadProfits = poolPerformanceData.poolSpreadProfits.sort(
+      (a, b) => a.timestamp - b.timestamp,
+    )
+    const historicalPriceIndex = poolPerformanceData.poolSnapshots
+      .map(({ price, liquidityA, liquidityB, totalSupply, timestamp }) => {
+        const usdValue = isAddressEqual(
+          base.address,
+          liquidityA.currency.address,
+        )
+          ? Number(liquidityA.value) * Number(price) + Number(liquidityB.value)
+          : Number(liquidityB.value) * Number(price) + Number(liquidityA.value)
+        const lpPrice =
+          Number(totalSupply.value) === 0
+            ? 0
+            : usdValue / Number(totalSupply.value)
+        return {
+          values: [lpPrice / START_LP_PRICE[chainId], 0],
+          time: Number(timestamp),
+        }
       })
-      // const poolPerformanceData = await getPoolPerformance({
-      //   chainId,
-      //   token0,
-      //   token1,
-      //   salt,
-      //   // volume
-      //   volumeFromTimestamp: todayTimestampInSeconds,
-      //   volumeToTimestamp: currentTimestampInSeconds,
-      //   // performance chart
-      //   snapshotFromTimestamp: 0,
-      //   snapshotToTimestamp: currentTimestampInSeconds,
-      //   snapshotIntervalType: CHART_LOG_INTERVALS.oneHour,
-      //   // apy
-      //   spreadProfitFromTimestamp: todayTimestampInSeconds,
-      //   spreadProfitToTimestamp: currentTimestampInSeconds,
-      //   options: {
-      //     pool,
-      //     useSubgraph: true,
-      //     rpcUrl: RPC_URL[chainId],
-      //   },
-      // })
-      return pool
-    }),
-  )
-  return pools.map((pool) => {
+      .sort((a, b) => a.time - b.time)
+    const firstNonZeroIndex = historicalPriceIndex.findIndex(
+      ({ values }) => values[0] > 0,
+    )
     const tvl =
       (prices[pool.currencyA.address] ?? 0) *
         Number(pool.liquidityA.total.value) +
@@ -107,10 +104,26 @@ export async function fetchPools(
       reserve0: Number(pool.liquidityA.total.value),
       reserve1: Number(pool.liquidityB.total.value),
       tvl,
-      // TODO
-      apy: 69696969,
-      volume24h: 69696969,
-      historicalPriceIndex: [] as StackedLineData[],
+      apy: calculateApy(
+        1 +
+          spreadProfits.reduce(
+            (acc, { accumulatedProfitInUsd }) =>
+              acc + Number(accumulatedProfitInUsd),
+            0,
+          ),
+        60 * 60 * 24,
+      ),
+      volume24h: poolPerformanceData.poolVolumes.reduce(
+        (acc, { currencyAVolume, currencyBVolume }) =>
+          acc +
+          (isAddressEqual(currencyAVolume.currency.address, quote.address)
+            ? Number(currencyAVolume.value)
+            : Number(currencyBVolume.value)),
+        0,
+      ),
+      historicalPriceIndex: historicalPriceIndex.slice(
+        firstNonZeroIndex,
+      ) as StackedLineData[],
     }
   })
 }

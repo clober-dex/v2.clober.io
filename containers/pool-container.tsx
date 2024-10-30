@@ -33,7 +33,7 @@ export const PoolContainer = () => {
                 TVL
               </div>
               <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
-                $612,384
+                ${pools.reduce((acc, pool) => acc + pool.tvl, 0)}
               </div>
             </div>
             <div className="grow shrink basis-0 h-full px-6 py-4 sm:px-8 sm:py-6 bg-[rgba(96,165,250,0.10)] rounded-xl sm:rounded-2xl flex-col justify-center items-center gap-3 inline-flex">
@@ -41,7 +41,7 @@ export const PoolContainer = () => {
                 24h Volume
               </div>
               <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
-                $31,582
+                ${pools.reduce((acc, pool) => acc + pool.volume24h, 0)}
               </div>
             </div>
           </div>
