@@ -7,6 +7,7 @@ import { PoolPositionCard } from '../components/card/pool-position-card'
 import { useChainContext } from '../contexts/chain-context'
 import { usePoolContext } from '../contexts/pool/pool-context'
 import { toCommaSeparated } from '../utils/number'
+import { formatUnits } from '../utils/bigint'
 
 export const PoolContainer = () => {
   const router = useRouter()
@@ -20,9 +21,9 @@ export const PoolContainer = () => {
     <div className="w-full flex flex-col text-white mb-4">
       <div className="flex justify-center w-auto sm:h-[400px] bg-gradient-to-t from-slate-900 to-slate-900">
         <div className="w-[960px] mt-8 sm:mt-16 flex flex-col sm:gap-12 items-center">
-          <div className="flex w-[261px] h-12 sm:h-[72px] flex-col justify-start items-center gap-2 sm:gap-3">
+          <div className="flex w-full h-12 sm:h-[72px] flex-col justify-start items-center gap-2 sm:gap-3">
             <div className="self-stretch text-center text-white text-lg sm:text-4xl font-bold">
-              Pool
+              Clober Liquidity Vault (CLV)
             </div>
             <div className="self-stretch text-center text-gray-400 text-xs sm:text-sm font-bold">
               Provide liquidity and earn fees!
@@ -78,7 +79,7 @@ export const PoolContainer = () => {
                   />
                 </svg>
                 <div className="text-center text-white text-sm sm:text-base font-bold">
-                  Pool
+                  CLV
                 </div>
               </button>
               <button
@@ -103,7 +104,7 @@ export const PoolContainer = () => {
                   />
                 </svg>
                 <div className="text-center text-gray-500 text-sm sm:text-base font-bold">
-                  My Liquidity
+                  My Vaults
                 </div>
               </button>
             </div>
@@ -155,7 +156,9 @@ export const PoolContainer = () => {
                     poolPosition={{
                       pool,
                       amount,
-                      value: 123441.3241,
+                      value:
+                        pool.lpUsdValue *
+                        Number(formatUnits(amount, pool.lpCurrency.decimals)),
                     }}
                     router={router}
                   />

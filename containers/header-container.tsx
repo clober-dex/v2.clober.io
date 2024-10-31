@@ -39,12 +39,12 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
             Trade
           </button>
           <button
-            disabled={true /*TODO: router.pathname.includes('/pool')*/}
-            onClick={() => router.push(`/pool?chain=${selectedChain.id}`)}
+            disabled={true /*TODO: router.pathname.includes('/earn')*/}
+            onClick={() => router.push(`/earn?chain=${selectedChain.id}`)}
             // className="text-sm text-gray-500 font-semibold disabled:text-white"
             className="text-sm text-gray-500 font-semibold"
           >
-            Pool
+            Earn
           </button>
         </div>
       </div>

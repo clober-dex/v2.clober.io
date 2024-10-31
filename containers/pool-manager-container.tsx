@@ -141,7 +141,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
       <div className="w-full lg:w-[992px] h-full flex flex-col items-start gap-8 md:gap-12 px-4 lg:px-0">
         <div className="flex w-full h-full items-center">
           <button
-            onClick={() => router.push(`/pool?chain=${selectedChain.id}`)}
+            onClick={() => router.push(`/earn?chain=${selectedChain.id}`)}
             className="flex items-center gap-2"
           >
             <svg
@@ -231,7 +231,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
             </div>
             <div className="flex-col items-start gap-3 md:gap-4 self-stretch hidden sm:flex">
               <div className="text-white text-sm md:text-base font-bold">
-                Performance Chart
+                Historical Performance Chart
               </div>
               <VaultChartContainer
                 historicalPriceIndex={pool.historicalPriceIndex}

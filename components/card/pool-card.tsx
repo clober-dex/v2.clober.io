@@ -45,7 +45,7 @@ export const PoolCard = ({
           ${toCommaSeparated(pool.volume24h.toFixed(0))}
         </div>
         <button
-          onClick={() => router.push(`/pools/${pool.key}?chain=${chainId}`)}
+          onClick={() => router.push(`/earn/${pool.key}?chain=${chainId}`)}
           className="flex w-[196px] h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1"
           rel="noreferrer"
         >
@@ -76,7 +76,7 @@ export const PoolCard = ({
             </div>
           </div>
           <button
-            onClick={() => router.push(`/pools/${pool.key}?chain=${chainId}`)}
+            onClick={() => router.push(`/earn/${pool.key}?chain=${chainId}`)}
             className="flex ml-auto"
             rel="noreferrer"
           >

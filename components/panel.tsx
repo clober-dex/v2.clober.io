@@ -68,10 +68,10 @@ const Panel = ({
                         <button
                           disabled={
                             true
-                            /*TODO: router.pathname.includes('/pool')*/
+                            /*TODO: router.pathname.includes('/earn')*/
                           }
                           onClick={() => {
-                            router.push(`/pool?chain=${chainId}`)
+                            router.push(`/earn?chain=${chainId}`)
                             setOpen(false)
                           }}
                           // className="text-gray-500 font-semibold disabled:text-white"

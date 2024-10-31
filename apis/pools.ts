@@ -100,7 +100,7 @@ export async function fetchPools(
       (prices[pool.currencyA.address] ?? 0) *
         Number(pool.liquidityA.total.value) +
       (prices[pool.currencyB.address] ?? 0) *
-        Number(pool.liquidityA.total.value)
+        Number(pool.liquidityB.total.value)
     return {
       key: pool.key,
       lpCurrency: {
