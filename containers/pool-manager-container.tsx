@@ -230,8 +230,13 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
               </div>
             </div>
             <div className="flex-col items-start gap-3 md:gap-4 self-stretch hidden sm:flex">
-              <div className="text-white text-sm md:text-base font-bold">
-                Historical Performance Chart
+              <div className="flex flex-col gap-0.5">
+                <div className="text-white text-sm md:text-base font-bold">
+                  Historical Performance Chart
+                </div>
+                <div className="text-gray-500 text-xs md:text-sm">
+                  cumulative performance (%)
+                </div>
               </div>
               <VaultChartContainer
                 historicalPriceIndex={pool.historicalPriceIndex}
