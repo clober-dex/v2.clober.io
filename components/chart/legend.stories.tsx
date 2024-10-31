@@ -19,12 +19,12 @@ export const Default: Story = {
       {
         label: 'v2',
         color: '#4C82FB',
-        value: 1632677264.9896278,
+        value: '1632677264.9896278',
       },
       {
         label: 'v3',
         color: '#FC72FF',
-        value: 1554154844.6900728,
+        value: '1632677264.9896278',
       },
     ],
   },
