@@ -1,6 +1,6 @@
 import React from 'react'
 
-export type LegendInfo = { label: string; color: string; value: number }
+export type LegendInfo = { label: string; color: string; value: string }
 
 export function Legend({ data }: { data: LegendInfo[] }) {
   return (
@@ -18,7 +18,7 @@ export function Legend({ data }: { data: LegendInfo[] }) {
               >
                 <div>{label}</div>
                 <div className="w-2 h-2" style={{ backgroundColor: color }} />
-                <div>{Number(display).toFixed(4)}</div>
+                <div>{display}</div>
               </div>
             )
           )
