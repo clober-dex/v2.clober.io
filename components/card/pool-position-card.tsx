@@ -60,7 +60,7 @@ export const PoolPositionCard = ({
         <div className="flex self-stretch h-8 px-3 py-2 rounded-lg border-2 border-blue-500 border-solid justify-center items-center gap-1">
           <button
             onClick={() =>
-              router.push(`/pools/${poolPosition.pool.key}?chain=${chainId}`)
+              router.push(`/earn/${poolPosition.pool.key}?chain=${chainId}`)
             }
             className="grow shrink basis-0 opacity-90 text-center text-blue-500 text-sm font-bold"
             rel="noreferrer"
@@ -111,7 +111,7 @@ export const PoolPositionCard = ({
         <div className="flex self-stretch h-8 px-3 py-2 rounded-lg border border-solid border-blue-500 justify-center items-center gap-1">
           <button
             onClick={() =>
-              router.push(`/pools/${poolPosition.pool.key}?chain=${chainId}`)
+              router.push(`/earn/${poolPosition.pool.key}?chain=${chainId}`)
             }
             className="grow shrink basis-0 opacity-90 text-center text-blue-500 text-sm font-bold"
             rel="noreferrer"

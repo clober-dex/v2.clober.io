@@ -57,7 +57,7 @@ export function ChartHeader({
     >
       <div className="absolute pointer-events-none w-[70%]">
         <span className="text-xl md:text-2xl font-bold text-gray-100">
-          {Number(value).toFixed(4)}
+          {Number(value).toFixed(4)}%
         </span>
         <div className="overflow-hidden">
           {additionalFields}

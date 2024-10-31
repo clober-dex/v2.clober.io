@@ -276,7 +276,7 @@ function App({ Component, pageProps }: AppProps) {
                         </div>
                       </div>
                     </LimitProvidersWrapper>
-                  ) : router.pathname.includes('/pool') ? (
+                  ) : router.pathname.includes('/earn') ? (
                     <PoolProvidersWrapper>
                       <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
                         <PanelWrapper open={open} setOpen={setOpen} />

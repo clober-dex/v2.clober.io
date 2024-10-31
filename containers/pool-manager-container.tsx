@@ -14,8 +14,6 @@ import { RemoveLiquidityForm } from '../components/form/remove-liquidity-form'
 import { RPC_URL } from '../constants/rpc-urls'
 import { usePoolContractContext } from '../contexts/pool/pool-contract-context'
 import { toPlacesAmountString } from '../utils/bignumber'
-import { fetchHistoricalPriceIndex } from '../apis/pools'
-import { StackedLineData } from '../components/chart/stacked/stacked-chart-model'
 
 import { VaultChartContainer } from './vault-chart-container'
 
@@ -41,16 +39,6 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
     lpBalances,
   } = usePoolContext()
   const { mint, burn } = usePoolContractContext()
-
-  const { data: historicalPriceIndex } = useQuery(
-    ['historical-price-index', selectedChain],
-    async () => {
-      return fetchHistoricalPriceIndex(selectedChain.id)
-    },
-    {
-      initialData: [] as StackedLineData[],
-    },
-  )
 
   const { data: receiveLpAmount } = useQuery(
     [
@@ -153,7 +141,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
       <div className="w-full lg:w-[992px] h-full flex flex-col items-start gap-8 md:gap-12 px-4 lg:px-0">
         <div className="flex w-full h-full items-center">
           <button
-            onClick={() => router.push(`/pool?chain=${selectedChain.id}`)}
+            onClick={() => router.push(`/earn?chain=${selectedChain.id}`)}
             className="flex items-center gap-2"
           >
             <svg
@@ -243,10 +231,10 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
             </div>
             <div className="flex-col items-start gap-3 md:gap-4 self-stretch hidden sm:flex">
               <div className="text-white text-sm md:text-base font-bold">
-                Performance Chart
+                Historical Performance Chart
               </div>
               <VaultChartContainer
-                historicalPriceIndex={historicalPriceIndex}
+                historicalPriceIndex={pool.historicalPriceIndex}
               />
             </div>
           </div>
