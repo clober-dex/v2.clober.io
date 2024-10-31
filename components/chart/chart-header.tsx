@@ -28,7 +28,7 @@ function HeaderTimeDisplay({ time, timePlaceholder }: HeaderTimeDisplayProps) {
 
 interface HeaderValueDisplayProps {
   /** The number to be formatted and displayed, or the ReactElement to be displayed */
-  value?: number | ReactElement
+  value?: string | ReactElement
 }
 
 interface ChartHeaderProps
@@ -57,7 +57,7 @@ export function ChartHeader({
     >
       <div className="absolute pointer-events-none w-[70%]">
         <span className="text-xl md:text-2xl font-bold text-gray-100">
-          {Number(value).toFixed(4)}%
+          {value}
         </span>
         <div className="overflow-hidden">
           {additionalFields}
