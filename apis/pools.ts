@@ -21,6 +21,11 @@ export async function fetchPools(
   prices: Prices,
 ): Promise<Pool[]> {
   const currentTimestampInSeconds = Math.floor(new Date().getTime() / 1000)
+  const _5minNormalizedCurrentTimestampInSeconds =
+    currentTimestampInSeconds - (currentTimestampInSeconds % (60 * 5))
+  const _1hourNormalizedCurrentTimestampInSeconds =
+    currentTimestampInSeconds - (currentTimestampInSeconds % (60 * 60))
+
   const pools: { pool: SdkPool; poolPerformanceData: PoolPerformanceData }[] =
     await Promise.all(
       POOL_KEY_INFOS[chainId].map(async ({ token0, token1, salt }) => {
@@ -40,15 +45,18 @@ export async function fetchPools(
           token1,
           salt,
           // volume
-          volumeFromTimestamp: currentTimestampInSeconds - 60 * 60 * 24,
-          volumeToTimestamp: currentTimestampInSeconds,
+          volumeFromTimestamp:
+            _5minNormalizedCurrentTimestampInSeconds - 60 * 60 * 24,
+          volumeToTimestamp: _5minNormalizedCurrentTimestampInSeconds,
           // performance chart
-          snapshotFromTimestamp: currentTimestampInSeconds - 60 * 60 * 24 * 90,
-          snapshotToTimestamp: currentTimestampInSeconds,
+          snapshotFromTimestamp:
+            _1hourNormalizedCurrentTimestampInSeconds - 60 * 60 * 24 * 90,
+          snapshotToTimestamp: _1hourNormalizedCurrentTimestampInSeconds,
           snapshotIntervalType: CHART_LOG_INTERVALS.oneHour,
           // apy
-          spreadProfitFromTimestamp: currentTimestampInSeconds - 60 * 60 * 24,
-          spreadProfitToTimestamp: currentTimestampInSeconds,
+          spreadProfitFromTimestamp:
+            _5minNormalizedCurrentTimestampInSeconds - 60 * 60 * 24,
+          spreadProfitToTimestamp: _5minNormalizedCurrentTimestampInSeconds,
           options: {
             pool,
             useSubgraph: true,
@@ -77,7 +85,10 @@ export async function fetchPools(
             ? 0
             : usdValue / Number(totalSupply.value)
         return {
-          values: [lpPrice / START_LP_PRICE[chainId], 0],
+          values: [
+            lpPrice !== 0 ? (lpPrice / START_LP_PRICE[chainId] - 1) * 100 : 0,
+            0,
+          ],
           time: Number(timestamp),
         }
       })
