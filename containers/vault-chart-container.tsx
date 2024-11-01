@@ -48,20 +48,18 @@ export const VaultChartContainer = ({
               )?.values.reduce((v: number, sum: number) => (sum += v), 0)
               return (
                 <ChartHeader
-                  value={`${Number(value) > 0 ? '+' : ''}${value.toFixed(4)}%`}
+                  value={`${value.toFixed(4)}`}
                   time={crosshairData?.time as any}
-                  detailData={[
-                    { label: 'performance(%)', color: '#4C82FB' },
-                  ].map(({ label, color }, index) => {
-                    const value = (crosshairData as any)?.values[index] ?? 0
-                    return {
-                      label,
-                      color,
-                      value: `${Number(value) > 0 ? '+' : ''}${value.toFixed(
-                        4,
-                      )}%`,
-                    }
-                  })}
+                  detailData={[{ label: 'Index', color: '#4C82FB' }].map(
+                    ({ label, color }, index) => {
+                      const value = (crosshairData as any)?.values[index] ?? 0
+                      return {
+                        label,
+                        color,
+                        value: `${value.toFixed(4)}`,
+                      }
+                    },
+                  )}
                 />
               )
             }}

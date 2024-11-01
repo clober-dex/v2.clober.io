@@ -235,7 +235,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                   Historical Performance Chart
                 </div>
                 <div className="text-gray-500 text-xs md:text-sm">
-                  cumulative performance (%)
+                  Performance Index (PI)
                 </div>
               </div>
               <VaultChartContainer

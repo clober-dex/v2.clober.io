@@ -85,10 +85,7 @@ export async function fetchPools(
             ? 0
             : usdValue / Number(totalSupply.value)
         return {
-          values: [
-            lpPrice !== 0 ? (lpPrice / START_LP_PRICE[chainId] - 1) * 100 : 0,
-            0,
-          ],
+          values: [lpPrice !== 0 ? lpPrice / START_LP_PRICE[chainId] : 0, 0],
           time: Number(timestamp),
         }
       })
