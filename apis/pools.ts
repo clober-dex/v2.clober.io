@@ -101,6 +101,10 @@ export async function fetchPools(
         Number(pool.liquidityA.total.value) +
       (prices[pool.currencyB.address] ?? 0) *
         Number(pool.liquidityB.total.value)
+    const totalSpreadProfit = spreadProfits.reduce(
+      (acc, { accumulatedProfitInUsd }) => acc + Number(accumulatedProfitInUsd),
+      0,
+    )
     return {
       key: pool.key,
       lpCurrency: {
@@ -115,15 +119,7 @@ export async function fetchPools(
       reserve0: Number(pool.liquidityA.total.value),
       reserve1: Number(pool.liquidityB.total.value),
       tvl,
-      apy: calculateApy(
-        1 +
-          spreadProfits.reduce(
-            (acc, { accumulatedProfitInUsd }) =>
-              acc + Number(accumulatedProfitInUsd),
-            0,
-          ),
-        60 * 60 * 24,
-      ),
+      apy: calculateApy(1 + totalSpreadProfit / tvl, 60 * 60 * 24),
       volume24h: poolPerformanceData.poolVolumes.reduce(
         (acc, { currencyAVolume, currencyBVolume }) =>
           acc +
