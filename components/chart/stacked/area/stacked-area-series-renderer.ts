@@ -48,7 +48,7 @@ function moveYs(
   ys: number,
   verticalPixelRatio: number,
 ): number {
-  return ys * verticalPixelRatio + (ys / firstYs - 1) * 50000
+  return ys * verticalPixelRatio + (ys / firstYs - 1) * 5000
 }
 
 export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
