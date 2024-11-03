@@ -36,7 +36,7 @@ export const PoolCard = ({
           </div>
         </div>
         <div className="w-[140px] text-white text-base font-bold">
-          {pool.apy.toFixed(2)}%
+          {(pool.apy ?? 0).toFixed(2)}%
         </div>
         <div className="w-[140px] text-white text-base font-bold">
           ${toCommaSeparated(pool.tvl.toFixed(0))}
@@ -101,7 +101,7 @@ export const PoolCard = ({
           <div className="flex w-full flex-col justify-start items-center gap-2">
             <div className="self-stretch text-gray-400 text-xs">APY</div>
             <div className="self-stretch text-white text-sm font-bold">
-              {pool.apy.toFixed(2)}%
+              {(pool.apy ?? 0).toFixed(2)}%
             </div>
           </div>
           <div className="flex w-full flex-col justify-start items-center gap-2">
