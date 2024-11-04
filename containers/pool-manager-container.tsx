@@ -232,7 +232,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
             <div className="flex-col items-start gap-3 md:gap-4 self-stretch hidden sm:flex">
               <div className="flex flex-col gap-0.5">
                 <div className="text-white text-sm md:text-base font-bold">
-                  Historical Performance Chart
+                  Historical Performance
                 </div>
                 <div className="text-gray-500 text-xs md:text-sm">
                   Performance Index (PI)
