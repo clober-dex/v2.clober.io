@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { useQuery, useWalletClient } from 'wagmi'
 import { addLiquidity, getQuoteToken, removeLiquidity } from '@clober/v2-sdk'
 import { isAddressEqual, parseUnits, zeroAddress, zeroHash } from 'viem'
+import { Tooltip } from 'react-tooltip'
 
 import { Pool } from '../model/pool'
 import { useChainContext } from '../contexts/chain-context'
@@ -14,6 +15,7 @@ import { RemoveLiquidityForm } from '../components/form/remove-liquidity-form'
 import { RPC_URL } from '../constants/rpc-urls'
 import { usePoolContractContext } from '../contexts/pool/pool-contract-context'
 import { toPlacesAmountString } from '../utils/bignumber'
+import { QuestionMarkSvg } from '../components/svg/question-mark-svg'
 
 import { VaultChartContainer } from './vault-chart-container'
 
@@ -234,8 +236,27 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                 <div className="text-white text-sm md:text-base font-bold">
                   Historical Performance
                 </div>
-                <div className="text-gray-500 text-xs md:text-sm">
-                  Performance Index (PI)
+                <div className="flex flex-row gap-2">
+                  <div className="flex text-gray-500 text-xs md:text-sm">
+                    Performance Index (PI)
+                  </div>
+                  <div className="flex mr-auto justify-center items-center">
+                    <QuestionMarkSvg
+                      data-tooltip-id="trading-view-info"
+                      data-tooltip-place="bottom-end"
+                      data-tooltip-html={
+                        'Performance Index (PI) shows the relative value of your portfolio over time, starting at 1. A value above 1 indicates growth, while a value below 1 indicates a decrease. PI provides a snapshot of how the assets have performed since the initial measurement.'
+                      }
+                      className="w-3 h-3"
+                    />
+                    <Tooltip
+                      id="trading-view-info"
+                      style={{
+                        width: '300px',
+                      }}
+                      clickable
+                    />
+                  </div>
                 </div>
               </div>
               <VaultChartContainer
