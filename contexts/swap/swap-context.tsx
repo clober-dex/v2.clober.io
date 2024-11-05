@@ -10,7 +10,7 @@ import {
   LOCAL_STORAGE_INPUT_CURRENCY_KEY,
   LOCAL_STORAGE_OUTPUT_CURRENCY_KEY,
 } from '../../utils/currency'
-import { setQueryParams } from '../../utils/url'
+import { getQueryParams, setQueryParams } from '../../utils/url'
 import {
   DEFAULT_INPUT_CURRENCY,
   DEFAULT_OUTPUT_CURRENCY,
@@ -91,59 +91,76 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
     [selectedChain],
   )
 
-  useEffect(() => {
-    if (!fetchCurrenciesDone(whitelistCurrencies, selectedChain)) {
-      setInputCurrency(DEFAULT_INPUT_CURRENCY[selectedChain.id])
-      setOutputCurrency(DEFAULT_OUTPUT_CURRENCY[selectedChain.id])
-      return
-    }
+  useEffect(
+    () => {
+      if (!fetchCurrenciesDone(whitelistCurrencies, selectedChain)) {
+        setInputCurrency(DEFAULT_INPUT_CURRENCY[selectedChain.id])
+        setOutputCurrency(DEFAULT_OUTPUT_CURRENCY[selectedChain.id])
+        return
+      }
 
-    const action = async () => {
-      const inputCurrencyAddress = localStorage.getItem(
-        LOCAL_STORAGE_INPUT_CURRENCY_KEY('swap', selectedChain),
-      )
-      const outputCurrencyAddress = localStorage.getItem(
-        LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('swap', selectedChain),
-      )
+      const action = async () => {
+        const inputCurrencyAddress =
+          getQueryParams()?.inputCurrency ??
+          localStorage.getItem(
+            LOCAL_STORAGE_INPUT_CURRENCY_KEY('swap', selectedChain),
+          )
+        const outputCurrencyAddress =
+          getQueryParams()?.outputCurrency ??
+          localStorage.getItem(
+            LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('swap', selectedChain),
+          )
 
-      const _inputCurrency = inputCurrencyAddress
-        ? whitelistCurrencies.find((currency) =>
-            isAddressEqual(currency.address, getAddress(inputCurrencyAddress)),
-          ) ??
-          (await fetchCurrency(
-            selectedChain.id,
-            getAddress(inputCurrencyAddress),
-          ))
-        : DEFAULT_INPUT_CURRENCY[selectedChain.id]
-      const _outputCurrency = outputCurrencyAddress
-        ? whitelistCurrencies.find((currency) =>
-            isAddressEqual(currency.address, getAddress(outputCurrencyAddress)),
-          ) ??
-          (await fetchCurrency(
-            selectedChain.id,
-            getAddress(outputCurrencyAddress),
-          ))
-        : DEFAULT_OUTPUT_CURRENCY[selectedChain.id]
+        const _inputCurrency = inputCurrencyAddress
+          ? whitelistCurrencies.find((currency) =>
+              isAddressEqual(
+                currency.address,
+                getAddress(inputCurrencyAddress),
+              ),
+            ) ??
+            (await fetchCurrency(
+              selectedChain.id,
+              getAddress(inputCurrencyAddress),
+            ))
+          : DEFAULT_INPUT_CURRENCY[selectedChain.id]
+        const _outputCurrency = outputCurrencyAddress
+          ? whitelistCurrencies.find((currency) =>
+              isAddressEqual(
+                currency.address,
+                getAddress(outputCurrencyAddress),
+              ),
+            ) ??
+            (await fetchCurrency(
+              selectedChain.id,
+              getAddress(outputCurrencyAddress),
+            ))
+          : DEFAULT_OUTPUT_CURRENCY[selectedChain.id]
 
-      setCurrencies(
-        deduplicateCurrencies(
-          [...whitelistCurrencies].concat(
-            _inputCurrency ? [_inputCurrency] : [],
-            _outputCurrency ? [_outputCurrency] : [],
+        setCurrencies(
+          deduplicateCurrencies(
+            [...whitelistCurrencies].concat(
+              _inputCurrency ? [_inputCurrency] : [],
+              _outputCurrency ? [_outputCurrency] : [],
+            ),
           ),
-        ),
-      )
-      setInputCurrency(_inputCurrency)
-      setOutputCurrency(_outputCurrency)
-    }
-    action()
-  }, [
-    selectedChain,
-    setCurrencies,
-    setInputCurrency,
-    setOutputCurrency,
-    whitelistCurrencies,
-  ])
+        )
+        setInputCurrency(_inputCurrency)
+        setOutputCurrency(_outputCurrency)
+      }
+      if (window.location.href.includes('/swap')) {
+        action()
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      selectedChain,
+      setCurrencies,
+      setInputCurrency,
+      setOutputCurrency,
+      whitelistCurrencies,
+      window.location.href,
+    ],
+  )
 
   return (
     <Context.Provider
