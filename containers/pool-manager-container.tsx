@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import { useQuery, useWalletClient } from 'wagmi'
 import { addLiquidity, getQuoteToken, removeLiquidity } from '@clober/v2-sdk'
@@ -138,6 +138,16 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
     setAsRatio(pool.reserve0 + pool.reserve1 === 0)
   }, [pool.reserve0, pool.reserve1, setAsRatio])
 
+  const latestPriceIndex = useMemo(
+    () =>
+      pool.historicalPriceIndex.length > 0
+        ? pool.historicalPriceIndex[
+            pool.historicalPriceIndex.length - 1
+          ].values.reduce((sum, value) => sum + value, 0)
+        : 0,
+    [pool.historicalPriceIndex],
+  )
+
   return (
     <div className="flex w-full h-full justify-center mt-8 md:mt-16 mb-4 sm:mb-6">
       <div className="w-full lg:w-[992px] h-full flex flex-col items-start gap-8 md:gap-12 px-4 lg:px-0">
@@ -229,6 +239,33 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                     )}
                   </div>
                 </div>
+              </div>
+            </div>
+            <div className="flex sm:hidden flex-col item-st gap-3 md:gap-4 self-stretch">
+              <div className="flex flex-row gap-2">
+                <div className="text-white text-sm md:text-base font-bold">
+                  Performance Index (PI)
+                </div>
+                <div className="flex mr-auto justify-center items-center">
+                  <QuestionMarkSvg
+                    data-tooltip-id="trading-view-info"
+                    data-tooltip-place="bottom-end"
+                    data-tooltip-html={
+                      'Performance Index (PI) shows the relative value of your portfolio over time, starting at 1. A value above 1 indicates growth, while a value below 1 indicates a decrease. PI provides a snapshot of how the assets have performed since the initial measurement.'
+                    }
+                    className="w-3 h-3"
+                  />
+                  <Tooltip
+                    id="trading-view-info"
+                    style={{
+                      width: '300px',
+                    }}
+                    clickable
+                  />
+                </div>
+              </div>
+              <div className="text-sm font-semibold flex h-14 px-8 py-4 bg-gray-800 rounded-xl justify-center items-center gap-8 md:gap-12">
+                {latestPriceIndex.toFixed(4)}
               </div>
             </div>
             <div className="flex-col items-start gap-3 md:gap-4 self-stretch hidden sm:flex">
