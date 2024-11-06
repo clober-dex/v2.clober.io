@@ -71,7 +71,9 @@ export const AddLiquidityForm = ({
           />
         </div>
         <div className="flex items-center gap-3 ml-auto">
-          <div className="text-white text-sm font-semibold ">Add by ratio</div>
+          <div className="text-white text-sm font-semibold ">
+            Add Proportionally
+          </div>
           <label className="inline-flex items-center cursor-pointer">
             <input
               type="checkbox"
