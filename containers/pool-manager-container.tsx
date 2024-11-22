@@ -32,8 +32,8 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
     setCurrency0Amount,
     currency1Amount,
     setCurrency1Amount,
-    asRatio,
-    setAsRatio,
+    disableSwap,
+    setDisableSwap,
     slippageInput,
     setSlippageInput,
     lpCurrencyAmount,
@@ -49,7 +49,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
       pool,
       currency0Amount,
       currency1Amount,
-      asRatio,
+      disableSwap,
       slippageInput,
       prices,
       tab,
@@ -84,7 +84,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
           useSubgraph: false,
           rpcUrl: RPC_URL[selectedChain.id],
           gasLimit: 1_000_000n,
-          disableSwap: asRatio,
+          disableSwap,
           slippage: Number(slippageInput),
           testnetPrice: prices[baseCurrency.address],
         },
@@ -367,18 +367,18 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                   availableCurrency1Balance={
                     balances[pool.currency1.address] ?? 0n
                   }
-                  asRatio={asRatio}
-                  setAsRatio={setAsRatio}
-                  disableAsRatio={pool.reserve0 + pool.reserve1 === 0}
+                  disableSwap={disableSwap}
+                  setDisableSwap={setDisableSwap}
+                  disabledisableSwap={pool.reserve0 + pool.reserve1 === 0}
                   slippageInput={slippageInput}
                   setSlippageInput={setSlippageInput}
                   receiveLpCurrencyAmount={receiveLpAmount}
                   isCalculatingReceiveLpAmount={
-                    (asRatio &&
+                    (!disableSwap &&
                       Number(currency0Amount) > 0 &&
                       Number(currency1Amount) > 0 &&
                       receiveLpAmount === 0n) ||
-                    (!asRatio &&
+                    (disableSwap &&
                       Number(currency0Amount) + Number(currency1Amount) > 0 &&
                       receiveLpAmount === 0n)
                   }
@@ -391,7 +391,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                         balances[pool.currency0.address] ||
                       parseUnits(currency1Amount, pool.currency1.decimals) >
                         balances[pool.currency1.address] ||
-                      (asRatio &&
+                      (!disableSwap &&
                         (Number(currency0Amount) === 0 ||
                           Number(currency1Amount) === 0)),
                     onClick: async () => {
@@ -400,7 +400,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                         pool.currency1,
                         currency0Amount,
                         currency1Amount,
-                        asRatio,
+                        disableSwap,
                         Number(slippageInput),
                       )
                     },
@@ -415,7 +415,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                       : parseUnits(currency1Amount, pool.currency1.decimals) >
                         balances[pool.currency1.address]
                       ? `Insufficient ${pool.currency1.symbol} balance`
-                      : asRatio &&
+                      : !disableSwap &&
                         (Number(currency0Amount) === 0 ||
                           Number(currency1Amount) === 0)
                       ? `Enter amount`

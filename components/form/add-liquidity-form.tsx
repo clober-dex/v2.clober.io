@@ -20,9 +20,9 @@ export const AddLiquidityForm = ({
   currency1Amount,
   setCurrency1Amount,
   availableCurrency1Balance,
-  asRatio,
-  setAsRatio,
-  disableAsRatio,
+  disableSwap,
+  setDisableSwap,
+  disabledisableSwap,
   slippageInput,
   setSlippageInput,
   receiveLpCurrencyAmount,
@@ -37,9 +37,9 @@ export const AddLiquidityForm = ({
   currency1Amount: string
   setCurrency1Amount: (inputCurrencyAmount: string) => void
   availableCurrency1Balance: bigint
-  asRatio: boolean
-  setAsRatio: (asRatio: boolean) => void
-  disableAsRatio: boolean
+  disableSwap: boolean
+  setDisableSwap: (value: boolean) => void
+  disabledisableSwap: boolean
   slippageInput: string
   setSlippageInput: (slippageInput: string) => void
   receiveLpCurrencyAmount: bigint
