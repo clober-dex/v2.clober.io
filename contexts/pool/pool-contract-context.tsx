@@ -81,13 +81,7 @@ export const PoolContractProvider = ({
           setConfirmation({
             title: 'Approve',
             body: 'Please confirm in your wallet.',
-            fields: [
-              {
-                currency: currency0,
-                label: currency0.symbol,
-                value: toPlacesAmountString(amount0, prices[currency0.address]),
-              },
-            ],
+            fields: [],
           })
           await maxApprove(walletClient, currency0, spender)
         }
@@ -100,13 +94,7 @@ export const PoolContractProvider = ({
           setConfirmation({
             title: 'Approve',
             body: 'Please confirm in your wallet.',
-            fields: [
-              {
-                currency: currency1,
-                label: currency1.symbol,
-                value: toPlacesAmountString(amount1, prices[currency1.address]),
-              },
-            ],
+            fields: [],
           })
           await maxApprove(walletClient, currency1, spender)
         }

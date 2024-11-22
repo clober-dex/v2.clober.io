@@ -18,8 +18,8 @@ type PoolContext = {
   setCurrency0Amount: (inputCurrencyAmount: string) => void
   currency1Amount: string
   setCurrency1Amount: (inputCurrencyAmount: string) => void
-  asRatio: boolean
-  setAsRatio: (asRatio: boolean) => void
+  disableSwap: boolean
+  setDisableSwap: (value: boolean) => void
   slippageInput: string
   setSlippageInput: (slippageInput: string) => void
   lpBalances: Balances
@@ -34,8 +34,8 @@ const Context = React.createContext<PoolContext>({
   setCurrency0Amount: () => {},
   currency1Amount: '',
   setCurrency1Amount: () => {},
-  asRatio: false,
-  setAsRatio: () => {},
+  disableSwap: false,
+  setDisableSwap: () => {},
   slippageInput: '1',
   setSlippageInput: () => {},
   lpBalances: {},
@@ -50,7 +50,7 @@ export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [lpCurrencyAmount, setLpCurrencyAmount] = React.useState('')
   const [currency0Amount, setCurrency0Amount] = React.useState('')
   const [currency1Amount, setCurrency1Amount] = React.useState('')
-  const [asRatio, setAsRatio] = React.useState(false)
+  const [disableSwap, setDisableSwap] = React.useState(true)
   const [slippageInput, setSlippageInput] = React.useState('1')
 
   const { data: pools } = useQuery(
@@ -138,8 +138,8 @@ export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
         setCurrency0Amount,
         currency1Amount,
         setCurrency1Amount,
-        asRatio,
-        setAsRatio,
+        disableSwap,
+        setDisableSwap,
         slippageInput,
         setSlippageInput,
         lpBalances: lpBalances ?? {},
