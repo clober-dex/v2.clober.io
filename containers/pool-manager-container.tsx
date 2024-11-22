@@ -46,12 +46,11 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
     [
       'calculate-receive-lp-amount',
       selectedChain,
-      pool,
+      pool.key,
       currency0Amount,
       currency1Amount,
       disableSwap,
       slippageInput,
-      prices,
       tab,
     ],
     async () => {
