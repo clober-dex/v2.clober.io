@@ -134,8 +134,43 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
   )
 
   useEffect(() => {
-    setAsRatio(pool.reserve0 + pool.reserve1 === 0)
-  }, [pool.reserve0, pool.reserve1, setAsRatio])
+    setDisableSwap(pool.reserve0 + pool.reserve1 === 0)
+  }, [pool.reserve0, pool.reserve1, setDisableSwap])
+
+  useEffect(() => {
+    setCurrency0Amount('')
+    setCurrency1Amount('')
+  }, [setCurrency0Amount, setCurrency1Amount, disableSwap])
+
+  // when change currency0Amount
+  useEffect(() => {
+    if (!disableSwap) {
+      setCurrency1Amount(
+        Number(currency0Amount) / (pool.reserve0 / pool.reserve1) + '',
+      )
+    }
+  }, [
+    currency0Amount,
+    disableSwap,
+    pool.reserve0,
+    pool.reserve1,
+    setCurrency1Amount,
+  ])
+
+  // when change currency1Amount
+  useEffect(() => {
+    if (!disableSwap) {
+      setCurrency0Amount(
+        Number(currency1Amount) * (pool.reserve0 / pool.reserve1) + '',
+      )
+    }
+  }, [
+    currency1Amount,
+    disableSwap,
+    pool.reserve0,
+    pool.reserve1,
+    setCurrency0Amount,
+  ])
 
   const latestPriceIndex = useMemo(
     () =>
