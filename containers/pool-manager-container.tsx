@@ -143,34 +143,30 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
   }, [setCurrency0Amount, setCurrency1Amount, disableSwap])
 
   // when change currency0Amount
-  useEffect(() => {
-    if (!disableSwap) {
-      setCurrency1Amount(
-        Number(currency0Amount) / (pool.reserve0 / pool.reserve1) + '',
-      )
-    }
-  }, [
-    currency0Amount,
-    disableSwap,
-    pool.reserve0,
-    pool.reserve1,
-    setCurrency1Amount,
-  ])
+  useEffect(
+    () => {
+      if (!disableSwap) {
+        setCurrency1Amount(
+          Number(currency0Amount) / (pool.reserve0 / pool.reserve1) + '',
+        )
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currency0Amount, pool.reserve0, pool.reserve1, setCurrency1Amount],
+  )
 
   // when change currency1Amount
-  useEffect(() => {
-    if (!disableSwap) {
-      setCurrency0Amount(
-        Number(currency1Amount) * (pool.reserve0 / pool.reserve1) + '',
-      )
-    }
-  }, [
-    currency1Amount,
-    disableSwap,
-    pool.reserve0,
-    pool.reserve1,
-    setCurrency0Amount,
-  ])
+  useEffect(
+    () => {
+      if (!disableSwap) {
+        setCurrency0Amount(
+          Number(currency1Amount) * (pool.reserve0 / pool.reserve1) + '',
+        )
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currency1Amount, pool.reserve0, pool.reserve1, setCurrency0Amount],
+  )
 
   const latestPriceIndex = useMemo(
     () =>
