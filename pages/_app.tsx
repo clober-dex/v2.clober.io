@@ -46,7 +46,6 @@ import { SwapContractProvider } from '../contexts/swap/swap-contract-context'
 import Panel from '../components/panel'
 import { RPC_URL } from '../constants/rpc-urls'
 import ErrorBoundary from '../components/error-boundary'
-import { beraTestnetChain } from '../constants/dev-chain'
 import { CurrencyProvider } from '../contexts/currency-context'
 import { PoolProvider } from '../contexts/pool/pool-context'
 import { PoolContractProvider } from '../contexts/pool/pool-contract-context'
@@ -190,11 +189,7 @@ const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
             className="flex font-bold items-center justify-center text-base sm:text-2xl w-16 sm:w-[120px] bg-transparent text-gray-500 disabled:text-white border-0 rounded-none p-2 border-b-4 border-b-transparent border-t-4 border-t-transparent disabled:border-b-white"
             disabled={router.pathname === '/swap'}
             onClick={() => {
-              if (
-                !testnetChainIds
-                  .filter((chainId) => chainId !== beraTestnetChain.id)
-                  .includes(selectedChain.id)
-              ) {
+              if (!testnetChainIds.includes(selectedChain.id)) {
                 router.push(`/swap?chain=${selectedChain.id}`)
               }
             }}

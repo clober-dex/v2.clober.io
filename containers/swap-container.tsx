@@ -12,9 +12,8 @@ import { useSwapContext } from '../contexts/swap/swap-context'
 import { useSwapContractContext } from '../contexts/swap/swap-contract-context'
 import { testnetChainIds } from '../constants/chain'
 import { useCurrencyContext } from '../contexts/currency-context'
-import { OogaBoogaLogoSvg } from '../components/svg/ooga-booga-logo-svg'
-import { beraTestnetChain } from '../constants/dev-chain'
 import { OdosLogoSvg } from '../components/svg/odos-logo-svg'
+import { mitosisTestnet } from '../constants/chains/mitosis-testnet-chain'
 
 export const SwapContainer = () => {
   const {
@@ -74,7 +73,7 @@ export const SwapContainer = () => {
   }, [selectedChain])
 
   const poweredByLink =
-    selectedChain.id === beraTestnetChain.id
+    selectedChain.id === mitosisTestnet.id
       ? 'https://www.oogabooga.io/'
       : 'https://www.odos.xyz/'
 
@@ -164,16 +163,11 @@ export const SwapContainer = () => {
             <></>
           )}
         </div>
-        {!testnetChainIds.includes(selectedChain.id) ||
-        selectedChain.id === beraTestnetChain.id ? (
+        {!testnetChainIds.includes(selectedChain.id) ? (
           <div className="flex ml-auto text-white items-center gap-2">
             <div className="text-gray-400 text-xs font-medium">Powered by</div>
             <a target="_blank" href={poweredByLink} rel="noreferrer">
-              {selectedChain.id === beraTestnetChain.id ? (
-                <OogaBoogaLogoSvg />
-              ) : (
-                <OdosLogoSvg />
-              )}
+              <OdosLogoSvg />
             </a>
           </div>
         ) : (

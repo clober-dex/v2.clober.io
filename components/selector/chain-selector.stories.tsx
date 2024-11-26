@@ -9,8 +9,6 @@ import {
   zkSync,
 } from 'viem/chains'
 
-import { beraTestnetChain } from '../../constants/dev-chain'
-
 import ChainSelector from './chain-selector'
 
 import '../../styles/globals.css'
@@ -28,15 +26,7 @@ export const Default: Story = {
   args: {
     chain: arbitrumSepolia,
     setChain: () => {},
-    chains: [
-      arbitrumSepolia,
-      {
-        ...beraTestnetChain,
-        icon: 'https://img.cryptorank.io/coins/berachain1681996075164.png',
-      },
-      base,
-      zkSync,
-    ],
+    chains: [arbitrumSepolia, base, zkSync],
   },
 }
 
@@ -52,13 +42,7 @@ export const OnlyTestnet: Story = {
   args: {
     chain: arbitrumSepolia,
     setChain: () => {},
-    chains: [
-      arbitrumSepolia,
-      {
-        ...beraTestnetChain,
-        icon: 'https://img.cryptorank.io/coins/berachain1681996075164.png',
-      },
-    ],
+    chains: [arbitrumSepolia],
   },
 }
 
