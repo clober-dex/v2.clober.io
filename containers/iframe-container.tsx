@@ -190,21 +190,17 @@ export const IframeContainer = () => {
             }}
             actionButtonProps={{
               disabled:
-                (!walletClient ||
-                  !inputCurrency ||
-                  !outputCurrency ||
-                  priceInput === '' ||
-                  (selectedMarket &&
-                    !isAddressesEqual(
-                      [inputCurrency.address, outputCurrency.address],
-                      [
-                        selectedMarket.base.address,
-                        selectedMarket.quote.address,
-                      ],
-                    )) ||
-                  amount === 0n ||
-                  amount > balances[getAddress(inputCurrency.address)]) ??
-                0n,
+                !walletClient ||
+                !inputCurrency ||
+                !outputCurrency ||
+                priceInput === '' ||
+                (selectedMarket &&
+                  !isAddressesEqual(
+                    [inputCurrency.address, outputCurrency.address],
+                    [selectedMarket.base.address, selectedMarket.quote.address],
+                  )) ||
+                amount === 0n ||
+                amount > (balances[getAddress(inputCurrency.address)] ?? 0n),
               onClick: async () => {
                 if (!inputCurrency || !outputCurrency || !selectedMarket) {
                   return

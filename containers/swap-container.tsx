@@ -117,7 +117,7 @@ export const SwapContainer = () => {
                       BigInt(feeData?.gasPrice ?? 0n),
                     selectedChain.nativeCurrency.decimals,
                   ),
-                ) * prices[getAddress(zeroAddress)]
+                ) * prices[getAddress(zeroAddress)] ?? 0
               }
               actionButtonProps={{
                 disabled:

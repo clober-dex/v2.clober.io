@@ -60,14 +60,14 @@ export const AddLiquidityForm = ({
             value={currency0Amount}
             onValueChange={setCurrency0Amount}
             availableAmount={availableCurrency0Balance}
-            price={prices[pool.currency0.address]}
+            price={prices[pool.currency0.address] ?? 0}
           />
           <CurrencyAmountInput
             currency={pool.currency1}
             value={currency1Amount}
             onValueChange={setCurrency1Amount}
             availableAmount={availableCurrency1Balance}
-            price={prices[pool.currency1.address]}
+            price={prices[pool.currency1.address] ?? 0}
           />
         </div>
         <div className="flex items-center gap-3 ml-auto">
@@ -102,7 +102,7 @@ export const AddLiquidityForm = ({
                     formatUnits(
                       receiveLpCurrencyAmount,
                       pool.lpCurrency.decimals,
-                      prices[pool.lpCurrency.address],
+                      prices[pool.lpCurrency.address] ?? 0,
                     ),
                   )}{' '}
                   {pool.lpCurrency.symbol}
@@ -112,7 +112,7 @@ export const AddLiquidityForm = ({
                   {formatDollarValue(
                     receiveLpCurrencyAmount,
                     pool.lpCurrency.decimals,
-                    prices[pool.lpCurrency.address],
+                    prices[pool.lpCurrency.address] ?? 0,
                   )}
                   )
                 </div>

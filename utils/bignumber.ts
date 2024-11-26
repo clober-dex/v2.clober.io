@@ -36,8 +36,11 @@ export const toPlacesString = (
 
 export const toPlacesAmountString = (
   number: BigNumber.Value,
-  price: number,
+  price?: number,
 ): string => {
+  if (price === undefined) {
+    price = 0
+  }
   const underHalfPennyDecimals =
     Math.floor(Math.max(-Math.log10(0.005 / price), 0) / 2) * 2
   return new BigNumber(number).toFixed(underHalfPennyDecimals)

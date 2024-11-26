@@ -85,7 +85,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
           gasLimit: 1_000_000n,
           disableSwap,
           slippage: Number(slippageInput),
-          testnetPrice: prices[baseCurrency.address],
+          testnetPrice: prices[baseCurrency.address] ?? 0,
         },
       })
       return parseUnits(
@@ -248,7 +248,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                   <div className="text-center text-white text-sm md:text-lg font-bold ">
                     {toPlacesAmountString(
                       pool.reserve0.toString(),
-                      prices[pool.currency0.address],
+                      prices[pool.currency0.address] ?? 0,
                     )}
                   </div>
                 </div>
@@ -265,7 +265,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                   <div className="text-center text-white text-sm md:text-lg font-bold ">
                     {toPlacesAmountString(
                       pool.reserve1.toString(),
-                      prices[pool.currency1.address],
+                      prices[pool.currency1.address] ?? 0,
                     )}
                   </div>
                 </div>
