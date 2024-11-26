@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js'
 import { formatUnits as _formatUnits } from 'viem'
 
+import { findFirstNonZeroIndex } from './bignumber'
+
 export const max = (...args: bigint[]) =>
   args.reduce((m, e) => (e > m ? e : m), 0n)
 export const min = (...args: bigint[]) =>
@@ -30,7 +32,8 @@ export const formatUnits = (
 ): string => {
   const formatted = _formatUnits(value, decimals)
   if (!price) {
-    return formatted
+    const index = findFirstNonZeroIndex(formatted)
+    return Number(formatted).toFixed(index)
   }
   const underHalfPennyDecimals =
     Math.floor(Math.max(-Math.log10(0.005 / price), 0) / 2) * 2
