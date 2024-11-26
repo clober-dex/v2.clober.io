@@ -117,7 +117,7 @@ export const PoolContainer = () => {
             <>
               <div className="hidden lg:flex self-stretch px-4 justify-start items-center gap-4">
                 <div className="w-60 text-gray-400 text-sm font-semibold">
-                  Pool
+                  Liquidity Vault
                 </div>
                 <div className="w-[140px] text-gray-400 text-sm font-semibold">
                   APY
