@@ -15,12 +15,20 @@ export async function sendTransaction(
     chain: supportChains.find((chain) => chain.id === walletClient.chain.id),
     transport: http(),
   })
-  const hash = await walletClient.sendTransaction({
-    data: transaction.data,
-    to: transaction.to,
-    value: transaction.value,
-    gas: transaction.gas,
-  })
+  const hash = await walletClient.sendTransaction(
+    transaction.gas > 0n
+      ? {
+          data: transaction.data,
+          to: transaction.to,
+          value: transaction.value,
+          gas: transaction.gas,
+        }
+      : {
+          data: transaction.data,
+          to: transaction.to,
+          value: transaction.value,
+        },
+  )
   await publicClient.waitForTransactionReceipt({ hash })
   return hash
 }

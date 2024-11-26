@@ -76,17 +76,7 @@ export const SwapContractProvider = ({
           setConfirmation({
             title: 'Approve',
             body: 'Please confirm in your wallet.',
-            fields: [
-              {
-                currency: inputCurrency,
-                label: inputCurrency.symbol,
-                value: formatUnits(
-                  amountIn,
-                  inputCurrency.decimals,
-                  prices[inputCurrency.address] ?? 0,
-                ),
-              },
-            ],
+            fields: [],
           })
           await maxApprove(walletClient, inputCurrency, spender)
 
