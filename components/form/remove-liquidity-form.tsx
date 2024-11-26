@@ -49,7 +49,7 @@ export const RemoveLiquidityForm = ({
           value={lpCurrencyAmount}
           onValueChange={setLpCurrencyAmount}
           availableAmount={availableLpCurrencyBalance}
-          price={prices[pool.lpCurrency.address]}
+          price={prices[pool.lpCurrency.address] ?? 0}
         />
       </div>
       <div className="flex flex-col items-start gap-3 self-stretch">
@@ -72,7 +72,7 @@ export const RemoveLiquidityForm = ({
                         {formatUnits(
                           receiveCurrency.amount,
                           receiveCurrency.currency.decimals,
-                          prices[receiveCurrency.currency.address],
+                          prices[receiveCurrency.currency.address] ?? 0,
                         )}
                       </div>
                       <div>{receiveCurrency.currency.symbol}</div>
@@ -82,7 +82,7 @@ export const RemoveLiquidityForm = ({
                       {formatDollarValue(
                         receiveCurrency.amount,
                         receiveCurrency.currency.decimals,
-                        prices[receiveCurrency.currency.address],
+                        prices[receiveCurrency.currency.address] ?? 0,
                       )}
                       )
                     </div>

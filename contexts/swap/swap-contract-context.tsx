@@ -83,7 +83,7 @@ export const SwapContractProvider = ({
                 value: formatUnits(
                   amountIn,
                   inputCurrency.decimals,
-                  prices[inputCurrency.address],
+                  prices[inputCurrency.address] ?? 0,
                 ),
               },
             ],
@@ -112,7 +112,7 @@ export const SwapContractProvider = ({
               value: formatUnits(
                 amountIn,
                 inputCurrency.decimals,
-                prices[inputCurrency.address],
+                prices[inputCurrency.address] ?? 0,
               ),
             },
             {
@@ -122,7 +122,7 @@ export const SwapContractProvider = ({
               value: formatUnits(
                 swapData.amountOut,
                 outputCurrency.decimals,
-                prices[outputCurrency.address],
+                prices[outputCurrency.address] ?? 0,
               ),
             },
           ],

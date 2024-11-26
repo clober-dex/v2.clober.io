@@ -128,7 +128,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
     ['prices', selectedChain],
     async () => {
       if (testnetChainIds.includes(selectedChain.id)) {
-        return TESTNET_PRICES[selectedChain.id] as Prices
+        return (TESTNET_PRICES[selectedChain.id] ?? 0) as Prices
       }
       return fetchPrices(AGGREGATORS[selectedChain.id])
     },

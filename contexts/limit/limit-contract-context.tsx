@@ -118,7 +118,7 @@ export const LimitContractProvider = ({
                 label: inputCurrency.symbol,
                 value: toPlacesAmountString(
                   amount,
-                  prices[inputCurrency.address],
+                  prices[inputCurrency.address] ?? 0,
                 ),
               },
             ],
@@ -154,7 +154,7 @@ export const LimitContractProvider = ({
                 label: result.make.currency.symbol,
                 value: toPlacesAmountString(
                   result.make.amount,
-                  prices[inputCurrency.address],
+                  prices[inputCurrency.address] ?? 0,
                 ),
               },
             ] as Confirmation['fields'],
@@ -170,7 +170,7 @@ export const LimitContractProvider = ({
                 label: result.make.currency.symbol,
                 value: toPlacesAmountString(
                   Number(result.make.amount) + Number(result.spent.amount),
-                  prices[inputCurrency.address],
+                  prices[inputCurrency.address] ?? 0,
                 ),
               },
               {
@@ -179,7 +179,7 @@ export const LimitContractProvider = ({
                 label: result.taken.currency.symbol,
                 value: toPlacesAmountString(
                   result.taken.amount,
-                  prices[outputCurrency.address],
+                  prices[outputCurrency.address] ?? 0,
                 ),
               },
             ] as Confirmation['fields'],
@@ -248,7 +248,7 @@ export const LimitContractProvider = ({
           fields: result.map(({ currency, amount, direction }) => ({
             currency,
             label: currency.symbol,
-            value: toPlacesAmountString(amount, prices[currency.address]),
+            value: toPlacesAmountString(amount, prices[currency.address] ?? 0),
             direction,
           })),
         })
@@ -315,7 +315,7 @@ export const LimitContractProvider = ({
           fields: result.map(({ currency, amount, direction }) => ({
             currency,
             label: currency.symbol,
-            value: toPlacesAmountString(amount, prices[currency.address]),
+            value: toPlacesAmountString(amount, prices[currency.address] ?? 0),
             direction,
           })),
         })
