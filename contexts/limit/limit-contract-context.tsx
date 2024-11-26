@@ -112,16 +112,7 @@ export const LimitContractProvider = ({
           setConfirmation({
             title: 'Approve',
             body: 'Please confirm in your wallet.',
-            fields: [
-              {
-                currency: inputCurrency,
-                label: inputCurrency.symbol,
-                value: toPlacesAmountString(
-                  amount,
-                  prices[inputCurrency.address] ?? 0,
-                ),
-              },
-            ],
+            fields: [],
           })
           await maxApprove(walletClient, inputCurrency, spender)
         }
