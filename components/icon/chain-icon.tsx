@@ -13,10 +13,11 @@ export default function ChainIcon({
   return (
     <div {...props}>
       <Image
+        className="rounded-full"
         src={chain.icon || `https://assets.odos.xyz/chains/${name}.png`}
         alt="ChainIcon"
-        width={16}
-        height={16}
+        width={18}
+        height={18}
       />
     </div>
   )
