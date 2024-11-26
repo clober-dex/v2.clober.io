@@ -3,8 +3,6 @@ import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Currency } from '../model/currency'
 
-import { BERACHAIN_TESTNET_WHITELISTED_CURRENCIES } from './currencies/80084'
-
 export const ETH: Currency = {
   address: zeroAddress,
   name: 'Ethereum',
@@ -30,9 +28,29 @@ export const WHITELISTED_CURRENCIES: {
       decimals: 6,
     },
   ],
-  [CHAIN_IDS.BERACHAIN_TESTNET]: BERACHAIN_TESTNET_WHITELISTED_CURRENCIES,
   [CHAIN_IDS.BASE]: [],
   [CHAIN_IDS.ZKSYNC]: [],
+  [CHAIN_IDS.MITOSIS_TESTNET]: [
+    {
+      address: zeroAddress,
+      name: 'Mitosis Token',
+      symbol: 'MITO',
+      decimals: 18,
+    },
+    {
+      name: 'Wrapped MITO',
+      symbol: 'WMITO',
+      decimals: 18,
+      icon: 'https://avatars.githubusercontent.com/u/150423703',
+      address: '0x8B71fD76b23721d0D73CA14Ea6464AAD70149B67',
+    },
+    {
+      address: '0xCB0CedF61be0Bf4d5F6596b8ab296614b154db91',
+      name: 'USDT',
+      symbol: 'USDT',
+      decimals: 6,
+    },
+  ],
 }
 
 export const DEFAULT_INPUT_CURRENCY: {
@@ -44,12 +62,12 @@ export const DEFAULT_INPUT_CURRENCY: {
     symbol: 'WETH',
     decimals: 18,
   },
-  [CHAIN_IDS.BERACHAIN_TESTNET]: {
-    name: 'BERA Token',
-    symbol: 'BERA',
+  [CHAIN_IDS.MITOSIS_TESTNET]: {
+    name: 'Wrapped MITO',
+    symbol: 'WMITO',
     decimals: 18,
-    icon: 'https://internal-oogabooga.up.railway.app/static/bera.png',
-    address: '0x0000000000000000000000000000000000000000',
+    icon: 'https://avatars.githubusercontent.com/u/150423703',
+    address: '0x8B71fD76b23721d0D73CA14Ea6464AAD70149B67',
   },
   [CHAIN_IDS.BASE]: {
     address: '0x4200000000000000000000000000000000000006',
@@ -69,12 +87,11 @@ export const DEFAULT_OUTPUT_CURRENCY: {
     symbol: 'USDC',
     decimals: 6,
   },
-  [CHAIN_IDS.BERACHAIN_TESTNET]: {
-    address: '0x0E4aaF1351de4c0264C5c7056Ef3777b41BD8e03',
-    name: 'HONEY',
-    symbol: 'HONEY',
-    decimals: 18,
-    icon: 'https://internal-oogabooga.up.railway.app/static/honey.png',
+  [CHAIN_IDS.MITOSIS_TESTNET]: {
+    address: '0xCB0CedF61be0Bf4d5F6596b8ab296614b154db91',
+    name: 'USDT',
+    symbol: 'USDT',
+    decimals: 6,
   },
   [CHAIN_IDS.BASE]: {
     address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',

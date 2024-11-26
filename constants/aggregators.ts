@@ -3,7 +3,6 @@ import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Aggregator } from '../model/aggregator'
 import { OdosAggregator } from '../model/aggregator/odos'
-import { OogaBoogaAggregator } from '../model/aggregator/ooga-booga'
 
 import { findSupportChain } from './chain'
 
@@ -11,12 +10,7 @@ export const AGGREGATORS: {
   [chain in CHAIN_IDS]: Aggregator[]
 } = {
   [CHAIN_IDS.ARBITRUM_SEPOLIA]: [],
-  [CHAIN_IDS.BERACHAIN_TESTNET]: [
-    new OogaBoogaAggregator(
-      getAddress('0x7bC98B68bCBb16cEC81EdDcEa1A3746Fdc5025A4'),
-      findSupportChain(CHAIN_IDS.BERACHAIN_TESTNET.valueOf())!,
-    ),
-  ],
+  [CHAIN_IDS.MITOSIS_TESTNET]: [],
   [CHAIN_IDS.BASE]: [
     new OdosAggregator(
       getAddress('0x19cEeAd7105607Cd444F5ad10dd51356436095a1'),
