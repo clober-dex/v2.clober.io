@@ -73,7 +73,7 @@ const ConfirmationModal = ({
                 <></>
               )}
               <div className="flex w-full items-center justify-between bg-gray-700 px-3 py-2 text-sm sm:text-base rounded-lg">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-[150px] truncate">
                   {field.currency ? (
                     <CurrencyIcon
                       currency={field.currency}

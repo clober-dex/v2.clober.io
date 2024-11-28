@@ -19,7 +19,9 @@ const NumberInput = ({
 
       const regex = supportNegative ? /^-?\d*\.?\d*$/ : /^\d*\.?\d*$/
       if (regex.test(newValue)) {
-        onValueChange(newValue)
+        if (newValue.length <= 20) {
+          onValueChange(newValue)
+        }
       }
     },
     [onValueChange, supportNegative],
