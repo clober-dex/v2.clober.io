@@ -15,7 +15,7 @@ import {
   DEFAULT_INPUT_CURRENCY,
   DEFAULT_OUTPUT_CURRENCY,
 } from '../../constants/currency'
-import { getQueryParams, setQueryParams } from '../../utils/url'
+import { getQueryParams } from '../../utils/url'
 import { useCurrencyContext } from '../currency-context'
 
 type LimitContext = {
@@ -89,13 +89,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
           LOCAL_STORAGE_INPUT_CURRENCY_KEY('limit', selectedChain),
           currency.address,
         )
-        setQueryParams({
-          inputCurrency: currency.address,
-        })
-      } else {
-        localStorage.removeItem(
-          LOCAL_STORAGE_INPUT_CURRENCY_KEY('limit', selectedChain),
-        )
       }
       _setInputCurrency(currency)
     },
@@ -109,13 +102,6 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
           LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('limit', selectedChain),
           currency.address,
         )
-        setQueryParams({
-          outputCurrency: currency.address,
-        })
-      } else {
-        localStorage.removeItem(
-          LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('limit', selectedChain),
-        )
       }
       _setOutputCurrency(currency)
     },
@@ -124,13 +110,13 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
   useEffect(
     () => {
-      if (!fetchCurrenciesDone(whitelistCurrencies, selectedChain)) {
-        setInputCurrency(DEFAULT_INPUT_CURRENCY[selectedChain.id])
-        setOutputCurrency(DEFAULT_OUTPUT_CURRENCY[selectedChain.id])
-        return
-      }
-
       const action = async () => {
+        if (!fetchCurrenciesDone(whitelistCurrencies, selectedChain)) {
+          setInputCurrency(DEFAULT_INPUT_CURRENCY[selectedChain.id])
+          setOutputCurrency(DEFAULT_OUTPUT_CURRENCY[selectedChain.id])
+          return
+        }
+
         const inputCurrencyAddress =
           getQueryParams()?.inputCurrency ??
           localStorage.getItem(
