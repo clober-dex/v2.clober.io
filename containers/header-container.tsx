@@ -7,12 +7,11 @@ import { useChainContext } from '../contexts/chain-context'
 import ChainSelector from '../components/selector/chain-selector'
 import { WalletSelector } from '../components/selector/wallet-selector'
 import { supportChains } from '../constants/chain'
-import MenuSvg from '../components/svg/menu-svg'
 import { DocsIconSvg } from '../components/svg/docs-icon-svg'
 import { DiscordIconSvg } from '../components/svg/discord-icon-svg'
 import { TwitterLogoSvg } from '../components/svg/twitter-logo-svg'
 
-const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
+const HeaderContainer = () => {
   const router = useRouter()
   const { selectedChain, setSelectedChain } = useChainContext()
   const { address, status } = useAccount()
@@ -81,16 +80,6 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
           chains={supportChains}
         />
         <WalletSelector address={address} status={status} />
-        {router.pathname !== '/iframe' ? (
-          <button
-            className="w-8 h-8 lg:hover:bg-gray-200 hover:bg-gray-700 rounded sm:rounded-lg flex items-center justify-center lg:hidden"
-            onClick={onMenuClick}
-          >
-            <MenuSvg />
-          </button>
-        ) : (
-          <></>
-        )}
       </div>
     </div>
   )

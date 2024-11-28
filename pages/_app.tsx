@@ -259,23 +259,11 @@ function App({ Component, pageProps }: AppProps) {
             <TransactionProvider>
               <ChainProvider>
                 <CurrencyProvider>
-                  {router.pathname === '/iframe' ? (
-                    <LimitProvidersWrapper>
-                      <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
-                        <HeaderContainer onMenuClick={() => setOpen(true)} />
-
-                        <div className="flex flex-1 relative justify-center bg-gray-950">
-                          <div className="flex w-full flex-col items-center gap-4 sm:gap-6 p-4 pb-0">
-                            <Component {...pageProps} />
-                          </div>
-                        </div>
-                      </div>
-                    </LimitProvidersWrapper>
-                  ) : router.pathname.includes('/earn') ? (
+                  {router.pathname.includes('/earn') ? (
                     <PoolProvidersWrapper>
                       <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
                         <PanelWrapper open={open} setOpen={setOpen} />
-                        <HeaderContainer onMenuClick={() => setOpen(true)} />
+                        <HeaderContainer />
 
                         <Component {...pageProps} />
                       </div>
@@ -285,7 +273,7 @@ function App({ Component, pageProps }: AppProps) {
                       <SwapProvidersWrapper>
                         <div className="flex flex-col w-[100vw] min-h-[100vh] bg-gray-950">
                           <PanelWrapper open={open} setOpen={setOpen} />
-                          <HeaderContainer onMenuClick={() => setOpen(true)} />
+                          <HeaderContainer />
                           <MainComponentWrapper>
                             <Component {...pageProps} />
                           </MainComponentWrapper>
