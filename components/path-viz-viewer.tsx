@@ -235,9 +235,11 @@ const _PathViz = ({ pathVizData }: { pathVizData: PathViz }) => {
             className="rounded-full w-5 h-5"
           />
           <div
-            className="text-sm text-white hidden lg:flex w-12"
+            className="text-sm text-white hidden lg:flex w-12 overflow-hidden whitespace-nowrap"
             style={{
-              transform: `scale(${1 - (symbol.length - 4) / 10})`,
+              transform: `scale(${
+                symbol.length > 10 ? 1 : 1 - (symbol.length - 4) / 10
+              })`,
               transformOrigin: 'left',
             }}
           >

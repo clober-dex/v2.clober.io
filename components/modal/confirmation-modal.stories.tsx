@@ -65,7 +65,7 @@ export const DefaultWithDirection: Story = {
             symbol: 'ETH',
             decimals: 18,
           },
-          label: 'Field 1',
+          label: 'ghffb47yii2rteeyy10op',
           value: 'Value 1',
         },
         {
