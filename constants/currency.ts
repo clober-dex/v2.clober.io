@@ -45,11 +45,11 @@ export const DEFAULT_INPUT_CURRENCY: {
     decimals: 18,
   },
   [CHAIN_IDS.MITOSIS_TESTNET]: {
-    name: 'Wrapped MITO',
-    symbol: 'WMITO',
+    address: zeroAddress,
+    name: 'Mitosis Token',
+    symbol: 'MITO',
     decimals: 18,
     icon: 'https://avatars.githubusercontent.com/u/150423703',
-    address: '0x8B71fD76b23721d0D73CA14Ea6464AAD70149B67',
   },
   [CHAIN_IDS.BASE]: {
     address: '0x4200000000000000000000000000000000000006',
