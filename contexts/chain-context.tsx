@@ -7,7 +7,6 @@ import {
   findSupportChain,
   supportChains,
 } from '../constants/chain'
-import { setQueryParams } from '../utils/url'
 
 type ChainContext = {
   selectedChain: Chain
@@ -27,14 +26,27 @@ export const ChainProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [selectedChain, _setSelectedChain] = React.useState<Chain>(
     supportChains.find((chain) => chain.id === DEFAULT_CHAIN_ID)!,
   )
+
   const { switchNetwork } = useSwitchNetwork({
     onSuccess(data) {
       const chain = findSupportChain(data.id)
       if (chain) {
-        _setSelectedChain(chain)
+        setSelectedChain(chain)
       }
     },
   })
+
+  const setSelectedChain = useCallback(
+    (_chain: Chain) => {
+      _setSelectedChain(_chain)
+      localStorage.setItem(LOCAL_STORAGE_CHAIN_KEY, _chain.id.toString())
+      if (switchNetwork) {
+        switchNetwork(_chain.id)
+      }
+      window.history.replaceState({}, '', `?chain=${_chain.id}`)
+    },
+    [switchNetwork],
+  )
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -50,55 +62,14 @@ export const ChainProvider = ({ children }: React.PropsWithChildren<{}>) => {
       ? findSupportChain(connectedChain.id)
       : undefined
 
-    if (queryParamChain) {
-      _setSelectedChain(queryParamChain)
-      localStorage.setItem(
-        LOCAL_STORAGE_CHAIN_KEY,
-        queryParamChain.id.toString(),
-      )
+    const chain = walletConnectedChain || queryParamChain || localStorageChain
+    if (chain) {
       if (switchNetwork) {
-        switchNetwork(queryParamChain.id)
+        switchNetwork(chain.id)
       }
-      setQueryParams({
-        chain: queryParamChain.id.toString(),
-      })
-    } else if (walletConnectedChain) {
-      _setSelectedChain(walletConnectedChain)
-      setQueryParams({
-        chain: walletConnectedChain.id.toString(),
-      })
-      localStorage.setItem(
-        LOCAL_STORAGE_CHAIN_KEY,
-        walletConnectedChain.id.toString(),
-      )
-    } else if (localStorageChain) {
-      _setSelectedChain(localStorageChain)
-      setQueryParams({
-        chain: localStorageChain.id.toString(),
-      })
-      if (switchNetwork) {
-        switchNetwork(localStorageChain.id)
-      }
-    } else {
-      setQueryParams({
-        chain: supportChains[0].id.toString(),
-      })
+      setSelectedChain(chain)
     }
-  }, [connectedChain, switchNetwork])
-
-  const setSelectedChain = useCallback(
-    (_chain: Chain) => {
-      _setSelectedChain(_chain)
-      localStorage.setItem(LOCAL_STORAGE_CHAIN_KEY, _chain.id.toString())
-      setQueryParams({
-        chain: _chain.id.toString(),
-      })
-      if (switchNetwork) {
-        switchNetwork(_chain.id)
-      }
-    },
-    [switchNetwork],
-  )
+  }, [connectedChain, setSelectedChain, switchNetwork])
 
   return (
     <Context.Provider value={{ selectedChain, setSelectedChain }}>
