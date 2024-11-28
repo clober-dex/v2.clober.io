@@ -3,6 +3,8 @@ import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Currency } from '../model/currency'
 
+import { MITOSIS_WHITELISTED_CURRENCIES } from './currencies/mitosis'
+
 export const ETH: Currency = {
   address: zeroAddress,
   name: 'Ethereum',
@@ -30,27 +32,7 @@ export const WHITELISTED_CURRENCIES: {
   ],
   [CHAIN_IDS.BASE]: [],
   [CHAIN_IDS.ZKSYNC]: [],
-  [CHAIN_IDS.MITOSIS_TESTNET]: [
-    {
-      address: zeroAddress,
-      name: 'Mitosis Token',
-      symbol: 'MITO',
-      decimals: 18,
-    },
-    {
-      name: 'Wrapped MITO',
-      symbol: 'WMITO',
-      decimals: 18,
-      icon: 'https://avatars.githubusercontent.com/u/150423703',
-      address: '0x8B71fD76b23721d0D73CA14Ea6464AAD70149B67',
-    },
-    {
-      address: '0xCB0CedF61be0Bf4d5F6596b8ab296614b154db91',
-      name: 'USDT',
-      symbol: 'USDT',
-      decimals: 6,
-    },
-  ],
+  [CHAIN_IDS.MITOSIS_TESTNET]: MITOSIS_WHITELISTED_CURRENCIES,
 }
 
 export const DEFAULT_INPUT_CURRENCY: {
