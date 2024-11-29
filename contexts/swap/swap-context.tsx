@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { getAddress, isAddressEqual } from 'viem'
 
 import { Currency } from '../../model/currency'
@@ -77,6 +77,19 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
     [selectedChain],
   )
 
+  const [inputCurrencyAddress, outputCurrencyAddress] = useMemo(() => {
+    return [
+      getQueryParams()?.inputCurrency ??
+        localStorage.getItem(
+          LOCAL_STORAGE_INPUT_CURRENCY_KEY('limit', selectedChain),
+        ),
+      getQueryParams()?.outputCurrency ??
+        localStorage.getItem(
+          LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('limit', selectedChain),
+        ),
+    ]
+  }, [selectedChain])
+
   useEffect(
     () => {
       const action = async () => {
@@ -85,17 +98,6 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
           setOutputCurrency(DEFAULT_OUTPUT_CURRENCY[selectedChain.id])
           return
         }
-
-        const inputCurrencyAddress =
-          getQueryParams()?.inputCurrency ??
-          localStorage.getItem(
-            LOCAL_STORAGE_INPUT_CURRENCY_KEY('swap', selectedChain),
-          )
-        const outputCurrencyAddress =
-          getQueryParams()?.outputCurrency ??
-          localStorage.getItem(
-            LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('swap', selectedChain),
-          )
 
         const _inputCurrency = inputCurrencyAddress
           ? whitelistCurrencies.find((currency) =>
@@ -145,6 +147,8 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
       setOutputCurrency,
       whitelistCurrencies,
       window.location.href,
+      inputCurrencyAddress,
+      outputCurrencyAddress,
     ],
   )
 
