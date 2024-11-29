@@ -1,3 +1,5 @@
+export const POLLY_FILL_DECIMALS = 4
+
 export const toCommaSeparated = (number: string) => {
   const parts = number.split('.')
   const integer = parts[0]

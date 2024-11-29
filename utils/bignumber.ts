@@ -1,5 +1,7 @@
 import BigNumber from 'bignumber.js'
 
+import { POLLY_FILL_DECIMALS } from './number'
+
 export const findFirstNonZeroIndex = (number: BigNumber.Value): number => {
   const value = new BigNumber(number)
   const decimalPart = value.minus(value.integerValue())
@@ -26,7 +28,10 @@ export const toPlacesString = (
   const result = new BigNumber(number).toFixed(places, roundingMode)
   if (new BigNumber(result).isZero()) {
     const index = findFirstNonZeroIndex(number)
-    return new BigNumber(number).toFixed(index + 4, roundingMode)
+    return new BigNumber(number).toFixed(
+      index + POLLY_FILL_DECIMALS,
+      roundingMode,
+    )
   } else {
     return result
   }
@@ -38,7 +43,10 @@ export const toPlacesAmountString = (
 ): string => {
   if (price === undefined) {
     const index = findFirstNonZeroIndex(number)
-    return new BigNumber(number).toFixed(index + 4, BigNumber.ROUND_FLOOR)
+    return new BigNumber(number).toFixed(
+      index + POLLY_FILL_DECIMALS,
+      BigNumber.ROUND_FLOOR,
+    )
   }
   const underHalfPennyDecimals =
     Math.floor(Math.max(-Math.log10(0.005 / price), 0) / 2) * 2
