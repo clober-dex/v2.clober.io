@@ -66,18 +66,14 @@ const Panel = ({
                           Trade
                         </button>
                         <button
-                          disabled={
-                            true
-                            /*TODO: router.pathname.includes('/earn')*/
-                          }
+                          disabled={router.pathname.includes('/earn')}
                           onClick={() => {
                             router.push(`/earn?chain=${chainId}`)
                             setOpen(false)
                           }}
-                          // className="text-gray-500 font-semibold disabled:text-white"
-                          className="text-gray-500 font-semibold"
+                          className="text-gray-500 font-semibold disabled:text-white"
                         >
-                          Pool
+                          Earn
                         </button>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
