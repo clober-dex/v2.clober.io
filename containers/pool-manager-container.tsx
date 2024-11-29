@@ -455,7 +455,10 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
               ) : (
                 <RemoveLiquidityForm
                   pool={pool}
-                  prices={prices}
+                  prices={{
+                    ...prices,
+                    [pool.lpCurrency.address]: pool.lpUsdValue,
+                  }}
                   lpCurrencyAmount={lpCurrencyAmount}
                   setLpCurrencyAmount={setLpCurrencyAmount}
                   availableLpCurrencyBalance={lpBalances[pool.key] ?? 0n}
