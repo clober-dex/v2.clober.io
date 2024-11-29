@@ -149,7 +149,8 @@ export const LimitForm = ({
         <div className="flex flex-col flex-1 gap-2">
           <div className="flex flex-row">
             <div className="text-gray-500 text-xs sm:text-sm">
-              {isBid ? 'Buy' : 'Sell'} {selectedMarket?.base.symbol} at rate
+              {isBid ? 'Buy' : 'Sell'}{' '}
+              {isBid ? outputCurrency?.symbol : inputCurrency?.symbol} at rate
             </div>
             {!testnetChainIds.includes(chainId) ? (
               <button

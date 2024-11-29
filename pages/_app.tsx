@@ -263,7 +263,7 @@ function App({ Component, pageProps }: AppProps) {
                     <PoolProvidersWrapper>
                       <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
                         <PanelWrapper open={open} setOpen={setOpen} />
-                        <HeaderContainer />
+                        <HeaderContainer onMenuClick={() => setOpen(true)} />
 
                         <Component {...pageProps} />
                       </div>
@@ -273,7 +273,7 @@ function App({ Component, pageProps }: AppProps) {
                       <SwapProvidersWrapper>
                         <div className="flex flex-col w-[100vw] min-h-[100vh] bg-gray-950">
                           <PanelWrapper open={open} setOpen={setOpen} />
-                          <HeaderContainer />
+                          <HeaderContainer onMenuClick={() => setOpen(true)} />
                           <MainComponentWrapper>
                             <Component {...pageProps} />
                           </MainComponentWrapper>

@@ -152,7 +152,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currency0Amount, pool.reserve0, pool.reserve1, setCurrency1Amount],
+    [currency0Amount, setCurrency1Amount],
   )
 
   // when change currency1Amount
@@ -165,7 +165,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currency1Amount, pool.reserve0, pool.reserve1, setCurrency0Amount],
+    [currency1Amount, setCurrency0Amount],
   )
 
   const latestPriceIndex = useMemo(
@@ -455,7 +455,10 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
               ) : (
                 <RemoveLiquidityForm
                   pool={pool}
-                  prices={prices}
+                  prices={{
+                    ...prices,
+                    [pool.lpCurrency.address]: pool.lpUsdValue,
+                  }}
                   lpCurrencyAmount={lpCurrencyAmount}
                   setLpCurrencyAmount={setLpCurrencyAmount}
                   availableLpCurrencyBalance={lpBalances[pool.key] ?? 0n}
