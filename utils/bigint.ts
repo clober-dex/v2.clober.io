@@ -32,8 +32,8 @@ export const formatUnits = (
 ): string => {
   const formatted = _formatUnits(value, decimals)
   if (!price) {
-    const index = findFirstNonZeroIndex(formatted)
-    return Number(formatted).toFixed(index)
+    const index = findFirstNonZeroIndex(formatted) + 4
+    return new BigNumber(formatted).toFixed(index, BigNumber.ROUND_FLOOR)
   }
   const underHalfPennyDecimals =
     Math.floor(Math.max(-Math.log10(0.005 / price), 0) / 2) * 2

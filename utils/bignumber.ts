@@ -25,10 +25,8 @@ export const toPlacesString = (
 ): string => {
   const result = new BigNumber(number).toFixed(places, roundingMode)
   if (new BigNumber(result).isZero()) {
-    return new BigNumber(number).toFixed(
-      findFirstNonZeroIndex(number),
-      roundingMode,
-    )
+    const index = findFirstNonZeroIndex(number)
+    return new BigNumber(number).toFixed(index + 4, roundingMode)
   } else {
     return result
   }
@@ -40,7 +38,7 @@ export const toPlacesAmountString = (
 ): string => {
   if (price === undefined) {
     const index = findFirstNonZeroIndex(number)
-    return Number(number).toFixed(index)
+    return new BigNumber(number).toFixed(index + 4, BigNumber.ROUND_FLOOR)
   }
   const underHalfPennyDecimals =
     Math.floor(Math.max(-Math.log10(0.005 / price), 0) / 2) * 2
