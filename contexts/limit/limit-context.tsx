@@ -108,18 +108,16 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
     [selectedChain],
   )
 
-  const [inputCurrencyAddress, outputCurrencyAddress] = useMemo(() => {
-    return [
-      getQueryParams()?.inputCurrency ??
-        localStorage.getItem(
-          LOCAL_STORAGE_INPUT_CURRENCY_KEY('limit', selectedChain),
-        ),
-      getQueryParams()?.outputCurrency ??
-        localStorage.getItem(
-          LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('limit', selectedChain),
-        ),
-    ]
-  }, [selectedChain])
+  const [inputCurrencyAddress, outputCurrencyAddress] = [
+    getQueryParams()?.inputCurrency ??
+      localStorage.getItem(
+        LOCAL_STORAGE_INPUT_CURRENCY_KEY('limit', selectedChain),
+      ),
+    getQueryParams()?.outputCurrency ??
+      localStorage.getItem(
+        LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('limit', selectedChain),
+      ),
+  ]
 
   useEffect(
     () => {
@@ -166,6 +164,10 @@ export const LimitProvider = ({ children }: React.PropsWithChildren<{}>) => {
         setInputCurrency(_inputCurrency)
         setOutputCurrency(_outputCurrency)
 
+        console.log({
+          inputCurrency: _inputCurrency?.address,
+          outputCurrency: _outputCurrency?.address,
+        })
         if (_inputCurrency && _outputCurrency) {
           const quote = getQuoteToken({
             chainId: selectedChain.id,
