@@ -77,18 +77,16 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
     [selectedChain],
   )
 
-  const [inputCurrencyAddress, outputCurrencyAddress] = useMemo(() => {
-    return [
-      getQueryParams()?.inputCurrency ??
-        localStorage.getItem(
-          LOCAL_STORAGE_INPUT_CURRENCY_KEY('limit', selectedChain),
-        ),
-      getQueryParams()?.outputCurrency ??
-        localStorage.getItem(
-          LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('limit', selectedChain),
-        ),
-    ]
-  }, [selectedChain])
+  const [inputCurrencyAddress, outputCurrencyAddress] = [
+    getQueryParams()?.inputCurrency ??
+      localStorage.getItem(
+        LOCAL_STORAGE_INPUT_CURRENCY_KEY('limit', selectedChain),
+      ),
+    getQueryParams()?.outputCurrency ??
+      localStorage.getItem(
+        LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('limit', selectedChain),
+      ),
+  ]
 
   useEffect(
     () => {
