@@ -62,7 +62,7 @@ export const Default: Story = {
     availableCurrency1Balance: 1000999n,
     disableSwap: true,
     setDisableSwap: () => {},
-    disabledisableSwap: false,
+    disableDisableSwap: false,
     slippageInput: '0.5',
     setSlippageInput: () => {},
     receiveLpCurrencyAmount: 1000999999999999900n,

@@ -50,7 +50,7 @@ export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [lpCurrencyAmount, setLpCurrencyAmount] = React.useState('')
   const [currency0Amount, setCurrency0Amount] = React.useState('')
   const [currency1Amount, setCurrency1Amount] = React.useState('')
-  const [disableSwap, setDisableSwap] = React.useState(true)
+  const [disableSwap, setDisableSwap] = React.useState(false)
   const [slippageInput, setSlippageInput] = React.useState('1')
 
   const { data: pools } = useQuery(
