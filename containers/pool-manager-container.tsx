@@ -430,7 +430,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                         pool.currency1,
                         currency0Amount,
                         currency1Amount,
-                        disableSwap,
+                        pool.reserve0 + pool.reserve1 > 0 ? disableSwap : true,
                         Number(slippageInput),
                       )
                     },

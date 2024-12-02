@@ -79,7 +79,7 @@ export const AddLiquidityForm = ({
               type="checkbox"
               className="sr-only peer"
               disabled={disableDisableSwap}
-              defaultChecked={true}
+              defaultChecked={pool.reserve0 + pool.reserve1 > 0}
               onChange={() => {
                 setDisableSwap(!disableSwap)
               }}
