@@ -30,7 +30,14 @@ export const WHITELISTED_CURRENCIES: {
       decimals: 6,
     },
   ],
-  [CHAIN_IDS.BASE]: [],
+  [CHAIN_IDS.BASE]: [
+    {
+      address: '0x67f0870BB897F5E1c369976b4A2962d527B9562c',
+      name: 'Department Of Government Efficiency',
+      symbol: 'DOGE',
+      decimals: 18,
+    },
+  ],
   [CHAIN_IDS.ZKSYNC]: [],
   [CHAIN_IDS.MITOSIS_TESTNET]: MITOSIS_WHITELISTED_CURRENCIES,
 }
