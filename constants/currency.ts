@@ -15,6 +15,9 @@ export const ETH: Currency = {
 export const WHITELISTED_CURRENCIES: {
   [chain in CHAIN_IDS]: Currency[]
 } = {
+  [CHAIN_IDS.CLOBER_TESTNET]: [],
+  [CHAIN_IDS.CLOBER_TESTNET_2]: [],
+  [CHAIN_IDS.BERACHAIN_TESTNET]: [],
   [CHAIN_IDS.ARBITRUM_SEPOLIA]: [
     ETH,
     {
@@ -45,6 +48,9 @@ export const WHITELISTED_CURRENCIES: {
 export const DEFAULT_INPUT_CURRENCY: {
   [chain in CHAIN_IDS]: Currency
 } = {
+  [CHAIN_IDS.CLOBER_TESTNET]: ETH,
+  [CHAIN_IDS.CLOBER_TESTNET_2]: ETH,
+  [CHAIN_IDS.BERACHAIN_TESTNET]: ETH,
   [CHAIN_IDS.ARBITRUM_SEPOLIA]: {
     address: '0xF2e615A933825De4B39b497f6e6991418Fb31b78',
     name: 'Wrapped Ether',
@@ -70,6 +76,9 @@ export const DEFAULT_INPUT_CURRENCY: {
 export const DEFAULT_OUTPUT_CURRENCY: {
   [chain in CHAIN_IDS]: Currency
 } = {
+  [CHAIN_IDS.CLOBER_TESTNET]: ETH,
+  [CHAIN_IDS.CLOBER_TESTNET_2]: ETH,
+  [CHAIN_IDS.BERACHAIN_TESTNET]: ETH,
   [CHAIN_IDS.ARBITRUM_SEPOLIA]: {
     address: '0x00BFD44e79FB7f6dd5887A9426c8EF85A0CD23e0',
     name: 'USD Coin',
