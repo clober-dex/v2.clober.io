@@ -62,6 +62,14 @@ export const PoolContractProvider = ({
       if (!walletClient || !selectedChain) {
         return
       }
+      console.log('mint', {
+        currency0,
+        currency1,
+        amount0,
+        amount1,
+        disableSwap,
+        slippage,
+      })
 
       try {
         setConfirmation({
@@ -119,6 +127,7 @@ export const PoolContractProvider = ({
           amount0,
           amount1,
           options: {
+            gasLimit: 800_000n,
             useSubgraph: false,
             rpcUrl: RPC_URL[selectedChain.id],
             disableSwap,
@@ -201,6 +210,12 @@ export const PoolContractProvider = ({
       if (!walletClient || !selectedChain) {
         return
       }
+      console.log('burn', {
+        currency0,
+        currency1,
+        lpCurrencyAmount,
+        slippageInput,
+      })
 
       try {
         setConfirmation({
@@ -228,6 +243,7 @@ export const PoolContractProvider = ({
           salt: zeroHash,
           amount: lpCurrencyAmount,
           options: {
+            gasLimit: 800_000n,
             useSubgraph: false,
             rpcUrl: RPC_URL[selectedChain.id],
             slippage: Number(slippageInput),

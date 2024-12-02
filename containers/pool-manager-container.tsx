@@ -145,7 +145,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
   // when change currency0Amount
   useEffect(
     () => {
-      if (!disableSwap) {
+      if (disableSwap) {
         setCurrency1Amount(
           Number(currency0Amount) / (pool.reserve0 / pool.reserve1) + '',
         )
@@ -158,7 +158,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
   // when change currency1Amount
   useEffect(
     () => {
-      if (!disableSwap) {
+      if (disableSwap) {
         setCurrency0Amount(
           Number(currency1Amount) * (pool.reserve0 / pool.reserve1) + '',
         )
@@ -404,11 +404,11 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                   setSlippageInput={setSlippageInput}
                   receiveLpCurrencyAmount={receiveLpAmount}
                   isCalculatingReceiveLpAmount={
-                    (!disableSwap &&
+                    (disableSwap &&
                       Number(currency0Amount) > 0 &&
                       Number(currency1Amount) > 0 &&
                       receiveLpAmount === 0n) ||
-                    (disableSwap &&
+                    (!disableSwap &&
                       Number(currency0Amount) + Number(currency1Amount) > 0 &&
                       receiveLpAmount === 0n)
                   }
@@ -421,7 +421,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                         balances[pool.currency0.address] ||
                       parseUnits(currency1Amount, pool.currency1.decimals) >
                         balances[pool.currency1.address] ||
-                      (!disableSwap &&
+                      (disableSwap &&
                         (Number(currency0Amount) === 0 ||
                           Number(currency1Amount) === 0)),
                     onClick: async () => {
@@ -445,7 +445,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                       : parseUnits(currency1Amount, pool.currency1.decimals) >
                         balances[pool.currency1.address]
                       ? `Insufficient ${pool.currency1.symbol} balance`
-                      : !disableSwap &&
+                      : disableSwap &&
                         (Number(currency0Amount) === 0 ||
                           Number(currency1Amount) === 0)
                       ? `Enter amount`
