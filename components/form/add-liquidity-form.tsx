@@ -22,7 +22,7 @@ export const AddLiquidityForm = ({
   availableCurrency1Balance,
   disableSwap,
   setDisableSwap,
-  disabledisableSwap,
+  disableDisableSwap,
   slippageInput,
   setSlippageInput,
   receiveLpCurrencyAmount,
@@ -39,7 +39,7 @@ export const AddLiquidityForm = ({
   availableCurrency1Balance: bigint
   disableSwap: boolean
   setDisableSwap: (value: boolean) => void
-  disabledisableSwap: boolean
+  disableDisableSwap: boolean
   slippageInput: string
   setSlippageInput: (slippageInput: string) => void
   receiveLpCurrencyAmount: bigint
@@ -78,7 +78,7 @@ export const AddLiquidityForm = ({
             <input
               type="checkbox"
               className="sr-only peer"
-              disabled={disabledisableSwap}
+              disabled={disableDisableSwap}
               onChange={() => {
                 setDisableSwap(!disableSwap)
               }}

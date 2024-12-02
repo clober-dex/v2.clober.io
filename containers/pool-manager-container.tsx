@@ -399,7 +399,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                   }
                   disableSwap={disableSwap}
                   setDisableSwap={setDisableSwap}
-                  disabledisableSwap={pool.reserve0 + pool.reserve1 === 0}
+                  disableDisableSwap={pool.reserve0 + pool.reserve1 === 0}
                   slippageInput={slippageInput}
                   setSlippageInput={setSlippageInput}
                   receiveLpCurrencyAmount={receiveLpAmount}
