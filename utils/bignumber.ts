@@ -41,7 +41,7 @@ export const toPlacesAmountString = (
   number: BigNumber.Value,
   price?: number,
 ): string => {
-  if (price === undefined) {
+  if (!price) {
     const index = findFirstNonZeroIndex(number)
     return new BigNumber(number).toFixed(
       index + POLLY_FILL_DECIMALS,
