@@ -2,7 +2,9 @@ import { createPublicClient, Hash, http } from 'viem'
 import { GetWalletClientResult } from '@wagmi/core'
 import { CHAIN_IDS, Transaction } from '@clober/v2-sdk'
 
-import { supportChains } from '../constants/chain'
+import { supportChains, testnetChainIds } from '../constants/chain'
+
+const DEFAULT_GAS_LIMIT = 800_000n
 
 export async function sendTransaction(
   walletClient: GetWalletClientResult,
@@ -21,12 +23,17 @@ export async function sendTransaction(
           data: transaction.data,
           to: transaction.to,
           value: transaction.value,
-          gas: transaction.gas,
+          gas: testnetChainIds.includes(walletClient.chain.id)
+            ? DEFAULT_GAS_LIMIT
+            : transaction.gas,
         }
       : {
           data: transaction.data,
           to: transaction.to,
           value: transaction.value,
+          gas: testnetChainIds.includes(walletClient.chain.id)
+            ? DEFAULT_GAS_LIMIT
+            : transaction.gas,
         },
   )
   await publicClient.waitForTransactionReceipt({ hash })
