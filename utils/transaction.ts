@@ -1,6 +1,7 @@
 import { createPublicClient, Hash, http } from 'viem'
 import { GetWalletClientResult } from '@wagmi/core'
 import { CHAIN_IDS, Transaction } from '@clober/v2-sdk'
+import * as Sentry from '@sentry/nextjs'
 
 import { supportChains, testnetChainIds } from '../constants/chain'
 
@@ -17,27 +18,32 @@ export async function sendTransaction(
     chain: supportChains.find((chain) => chain.id === walletClient.chain.id),
     transport: http(),
   })
-  const hash = await walletClient.sendTransaction(
-    transaction.gas > 0n
-      ? {
-          data: transaction.data,
-          to: transaction.to,
-          value: transaction.value,
-          gas: testnetChainIds.includes(walletClient.chain.id)
-            ? DEFAULT_GAS_LIMIT
-            : transaction.gas,
-        }
-      : {
-          data: transaction.data,
-          to: transaction.to,
-          value: transaction.value,
-          gas: testnetChainIds.includes(walletClient.chain.id)
-            ? DEFAULT_GAS_LIMIT
-            : transaction.gas,
-        },
-  )
-  await publicClient.waitForTransactionReceipt({ hash })
-  return hash
+  try {
+    const hash = await walletClient.sendTransaction(
+      transaction.gas > 0n
+        ? {
+            data: transaction.data,
+            to: transaction.to,
+            value: transaction.value,
+            gas: testnetChainIds.includes(walletClient.chain.id)
+              ? DEFAULT_GAS_LIMIT
+              : transaction.gas,
+          }
+        : {
+            data: transaction.data,
+            to: transaction.to,
+            value: transaction.value,
+            gas: testnetChainIds.includes(walletClient.chain.id)
+              ? DEFAULT_GAS_LIMIT
+              : transaction.gas,
+          },
+    )
+    await publicClient.waitForTransactionReceipt({ hash })
+    return hash
+  } catch (error) {
+    Sentry.captureException(error)
+    throw error
+  }
 }
 
 export async function waitTransaction(
