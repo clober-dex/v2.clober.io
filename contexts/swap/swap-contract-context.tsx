@@ -71,7 +71,7 @@ export const SwapContractProvider = ({
         const spender = getAddress(swapData.transaction.to)
         if (
           !isAddressEqual(inputCurrency.address, zeroAddress) &&
-          allowances[spender][inputCurrency.address] === 0n
+          allowances[spender][inputCurrency.address] < amountIn
         ) {
           setConfirmation({
             title: 'Approve',

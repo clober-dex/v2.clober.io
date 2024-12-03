@@ -6,7 +6,7 @@ import {
   getQuoteToken,
   removeLiquidity,
 } from '@clober/v2-sdk'
-import { isAddressEqual, zeroAddress, zeroHash } from 'viem'
+import { isAddressEqual, parseUnits, zeroAddress, zeroHash } from 'viem'
 import BigNumber from 'bignumber.js'
 
 import { useChainContext } from '../chain-context'
@@ -84,7 +84,8 @@ export const PoolContractProvider = ({
         // Max approve for currency0
         if (
           !isAddressEqual(currency0.address, zeroAddress) &&
-          allowances[spender][currency0.address] === 0n
+          allowances[spender][currency0.address] <
+            parseUnits(amount0, currency0.decimals)
         ) {
           setConfirmation({
             title: 'Approve',
@@ -97,7 +98,8 @@ export const PoolContractProvider = ({
         // Max approve for currency1
         if (
           !isAddressEqual(currency1.address, zeroAddress) &&
-          allowances[spender][currency1.address] === 0n
+          allowances[spender][currency1.address] <
+            parseUnits(amount1, currency1.decimals)
         ) {
           setConfirmation({
             title: 'Approve',

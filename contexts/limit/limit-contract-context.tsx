@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { useQueryClient, useWalletClient } from 'wagmi'
-import { isAddressEqual, zeroAddress } from 'viem'
+import { isAddressEqual, parseUnits, zeroAddress } from 'viem'
 import {
   cancelOrders,
   claimOrders,
@@ -107,7 +107,8 @@ export const LimitContractProvider = ({
         }).Controller
         if (
           !isAddressEqual(inputCurrency.address, zeroAddress) &&
-          allowances[spender][inputCurrency.address] === 0n
+          allowances[spender][inputCurrency.address] <
+            parseUnits(amount, inputCurrency.decimals)
         ) {
           setConfirmation({
             title: 'Approve',
