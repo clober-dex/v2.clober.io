@@ -307,7 +307,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
                   <div className="flex text-gray-500 text-xs md:text-sm">
                     Performance Index (PI)
                   </div>
-                  <div className="flex mr-auto justify-center items-center">
+                  <div className="flex mr-auto justify-center items-center z-50">
                     <QuestionMarkSvg
                       data-tooltip-id="trading-view-info"
                       data-tooltip-place="bottom-end"
