@@ -3,9 +3,7 @@ import { GetWalletClientResult } from '@wagmi/core'
 import { CHAIN_IDS, Transaction } from '@clober/v2-sdk'
 import * as Sentry from '@sentry/nextjs'
 
-import { supportChains, testnetChainIds } from '../constants/chain'
-
-const DEFAULT_GAS_LIMIT = 800_000n
+import { supportChains } from '../constants/chain'
 
 export async function sendTransaction(
   walletClient: GetWalletClientResult,
@@ -25,17 +23,12 @@ export async function sendTransaction(
             data: transaction.data,
             to: transaction.to,
             value: transaction.value,
-            gas: testnetChainIds.includes(walletClient.chain.id)
-              ? DEFAULT_GAS_LIMIT
-              : transaction.gas,
+            gas: transaction.gas,
           }
         : {
             data: transaction.data,
             to: transaction.to,
             value: transaction.value,
-            gas: testnetChainIds.includes(walletClient.chain.id)
-              ? DEFAULT_GAS_LIMIT
-              : transaction.gas,
           },
     )
     await publicClient.waitForTransactionReceipt({ hash })
