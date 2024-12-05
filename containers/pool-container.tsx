@@ -1,6 +1,7 @@
 import React from 'react'
 import { useAccount } from 'wagmi'
 import { useRouter } from 'next/router'
+import { PlacesType, Tooltip } from 'react-tooltip'
 
 import { PoolCard } from '../components/card/pool-card'
 import { PoolPositionCard } from '../components/card/pool-position-card'
@@ -8,6 +9,7 @@ import { useChainContext } from '../contexts/chain-context'
 import { usePoolContext } from '../contexts/pool/pool-context'
 import { toCommaSeparated } from '../utils/number'
 import { formatUnits } from '../utils/bigint'
+import { QuestionMarkSvg } from '../components/svg/question-mark-svg'
 
 export const PoolContainer = () => {
   const router = useRouter()
@@ -119,8 +121,26 @@ export const PoolContainer = () => {
                 <div className="w-60 text-gray-400 text-sm font-semibold">
                   Liquidity Vault
                 </div>
-                <div className="w-[140px] text-gray-400 text-sm font-semibold">
+                <div className="flex flex-row gap-2 w-[140px] text-gray-400 text-sm font-semibold">
                   APY
+                  <div className="z-[100] flex justify-center items-center">
+                    <QuestionMarkSvg
+                      data-tooltip-id="apy-info"
+                      data-tooltip-place="top"
+                      data-tooltip-html={
+                        'Note that the APY displayed reflects only the spread profit generated through market-making activities. It does not account for the opportunity costs arising from changes in portfolio composition due to market price volatility during the market-making process.'
+                      }
+                      className="w-3 h-3"
+                    />
+                    <Tooltip
+                      id="apy-info"
+                      style={{
+                        width: '300px',
+                        opacity: 1,
+                      }}
+                      clickable
+                    />
+                  </div>
                 </div>
                 <div className="w-[140px] text-gray-400 text-sm font-semibold">
                   Total Liquidity
