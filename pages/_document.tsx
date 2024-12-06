@@ -24,7 +24,7 @@ export default function Document() {
           content="https://app.clober.io/twitter-card-v2.png"
         />
         {/* <!-- Twitter Meta Tags --> */}
-        <meta property="twitter:card" content="summary" />
+        <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:site" content="@CloberDEX" />
         <meta property="twitter:title" content="Trade | Clober DEX" />
         <meta
