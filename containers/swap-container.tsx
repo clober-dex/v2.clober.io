@@ -66,6 +66,10 @@ export const SwapContainer = () => {
       }
       return null
     },
+    {
+      refetchInterval: 5 * 1000,
+      refetchIntervalInBackground: true,
+    },
   )
 
   useEffect(() => {
@@ -146,9 +150,13 @@ export const SwapContainer = () => {
                       inputCurrency?.decimals ?? 18,
                     ),
                     outputCurrency,
+                    data.amountOut,
                     parseFloat(slippageInput),
                     feeData.gasPrice,
                     userAddress,
+                    AGGREGATORS[selectedChain.id].find(
+                      (aggregator) => aggregator.name === data.aggregator.name,
+                    )!,
                   )
                 },
                 text: 'Swap',

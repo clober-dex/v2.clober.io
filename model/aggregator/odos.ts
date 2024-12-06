@@ -9,9 +9,12 @@ import { PathViz } from '../pathviz'
 import { Aggregator } from './index'
 
 export class OdosAggregator implements Aggregator {
+  public readonly name = 'Odos'
   public readonly baseUrl = 'https://api.odos.xyz'
   public readonly contract: `0x${string}`
   public readonly chain: Chain
+
+  private latestPathId: string | undefined
 
   constructor(contract: `0x${string}`, chain: Chain) {
     this.contract = contract
@@ -92,6 +95,7 @@ export class OdosAggregator implements Aggregator {
         referralCode: '1939997089',
       }),
     })
+    this.latestPathId = result.pathId
     return {
       amountOut: BigInt(result.outAmounts[0]),
       gasLimit: BigInt(result.gasEstimate),
@@ -115,37 +119,40 @@ export class OdosAggregator implements Aggregator {
     nonce?: number
     gasPrice?: bigint
   }> {
-    const { pathId } = await fetchApi<{
-      pathId: string
-    }>(this.baseUrl, 'sor/quote/v2', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        accept: 'application/json',
-      },
-      body: JSON.stringify({
-        chainId: this.chain.id,
-        inputTokens: [
-          {
-            tokenAddress: getAddress(inputCurrency.address),
-            amount: amountIn.toString(),
-          },
-        ],
-        outputTokens: [
-          {
-            tokenAddress: getAddress(outputCurrency.address),
-            proportion: 1,
-          },
-        ],
-        gasPrice: Number(gasPrice) / 1000000000,
-        userAddr: userAddress,
-        slippageLimitPercent,
-        sourceBlacklist: [],
-        pathViz: true,
-        referralCode: '1939997089',
-      }),
-    })
-    if (!pathId) {
+    if (!this.latestPathId) {
+      const { pathId } = await fetchApi<{
+        pathId: string
+      }>(this.baseUrl, 'sor/quote/v2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify({
+          chainId: this.chain.id,
+          inputTokens: [
+            {
+              tokenAddress: getAddress(inputCurrency.address),
+              amount: amountIn.toString(),
+            },
+          ],
+          outputTokens: [
+            {
+              tokenAddress: getAddress(outputCurrency.address),
+              proportion: 1,
+            },
+          ],
+          gasPrice: Number(gasPrice) / 1000000000,
+          userAddr: userAddress,
+          slippageLimitPercent,
+          sourceBlacklist: [],
+          pathViz: true,
+          referralCode: '1939997089',
+        }),
+      })
+      this.latestPathId = pathId
+    }
+    if (!this.latestPathId) {
       throw new Error('Path ID is not defined')
     }
     const result = await fetchApi<{
@@ -164,7 +171,7 @@ export class OdosAggregator implements Aggregator {
         accept: 'application/json',
       },
       body: JSON.stringify({
-        pathId,
+        pathId: this.latestPathId,
         simulate: true,
         userAddr: userAddress,
       }),

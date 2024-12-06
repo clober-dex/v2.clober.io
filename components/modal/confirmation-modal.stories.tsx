@@ -66,7 +66,7 @@ export const DefaultWithDirection: Story = {
             decimals: 18,
           },
           label: 'ghffb47yii2rteeyy10op',
-          value: 'Value 1',
+          value: 'ghffb47yii2rteeyy10opghffb47yii2rteeyy10op',
         },
         {
           direction: 'out',
