@@ -104,7 +104,7 @@ export const LimitContainer = () => {
       ) : (
         <></>
       )}
-      <div className="flex flex-col w-full lg:flex-row gap-4">
+      <div className="flex flex-col w-full lg:flex-row gap-4 justify-center">
         {!showOrderBook && !selectedMarket ? (
           <div className="flex flex-col bg-gray-900 overflow-hidden rounded-2xl min-h-[280px] w-full md:w-[480px] lg:w-[704px]" />
         ) : (
