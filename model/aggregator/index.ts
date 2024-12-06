@@ -5,6 +5,7 @@ import { Prices } from '../prices'
 import { PathViz } from '../pathviz'
 
 export interface Aggregator {
+  name: string
   baseUrl: string
   contract: `0x${string}`
   chain: Chain

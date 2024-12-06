@@ -1,10 +1,8 @@
 import { Aggregator } from '../../model/aggregator'
 import { Currency } from '../../model/currency'
 
-import { fetchQuotes } from './quotes'
-
 export async function fetchSwapData(
-  aggregators: Aggregator[],
+  aggregator: Aggregator,
   inputCurrency: Currency,
   amountIn: bigint,
   outputCurrency: Currency,
@@ -20,17 +18,7 @@ export async function fetchSwapData(
     nonce?: number
     gasPrice?: bigint
   }
-  amountOut: bigint
 }> {
-  const { aggregator, amountOut } = await fetchQuotes(
-    aggregators,
-    inputCurrency,
-    amountIn,
-    outputCurrency,
-    slippageLimitPercent,
-    gasPrice,
-    userAddress,
-  )
   const transaction = await aggregator.buildCallData(
     inputCurrency,
     amountIn,
@@ -41,6 +29,5 @@ export async function fetchSwapData(
   )
   return {
     transaction,
-    amountOut,
   }
 }

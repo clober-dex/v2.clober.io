@@ -6,21 +6,23 @@ import { Transaction } from '@clober/v2-sdk'
 import { Currency } from '../../model/currency'
 import { formatUnits } from '../../utils/bigint'
 import { fetchSwapData } from '../../apis/swap/data'
-import { AGGREGATORS } from '../../constants/aggregators'
 import { useChainContext } from '../chain-context'
 import { useTransactionContext } from '../transaction-context'
 import { sendTransaction } from '../../utils/transaction'
 import { useCurrencyContext } from '../currency-context'
 import { maxApprove } from '../../utils/approve20'
+import { Aggregator } from '../../model/aggregator'
 
 type SwapContractContext = {
   swap: (
     inputCurrency: Currency,
     amountIn: bigint,
     outputCurrency: Currency,
+    expectedAmountOut: bigint,
     slippageLimitPercent: number,
     gasPrice: bigint,
     userAddress: `0x${string}`,
+    aggregator: Aggregator,
   ) => Promise<void>
 }
 
@@ -43,9 +45,11 @@ export const SwapContractProvider = ({
       inputCurrency: Currency,
       amountIn: bigint,
       outputCurrency: Currency,
+      expectedAmountOut: bigint,
       slippageLimitPercent: number,
       gasPrice: bigint,
       userAddress: `0x${string}`,
+      aggregator: Aggregator,
     ) => {
       if (!walletClient) {
         return
@@ -58,8 +62,8 @@ export const SwapContractProvider = ({
           fields: [],
         })
 
-        let swapData = await fetchSwapData(
-          AGGREGATORS[selectedChain.id],
+        const swapData = await fetchSwapData(
+          aggregator,
           inputCurrency,
           amountIn,
           outputCurrency,
@@ -79,16 +83,6 @@ export const SwapContractProvider = ({
             fields: [],
           })
           await maxApprove(walletClient, inputCurrency, spender)
-
-          swapData = await fetchSwapData(
-            AGGREGATORS[selectedChain.id],
-            inputCurrency,
-            amountIn,
-            outputCurrency,
-            slippageLimitPercent,
-            gasPrice,
-            userAddress,
-          )
         }
 
         setConfirmation({
@@ -110,7 +104,7 @@ export const SwapContractProvider = ({
               label: outputCurrency.symbol,
               direction: 'out',
               value: formatUnits(
-                swapData.amountOut,
+                expectedAmountOut,
                 outputCurrency.decimals,
                 prices[outputCurrency.address] ?? 0,
               ),
@@ -128,7 +122,7 @@ export const SwapContractProvider = ({
         setConfirmation(undefined)
       }
     },
-    [walletClient, setConfirmation, selectedChain.id, allowances, queryClient],
+    [walletClient, setConfirmation, allowances, prices, queryClient],
   )
 
   return (
