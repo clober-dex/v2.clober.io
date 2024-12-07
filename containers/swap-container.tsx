@@ -86,7 +86,7 @@ export const SwapContainer = () => {
     <div className="flex flex-col w-fit mb-4 sm:mb-6">
       <div className="flex flex-col gap-3">
         <div className="flex flex-col w-full lg:flex-row gap-4">
-          <div className="flex flex-col rounded-2xl bg-gray-900 p-6 w-[340px] sm:w-[528px] lg:w-[480px] h-full sm:h-[392px]">
+          <div className="flex flex-col rounded-2xl bg-gray-900 p-6 w-[340px] sm:w-[528px] lg:w-[480px] sm:h-[392px]">
             <SwapForm
               chainId={selectedChain.id}
               currencies={currencies}
@@ -169,7 +169,7 @@ export const SwapContainer = () => {
               <PathVizViewer pathVizData={data.pathViz} />
             </div>
           ) : (
-            <div className="w-[528px] h-[392px] flex flex-col rounded-2xl bg-gray-900 p-6" />
+            <div className="hidden sm:w-[528px] sm:h-[392px] sm:flex flex-col rounded-2xl bg-gray-900 p-6" />
           )}
         </div>
         {!testnetChainIds.includes(selectedChain.id) ? (
