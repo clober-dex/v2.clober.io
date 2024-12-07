@@ -13,7 +13,7 @@ export const PageButton = ({
     <button
       disabled={disabled}
       onClick={onClick}
-      className="group flex flex-row gap-2 items-center text-gray-500 font-semibold disabled:text-white stroke-gray-500 fill-gray-500 disabled:stroke-blue-500 disabled:fill-blue-500"
+      className="group flex flex-row gap-2 items-center text-gray-300 font-semibold disabled:text-white stroke-gray-500 fill-gray-500 disabled:stroke-blue-500 disabled:fill-blue-500"
     >
       {children}
     </button>
