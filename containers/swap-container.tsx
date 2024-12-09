@@ -69,7 +69,7 @@ export const SwapContainer = () => {
     {
       refetchInterval: 5 * 1000,
       refetchIntervalInBackground: true,
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
     },
   )
 
