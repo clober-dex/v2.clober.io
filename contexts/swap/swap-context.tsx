@@ -80,11 +80,11 @@ export const SwapProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [inputCurrencyAddress, outputCurrencyAddress] = [
     getQueryParams()?.inputCurrency ??
       localStorage.getItem(
-        LOCAL_STORAGE_INPUT_CURRENCY_KEY('limit', selectedChain),
+        LOCAL_STORAGE_INPUT_CURRENCY_KEY('swap', selectedChain),
       ),
     getQueryParams()?.outputCurrency ??
       localStorage.getItem(
-        LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('limit', selectedChain),
+        LOCAL_STORAGE_OUTPUT_CURRENCY_KEY('swap', selectedChain),
       ),
   ]
 
