@@ -36,6 +36,11 @@ export const SwapContainer = () => {
   const [showOutputCurrencySelect, setShowOutputCurrencySelect] =
     useState(false)
 
+  const amountIn = parseUnits(
+    inputCurrencyAmount,
+    inputCurrency?.decimals ?? 18,
+  )
+
   const { data } = useQuery(
     [
       'quotes',
@@ -52,12 +57,12 @@ export const SwapContainer = () => {
         feeData.gasPrice &&
         inputCurrency &&
         outputCurrency &&
-        parseUnits(inputCurrencyAmount, inputCurrency?.decimals ?? 18) > 0n
+        amountIn > 0n
       ) {
         return fetchQuotes(
           AGGREGATORS[selectedChain.id],
           inputCurrency,
-          parseUnits(inputCurrencyAmount, inputCurrency?.decimals ?? 18),
+          amountIn,
           outputCurrency,
           parseFloat(slippageInput),
           feeData.gasPrice,
@@ -71,11 +76,6 @@ export const SwapContainer = () => {
       refetchIntervalInBackground: true,
       refetchOnWindowFocus: false,
     },
-  )
-
-  const amountIn = parseUnits(
-    inputCurrencyAmount,
-    inputCurrency?.decimals ?? 18,
   )
 
   useEffect(() => {
