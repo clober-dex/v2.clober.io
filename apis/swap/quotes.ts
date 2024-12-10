@@ -11,6 +11,7 @@ export async function fetchQuotes(
   gasPrice: bigint,
   userAddress?: `0x${string}`,
 ): Promise<{
+  amountIn: bigint
   amountOut: bigint
   gasLimit: bigint
   pathViz: PathViz | undefined
@@ -28,10 +29,13 @@ export async function fetchQuotes(
       ),
     ),
   )
-  return quotes.reduce((best, quote) => {
-    if (quote.amountOut > best.amountOut) {
-      return quote
-    }
-    return best
-  })
+  return {
+    ...quotes.reduce((best, quote) => {
+      if (quote.amountOut > best.amountOut) {
+        return quote
+      }
+      return best
+    }),
+    amountIn,
+  }
 }
