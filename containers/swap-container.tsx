@@ -41,7 +41,7 @@ export const SwapContainer = () => {
       'quotes',
       inputCurrency,
       outputCurrency,
-      inputCurrencyAmount,
+      Number(inputCurrencyAmount),
       slippageInput,
       userAddress,
       selectedChain,

@@ -62,6 +62,7 @@ export class OdosAggregator implements Aggregator {
     pathViz: PathViz | undefined
     aggregator: Aggregator
   }> {
+    console.log('Fetching quote...')
     const result: {
       outAmounts: string[]
       pathViz: PathViz
@@ -120,6 +121,7 @@ export class OdosAggregator implements Aggregator {
     gasPrice?: bigint
   }> {
     if (!this.latestPathId) {
+      console.log('Path ID is not defined, fetching...')
       const { pathId } = await fetchApi<{
         pathId: string
       }>(this.baseUrl, 'sor/quote/v2', {
