@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { useQuery, useWalletClient } from 'wagmi'
 import { addLiquidity, getQuoteToken, removeLiquidity } from '@clober/v2-sdk'
 import { isAddressEqual, parseUnits, zeroAddress, zeroHash } from 'viem'
 import { Tooltip } from 'react-tooltip'
+import BigNumber from 'bignumber.js'
 
 import { Pool } from '../model/pool'
 import { useChainContext } from '../contexts/chain-context'
@@ -41,6 +42,10 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
     lpBalances,
   } = usePoolContext()
   const { mint, burn } = usePoolContractContext()
+  const previousValues = useRef({
+    currency0Amount,
+    currency1Amount,
+  })
 
   const { data: receiveLpAmount } = useQuery(
     [
@@ -142,30 +147,45 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
     setCurrency1Amount('')
   }, [setCurrency0Amount, setCurrency1Amount, disableSwap])
 
-  // when change currency0Amount
   useEffect(
     () => {
       if (disableSwap) {
-        setCurrency1Amount(
-          Number(currency0Amount) / (pool.reserve0 / pool.reserve1) + '',
-        )
+        // when change currency0Amount
+        if (previousValues.current.currency0Amount !== currency0Amount) {
+          const _currency1Amount = new BigNumber(currency0Amount)
+            .div(pool.reserve0)
+            .times(pool.reserve1)
+            .toFixed()
+          setCurrency1Amount(
+            new BigNumber(_currency1Amount).isNaN() ? '0' : _currency1Amount,
+          )
+          previousValues.current = {
+            currency0Amount,
+            currency1Amount: new BigNumber(_currency1Amount).isNaN()
+              ? '0'
+              : _currency1Amount,
+          }
+        }
+        // when change currency1Amount
+        else if (previousValues.current.currency1Amount !== currency1Amount) {
+          const _currency0Amount = new BigNumber(currency1Amount)
+            .div(pool.reserve1)
+            .times(pool.reserve0)
+            .toFixed()
+          setCurrency0Amount(
+            new BigNumber(_currency0Amount).isNaN() ? '0' : _currency0Amount,
+          )
+          previousValues.current = {
+            currency0Amount: new BigNumber(_currency0Amount).isNaN()
+              ? '0'
+              : _currency0Amount,
+            currency1Amount,
+          }
+        }
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currency0Amount, setCurrency1Amount],
-  )
-
-  // when change currency1Amount
-  useEffect(
-    () => {
-      if (disableSwap) {
-        setCurrency0Amount(
-          Number(currency1Amount) * (pool.reserve0 / pool.reserve1) + '',
-        )
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currency1Amount, setCurrency0Amount],
+    [currency0Amount, currency1Amount],
   )
 
   const latestPriceIndex = useMemo(
