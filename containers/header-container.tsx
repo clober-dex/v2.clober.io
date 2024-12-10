@@ -47,7 +47,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
           </PageButton>
 
           <PageButton
-            disabled={router.pathname === '/earn'}
+            disabled={true /* TODO: router.pathname === '/earn' */}
             onClick={() => {
               router.push(`/earn?chain=${selectedChain.id}`)
             }}
