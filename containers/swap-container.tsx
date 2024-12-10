@@ -73,6 +73,11 @@ export const SwapContainer = () => {
     },
   )
 
+  const amountIn = parseUnits(
+    inputCurrencyAmount,
+    inputCurrency?.decimals ?? 18,
+  )
+
   useEffect(() => {
     setShowInputCurrencySelect(false)
   }, [selectedChain])
@@ -131,7 +136,8 @@ export const SwapContainer = () => {
                   !inputCurrencyAmount ||
                   !feeData ||
                   !feeData.gasPrice ||
-                  !data,
+                  !data ||
+                  amountIn !== data.amountIn,
                 onClick: async () => {
                   if (
                     !userAddress ||
@@ -140,16 +146,14 @@ export const SwapContainer = () => {
                     !inputCurrencyAmount ||
                     !feeData ||
                     !feeData.gasPrice ||
-                    !data
+                    !data ||
+                    amountIn !== data.amountIn
                   ) {
                     return
                   }
                   await swap(
                     inputCurrency,
-                    parseUnits(
-                      inputCurrencyAmount,
-                      inputCurrency?.decimals ?? 18,
-                    ),
+                    amountIn,
                     outputCurrency,
                     data.amountOut,
                     parseFloat(slippageInput),
