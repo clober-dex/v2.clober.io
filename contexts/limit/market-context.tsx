@@ -197,16 +197,6 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     selectedMarket?.base.address,
   ])
 
-  // When selectedMarket is changed
-  useEffect(() => {
-    setDepthClickedIndex(undefined)
-    setPriceInput('')
-  }, [
-    setPriceInput,
-    selectedMarket?.quote.address,
-    selectedMarket?.base.address,
-  ])
-
   // When depthClickedIndex is changed, reset the priceInput
   useEffect(() => {
     if (

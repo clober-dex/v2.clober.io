@@ -44,6 +44,7 @@ export const LimitForm = ({
   availableOutputCurrencyBalance,
   swapInputCurrencyAndOutputCurrency,
   minimumDecimalPlaces,
+  marketPrice,
   marketRateDiff,
   setMarketRateAction,
   actionButtonProps,
@@ -75,6 +76,7 @@ export const LimitForm = ({
   availableOutputCurrencyBalance: bigint
   swapInputCurrencyAndOutputCurrency: () => void
   minimumDecimalPlaces: number | undefined
+  marketPrice: number
   marketRateDiff: number
   setMarketRateAction: {
     isLoading: boolean
@@ -154,11 +156,11 @@ export const LimitForm = ({
               {isBid ? 'Buy' : 'Sell'}{' '}
               {isBid ? outputCurrency?.symbol : inputCurrency?.symbol} at rate
             </div>
-            {marketRateDiff >= 10000 ? (
+            {marketPrice > 0 && marketRateDiff >= 10000 ? (
               <div className="text-xs sm:text-sm font-semibold text-green-400">
                 (&gt;10000%)
               </div>
-            ) : !isNaN(marketRateDiff) ? (
+            ) : !isNaN(marketRateDiff) && isFinite(marketRateDiff) ? (
               <div
                 className={`text-gray-200 ${
                   marketRateDiff >= 0 ? 'text-green-400' : 'text-red-400'

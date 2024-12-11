@@ -13,6 +13,7 @@ export class OdosAggregator implements Aggregator {
   public readonly baseUrl = 'https://api.odos.xyz'
   public readonly contract: `0x${string}`
   public readonly chain: Chain
+  private readonly TIMEOUT = 5000
 
   private latestPathId: string | undefined
 
@@ -74,7 +75,8 @@ export class OdosAggregator implements Aggregator {
         'Content-Type': 'application/json',
         accept: 'application/json',
       },
-      body: JSON.stringify({
+      timeout: this.TIMEOUT,
+      data: {
         chainId: this.chain.id,
         inputTokens: [
           {
@@ -94,7 +96,7 @@ export class OdosAggregator implements Aggregator {
         sourceBlacklist: [],
         pathViz: true,
         referralCode: '1939997089',
-      }),
+      },
     })
     this.latestPathId = result.pathId
     return {
@@ -130,7 +132,8 @@ export class OdosAggregator implements Aggregator {
           'Content-Type': 'application/json',
           accept: 'application/json',
         },
-        body: JSON.stringify({
+        timeout: this.TIMEOUT,
+        data: {
           chainId: this.chain.id,
           inputTokens: [
             {
@@ -150,7 +153,7 @@ export class OdosAggregator implements Aggregator {
           sourceBlacklist: [],
           pathViz: true,
           referralCode: '1939997089',
-        }),
+        },
       })
       this.latestPathId = pathId
     }
@@ -172,11 +175,11 @@ export class OdosAggregator implements Aggregator {
         'Content-Type': 'application/json',
         accept: 'application/json',
       },
-      body: JSON.stringify({
+      body: {
         pathId: this.latestPathId,
         simulate: true,
         userAddr: userAddress,
-      }),
+      },
     })
     return {
       data: result.transaction.data,
