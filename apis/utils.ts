@@ -1,15 +1,15 @@
+import axios from 'axios'
+
 export async function fetchApi<T>(
   apiBaseUrl: string,
   path: string,
-  options?: RequestInit,
+  options?: any,
 ): Promise<T> {
-  const response = await fetch(`${apiBaseUrl}/${path}`, options)
+  const response = await axios(`${apiBaseUrl}/${path}`, options)
 
-  if (response.ok) {
-    return response.json()
+  if (response.status === 200) {
+    return response.data
   } else {
-    const errorResponse = await response.json()
-
-    throw new Error(errorResponse.message || 'Unknown Error')
+    throw new Error(response.data)
   }
 }

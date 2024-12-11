@@ -121,29 +121,20 @@ export const LimitContainer = () => {
             const value = new BigNumber(prices[baseCurrency.address]).div(
               prices[quoteCurrency.address],
             )
+            console.log({ price: value.toNumber() })
             setMarketPrice(value.toNumber())
-          } else if (feeData && feeData.gasPrice) {
-            const { amountOut } = await fetchQuotes(
-              AGGREGATORS[selectedChain.id],
-              baseCurrency,
-              parseUnits('1', baseCurrency.decimals),
-              quoteCurrency,
-              20,
-              feeData.gasPrice,
-            )
-
-            setMarketPrice(
-              new BigNumber(
-                formatUnits(amountOut, quoteCurrency.decimals),
-              ).toNumber(),
-            )
+            setPriceInput(value.toNumber().toString())
           }
         }
       }
+
+      setDepthClickedIndex(undefined)
+      setPriceInput('')
+      setMarketPrice(0)
+
       action()
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [inputCurrency?.address, outputCurrency?.address, selectedChain.id],
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [inputCurrency, outputCurrency, selectedChain.id],
   )
 
   const marketRateDiff = (
@@ -151,12 +142,6 @@ export const LimitContainer = () => {
       ? new BigNumber(marketPrice).dividedBy(priceInput).minus(1).times(100)
       : new BigNumber(priceInput).dividedBy(marketPrice).minus(1).times(100)
   ).toNumber()
-
-  console.log({
-    marketPrice,
-    priceInput,
-    marketRateDiff,
-  })
 
   return (
     <div className="flex flex-col w-fit mb-4 sm:mb-6">
@@ -276,6 +261,7 @@ export const LimitContainer = () => {
               setOutputCurrency(_inputCurrency)
             }}
             minimumDecimalPlaces={availableDecimalPlacesGroups?.[0]?.value}
+            marketPrice={marketPrice}
             marketRateDiff={marketRateDiff}
             setMarketRateAction={{
               isLoading: isFetchingQuotes,
@@ -298,25 +284,31 @@ export const LimitContainer = () => {
                   )
                     ? [inputCurrency, outputCurrency]
                     : [outputCurrency, inputCurrency]
-                  const { amountOut } = await fetchQuotes(
-                    AGGREGATORS[selectedChain.id],
-                    baseCurrency,
-                    parseUnits('1', baseCurrency.decimals),
-                    quoteCurrency,
-                    20,
-                    feeData.gasPrice,
-                  )
-                  const price = new BigNumber(
-                    formatUnits(amountOut, quoteCurrency.decimals),
-                  )
-                  const minimumDecimalPlaces =
-                    availableDecimalPlacesGroups?.[0]?.value
-                  setPriceInput(
-                    minimumDecimalPlaces
-                      ? toPlacesString(price, minimumDecimalPlaces)
-                      : price.toFixed(),
-                  )
-                  setIsFetchingQuotes(false)
+                  try {
+                    const { amountOut } = await fetchQuotes(
+                      AGGREGATORS[selectedChain.id],
+                      baseCurrency,
+                      parseUnits('1', baseCurrency.decimals),
+                      quoteCurrency,
+                      20,
+                      feeData.gasPrice,
+                    )
+                    const price = new BigNumber(
+                      formatUnits(amountOut, quoteCurrency.decimals),
+                    )
+                    const minimumDecimalPlaces =
+                      availableDecimalPlacesGroups?.[0]?.value
+                    setPriceInput(
+                      minimumDecimalPlaces
+                        ? toPlacesString(price, minimumDecimalPlaces)
+                        : price.toFixed(),
+                    )
+                    setIsFetchingQuotes(false)
+                  } catch (e) {
+                    console.error(e)
+                    setPriceInput('')
+                    setIsFetchingQuotes(false)
+                  }
                 }
               },
             }}
