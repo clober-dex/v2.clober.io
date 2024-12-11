@@ -101,8 +101,6 @@ export const LimitContainer = () => {
     () => {
       const action = async () => {
         if (
-          feeData &&
-          feeData.gasPrice &&
           inputCurrency &&
           outputCurrency &&
           !testnetChainIds.includes(selectedChain.id)
@@ -118,26 +116,31 @@ export const LimitContainer = () => {
           )
             ? [inputCurrency, outputCurrency]
             : [outputCurrency, inputCurrency]
-          const { amountOut } = await fetchQuotes(
-            AGGREGATORS[selectedChain.id],
-            baseCurrency,
-            parseUnits('1', baseCurrency.decimals),
-            quoteCurrency,
-            20,
-            feeData.gasPrice,
-          )
 
-          setMarketPrice(
-            new BigNumber(
-              formatUnits(amountOut, quoteCurrency.decimals),
-            ).toNumber(),
-          )
+          if (prices[baseCurrency.address]) {
+            setMarketPrice(prices[baseCurrency.address])
+          } else if (feeData && feeData.gasPrice) {
+            const { amountOut } = await fetchQuotes(
+              AGGREGATORS[selectedChain.id],
+              baseCurrency,
+              parseUnits('1', baseCurrency.decimals),
+              quoteCurrency,
+              20,
+              feeData.gasPrice,
+            )
+
+            setMarketPrice(
+              new BigNumber(
+                formatUnits(amountOut, quoteCurrency.decimals),
+              ).toNumber(),
+            )
+          }
         }
       }
       action()
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [inputCurrency?.address, outputCurrency?.address],
+    [inputCurrency?.address, outputCurrency?.address, selectedChain.id],
   )
 
   const marketRateDiff = (
