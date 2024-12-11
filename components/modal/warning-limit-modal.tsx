@@ -17,9 +17,7 @@ const WarningLimitModal = ({
   return createPortal(
     <div
       className="flex items-center justify-center fixed inset-0 bg-black bg-opacity-50 z-[1000] backdrop-blur-sm px-4 sm:px-0"
-      onClick={(e) => {
-        e.stopPropagation()
-      }}
+      onClick={() => closeModal()}
     >
       <div
         className="flex flex-col w-80 sm:w-[480px] h-auto bg-gray-900 text-white rounded-xl sm:rounded-2xl p-4 sm:p-6 gap-6"
@@ -98,14 +96,8 @@ const WarningLimitModal = ({
 
         <div className="flex items-start gap-4 self-stretch">
           <button
-            onClick={closeModal}
-            className="flex-1 h-11 px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-xl justify-center items-center flex opacity-90 text-center text-white text-sm font-semibold"
-          >
-            Cancel
-          </button>
-          <button
             onClick={limit}
-            className="flex-1 h-11 px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-xl justify-center items-center flex opacity-90 text-center text-white text-sm font-semibold"
+            className="w-full h-11 px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-xl justify-center items-center flex opacity-90 text-center text-white text-sm font-semibold"
           >
             Proceed
           </button>
