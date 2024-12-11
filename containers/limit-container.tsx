@@ -117,8 +117,11 @@ export const LimitContainer = () => {
             ? [inputCurrency, outputCurrency]
             : [outputCurrency, inputCurrency]
 
-          if (prices[baseCurrency.address]) {
-            setMarketPrice(prices[baseCurrency.address])
+          if (prices[baseCurrency.address] && prices[quoteCurrency.address]) {
+            const value = new BigNumber(prices[baseCurrency.address]).div(
+              prices[quoteCurrency.address],
+            )
+            setMarketPrice(value.toNumber())
           } else if (feeData && feeData.gasPrice) {
             const { amountOut } = await fetchQuotes(
               AGGREGATORS[selectedChain.id],
@@ -148,6 +151,12 @@ export const LimitContainer = () => {
       ? new BigNumber(marketPrice).dividedBy(priceInput).minus(1).times(100)
       : new BigNumber(priceInput).dividedBy(marketPrice).minus(1).times(100)
   ).toNumber()
+
+  console.log({
+    marketPrice,
+    priceInput,
+    marketRateDiff,
+  })
 
   return (
     <div className="flex flex-col w-fit mb-4 sm:mb-6">
