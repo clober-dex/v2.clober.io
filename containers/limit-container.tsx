@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { getAddress, isAddressEqual, parseUnits } from 'viem'
 import { useAccount, useFeeData, useWalletClient } from 'wagmi'
 import { getQuoteToken } from '@clober/v2-sdk'
@@ -20,6 +20,8 @@ import { fetchQuotes } from '../apis/swap/quotes'
 import { AGGREGATORS } from '../constants/aggregators'
 import { formatUnits } from '../utils/bigint'
 import { toPlacesString } from '../utils/bignumber'
+import { testnetChainIds } from '../constants/chain'
+import WarningLimitModal from '../components/modal/warning-limit-modal'
 
 import { ChartContainer } from './chart-container'
 
@@ -62,6 +64,8 @@ export const LimitContainer = () => {
   const [showOrderBook, setShowOrderBook] = useState(true)
   const { data: feeData } = useFeeData()
   const [isFetchingQuotes, setIsFetchingQuotes] = useState(false)
+  const [marketPrice, setMarketPrice] = useState(0)
+  const [showWarningModal, setShowWarningModal] = useState(false)
 
   const [quoteCurrency, baseCurrency] = useMemo(() => {
     if (inputCurrency && outputCurrency) {
@@ -92,8 +96,82 @@ export const LimitContainer = () => {
       parseUnits(cancelable.value, cancelable.currency.decimals) > 0n,
   )
 
+  // once
+  useEffect(
+    () => {
+      const action = async () => {
+        if (
+          feeData &&
+          feeData.gasPrice &&
+          inputCurrency &&
+          outputCurrency &&
+          !testnetChainIds.includes(selectedChain.id)
+        ) {
+          const quoteToken = getQuoteToken({
+            chainId: selectedChain.id,
+            token0: inputCurrency.address,
+            token1: outputCurrency.address,
+          })
+          const [quoteCurrency, baseCurrency] = isAddressEqual(
+            quoteToken,
+            inputCurrency.address,
+          )
+            ? [inputCurrency, outputCurrency]
+            : [outputCurrency, inputCurrency]
+          const { amountOut } = await fetchQuotes(
+            AGGREGATORS[selectedChain.id],
+            baseCurrency,
+            parseUnits('1', baseCurrency.decimals),
+            quoteCurrency,
+            20,
+            feeData.gasPrice,
+          )
+
+          setMarketPrice(
+            new BigNumber(
+              formatUnits(amountOut, quoteCurrency.decimals),
+            ).toNumber(),
+          )
+        }
+      }
+      action()
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [inputCurrency?.address, outputCurrency?.address],
+  )
+
+  const marketRateDiff = (
+    isBid
+      ? new BigNumber(marketPrice).dividedBy(priceInput).minus(1).times(100)
+      : new BigNumber(priceInput).dividedBy(marketPrice).minus(1).times(100)
+  ).toNumber()
+
   return (
     <div className="flex flex-col w-fit mb-4 sm:mb-6">
+      {showWarningModal ? (
+        <WarningLimitModal
+          marketPrice={marketPrice}
+          priceInput={Number(priceInput)}
+          marketRateDiff={marketRateDiff}
+          closeModal={() => setShowWarningModal(false)}
+          limit={async () => {
+            if (!inputCurrency || !outputCurrency || !selectedMarket) {
+              return
+            }
+            await limit(
+              inputCurrency,
+              outputCurrency,
+              inputCurrencyAmount,
+              priceInput,
+              isPostOnly,
+              selectedMarket,
+            )
+          }}
+        />
+      ) : (
+        <></>
+      )}
+
       {selectedDecimalPlaces ? (
         <button
           className="rounded bg-blue-500 bg-opacity-20 text-blue-500 px-2 py-1 w-fit mb-3 text-xs sm:text-sm"
@@ -186,6 +264,7 @@ export const LimitContainer = () => {
               setOutputCurrency(_inputCurrency)
             }}
             minimumDecimalPlaces={availableDecimalPlacesGroups?.[0]?.value}
+            marketRateDiff={marketRateDiff}
             setMarketRateAction={{
               isLoading: isFetchingQuotes,
               action: async () => {
@@ -244,6 +323,10 @@ export const LimitContainer = () => {
                 amount > (balances[getAddress(inputCurrency.address)] ?? 0n),
               onClick: async () => {
                 if (!inputCurrency || !outputCurrency || !selectedMarket) {
+                  return
+                }
+                if (marketRateDiff < -10) {
+                  setShowWarningModal(true)
                   return
                 }
                 await limit(
