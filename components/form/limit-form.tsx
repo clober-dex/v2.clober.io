@@ -44,6 +44,7 @@ export const LimitForm = ({
   availableOutputCurrencyBalance,
   swapInputCurrencyAndOutputCurrency,
   minimumDecimalPlaces,
+  marketRateDiff,
   setMarketRateAction,
   actionButtonProps,
 }: {
@@ -74,6 +75,7 @@ export const LimitForm = ({
   availableOutputCurrencyBalance: bigint
   swapInputCurrencyAndOutputCurrency: () => void
   minimumDecimalPlaces: number | undefined
+  marketRateDiff: number
   setMarketRateAction: {
     isLoading: boolean
     action: () => Promise<void>
@@ -147,11 +149,26 @@ export const LimitForm = ({
     <>
       <div className="hover:ring-1 hover:ring-gray-700 flex rounded-lg border-solid border-[1.5px] border-gray-700 p-4 mb-3 sm:mb-4">
         <div className="flex flex-col flex-1 gap-2">
-          <div className="flex flex-row">
+          <div className="flex flex-row gap-1">
             <div className="text-gray-500 text-xs sm:text-sm">
               {isBid ? 'Buy' : 'Sell'}{' '}
               {isBid ? outputCurrency?.symbol : inputCurrency?.symbol} at rate
             </div>
+            {marketRateDiff >= 10000 ? (
+              <div className="text-xs sm:text-sm font-semibold text-green-400">
+                (&gt;10000%)
+              </div>
+            ) : !isNaN(marketRateDiff) ? (
+              <div
+                className={`text-gray-200 ${
+                  marketRateDiff >= 0 ? 'text-green-400' : 'text-red-400'
+                } sm:text-sm font-semibold`}
+              >
+                ({marketRateDiff.toFixed(2)}%)
+              </div>
+            ) : (
+              <></>
+            )}
             {!testnetChainIds.includes(chainId) ? (
               <button
                 disabled={setMarketRateAction.isLoading}
@@ -160,7 +177,7 @@ export const LimitForm = ({
                 }}
                 className="flex ml-auto mr-[10px] sm:mr-[16px] text-center text-blue-500 text-xs sm:text-sm font-semibold disabled:opacity-50"
               >
-                Set to market rate
+                Use Market
               </button>
             ) : (
               <></>

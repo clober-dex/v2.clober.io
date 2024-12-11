@@ -38,6 +38,7 @@ export const Default: Story = {
     outputCurrencyAmount: '0.1',
     setOutputCurrencyAmount: () => {},
     swapInputCurrencyAndOutputCurrency: () => {},
+    marketRateDiff: 20000,
     setMarketRateAction: {
       isLoading: false,
       action: async () => {},
@@ -64,6 +65,7 @@ export const Selected: Story = {
     setOutputCurrencyAmount: () => {},
     availableOutputCurrencyBalance: 100000000000000000n,
     swapInputCurrencyAndOutputCurrency: () => {},
+    marketRateDiff: 20000,
     setMarketRateAction: {
       isLoading: false,
       action: async () => {},
@@ -88,6 +90,7 @@ export const IsFetchingPrice: Story = {
     outputCurrencyAmount: '0.1',
     setOutputCurrencyAmount: () => {},
     swapInputCurrencyAndOutputCurrency: () => {},
+    marketRateDiff: 20000,
     setMarketRateAction: {
       isLoading: true,
       action: async () => {},
