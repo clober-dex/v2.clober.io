@@ -329,7 +329,10 @@ export const LimitContainer = () => {
                 if (!inputCurrency || !outputCurrency || !selectedMarket) {
                   return
                 }
-                if (marketRateDiff < -10) {
+                if (
+                  !testnetChainIds.includes(selectedChain.id) &&
+                  marketRateDiff < -10
+                ) {
                   setShowWarningModal(true)
                   return
                 }

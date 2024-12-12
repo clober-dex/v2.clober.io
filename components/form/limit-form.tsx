@@ -160,7 +160,9 @@ export const LimitForm = ({
               <div className="text-xs sm:text-sm font-semibold text-green-400">
                 (&gt;10000%)
               </div>
-            ) : !isNaN(marketRateDiff) && isFinite(marketRateDiff) ? (
+            ) : !isNaN(marketRateDiff) &&
+              isFinite(marketRateDiff) &&
+              marketRateDiff >= 0.01 ? (
               <div
                 className={`text-gray-200 ${
                   marketRateDiff >= 0 ? 'text-green-400' : 'text-red-400'
