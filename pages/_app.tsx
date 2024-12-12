@@ -62,7 +62,6 @@ const { wallets } = getDefaultWallets({
   projectId: PROJECT_ID,
   chains,
 })
-hotjar.initialize({ id: 5239083, sv: 6, debug: true })
 
 const connectors = connectorsForWallets([
   ...wallets,
@@ -156,6 +155,11 @@ const PanelWrapper = ({
 const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
   const router = useRouter()
   const { selectedChain } = useChainContext()
+
+  useEffect(() => {
+    hotjar.initialize({ id: 5239083, sv: 6, debug: true })
+  }, [])
+
   return (
     <div className="flex flex-1 relative justify-center bg-gray-950">
       <div className="flex w-full flex-col items-center gap-4 sm:gap-6 p-4 pb-0">
