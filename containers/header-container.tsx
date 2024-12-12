@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Link from 'next/link'
 import { useAccount } from 'wagmi'
 import { useRouter } from 'next/router'
+import Hotjar from '@hotjar/browser'
+import axios from 'axios'
 
 import { useChainContext } from '../contexts/chain-context'
 import ChainSelector from '../components/selector/chain-selector'
@@ -19,6 +21,30 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const router = useRouter()
   const { selectedChain, setSelectedChain } = useChainContext()
   const { address, status } = useAccount()
+
+  useEffect(() => {
+    const action = async () => {
+      if (address) {
+        const response = (await axios.get(
+          `/api/debank/userAddress/${address}`,
+        )) as {
+          data: {
+            message: string
+            status: string
+          }
+        }
+        const totalUsdValue =
+          (response?.data?.status ?? '') === 'success'
+            ? Number(response?.data?.message ?? 0)
+            : 0
+        Hotjar.identify(address, {
+          address,
+          totalUsdValue,
+        })
+      }
+    }
+    action()
+  }, [address])
 
   return (
     <div className="flex items-center justify-between h-12 md:h-16 py-0 px-4">
