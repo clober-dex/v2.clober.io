@@ -23,7 +23,7 @@ export async function sendTransaction(
             data: transaction.data,
             to: transaction.to,
             value: transaction.value,
-            gas: transaction.gas,
+            gas: (transaction.gas * 3n) / 2n,
           }
         : {
             data: transaction.data,
