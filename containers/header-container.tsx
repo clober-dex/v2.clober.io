@@ -2,8 +2,9 @@ import React, { useEffect } from 'react'
 import Link from 'next/link'
 import { useAccount } from 'wagmi'
 import { useRouter } from 'next/router'
-import Hotjar from '@hotjar/browser'
 import axios from 'axios'
+import { hotjar } from 'react-hotjar'
+import { getAddress } from 'viem'
 
 import { useChainContext } from '../contexts/chain-context'
 import ChainSelector from '../components/selector/chain-selector'
@@ -37,10 +38,14 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
           (response?.data?.status ?? '') === 'success'
             ? Number(response?.data?.message ?? 0)
             : 0
-        Hotjar.identify(address, {
-          address,
-          totalUsdValue,
-        })
+        if (hotjar.initialized()) {
+          const userId = getAddress(address)
+          hotjar.identify(userId, {
+            address: userId,
+            totalUsdValue,
+            label: 'Clober',
+          })
+        }
       }
     }
     action()
