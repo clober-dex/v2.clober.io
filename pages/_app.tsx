@@ -9,15 +9,8 @@ import {
 } from '@rainbow-me/rainbowkit'
 import Head from 'next/head'
 import type { AppProps } from 'next/app'
-import {
-  configureChains,
-  createConfig,
-  useAccount,
-  useQuery,
-  WagmiConfig,
-} from 'wagmi'
+import { configureChains, createConfig, useQuery, WagmiConfig } from 'wagmi'
 import { jsonRpcProvider } from '@wagmi/core/providers/jsonRpc'
-import { identify } from '@web3analytic/funnel-sdk'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import {
@@ -30,6 +23,7 @@ import {
   zerionWallet,
 } from '@rainbow-me/rainbowkit/wallets'
 import { getSubgraphBlockNumber } from '@clober/v2-sdk'
+import Hotjar from '@hotjar/browser'
 
 import HeaderContainer from '../containers/header-container'
 import Footer from '../components/footer'
@@ -68,6 +62,7 @@ const { wallets } = getDefaultWallets({
   projectId: PROJECT_ID,
   chains,
 })
+Hotjar.init(5239083, 6)
 
 const connectors = connectorsForWallets([
   ...wallets,
@@ -105,19 +100,6 @@ const WalletProvider = ({ children }: React.PropsWithChildren) => {
       </RainbowKitProvider>
     </WagmiConfig>
   )
-}
-
-const Web3AnalyticWrapper = ({ children }: React.PropsWithChildren) => {
-  const { address } = useAccount()
-
-  useEffect(() => {
-    if (!address) {
-      return
-    }
-    identify(process.env.NEXT_PUBLIC_WEB3_ANALYTIC_API_KEY || '', address)
-  }, [address])
-
-  return <>{children}</>
 }
 
 const LimitProvidersWrapper = ({ children }: React.PropsWithChildren) => {
@@ -255,37 +237,35 @@ function App({ Component, pageProps }: AppProps) {
           <link rel="icon" type="image/png" href="/favicon.png" />
         </Head>
         <WalletProvider>
-          <Web3AnalyticWrapper>
-            <TransactionProvider>
-              <ChainProvider>
-                <CurrencyProvider>
-                  {router.pathname.includes('/earn') ? (
-                    <PoolProvidersWrapper>
-                      <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
+          <TransactionProvider>
+            <ChainProvider>
+              <CurrencyProvider>
+                {router.pathname.includes('/earn') ? (
+                  <PoolProvidersWrapper>
+                    <div className="flex flex-col w-full min-h-[100vh] bg-gray-950">
+                      <PanelWrapper open={open} setOpen={setOpen} />
+                      <HeaderContainer onMenuClick={() => setOpen(true)} />
+
+                      <Component {...pageProps} />
+                    </div>
+                  </PoolProvidersWrapper>
+                ) : (
+                  <LimitProvidersWrapper>
+                    <SwapProvidersWrapper>
+                      <div className="flex flex-col w-[100vw] min-h-[100vh] bg-gray-950">
                         <PanelWrapper open={open} setOpen={setOpen} />
                         <HeaderContainer onMenuClick={() => setOpen(true)} />
-
-                        <Component {...pageProps} />
+                        <MainComponentWrapper>
+                          <Component {...pageProps} />
+                        </MainComponentWrapper>
+                        <FooterWrapper />
                       </div>
-                    </PoolProvidersWrapper>
-                  ) : (
-                    <LimitProvidersWrapper>
-                      <SwapProvidersWrapper>
-                        <div className="flex flex-col w-[100vw] min-h-[100vh] bg-gray-950">
-                          <PanelWrapper open={open} setOpen={setOpen} />
-                          <HeaderContainer onMenuClick={() => setOpen(true)} />
-                          <MainComponentWrapper>
-                            <Component {...pageProps} />
-                          </MainComponentWrapper>
-                          <FooterWrapper />
-                        </div>
-                      </SwapProvidersWrapper>
-                    </LimitProvidersWrapper>
-                  )}
-                </CurrencyProvider>
-              </ChainProvider>
-            </TransactionProvider>
-          </Web3AnalyticWrapper>
+                    </SwapProvidersWrapper>
+                  </LimitProvidersWrapper>
+                )}
+              </CurrencyProvider>
+            </ChainProvider>
+          </TransactionProvider>
         </WalletProvider>
       </ErrorBoundary>
     </>
