@@ -1,7 +1,7 @@
 import React from 'react'
 import { useAccount } from 'wagmi'
 import { useRouter } from 'next/router'
-import { PlacesType, Tooltip } from 'react-tooltip'
+import { Tooltip } from 'react-tooltip'
 
 import { PoolCard } from '../components/card/pool-card'
 import { PoolPositionCard } from '../components/card/pool-position-card'
