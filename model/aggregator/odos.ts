@@ -175,7 +175,7 @@ export class OdosAggregator implements Aggregator {
         'Content-Type': 'application/json',
         accept: 'application/json',
       },
-      body: {
+      data: {
         pathId: this.latestPathId,
         simulate: true,
         userAddr: userAddress,
