@@ -206,10 +206,6 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
         ),
       }
     },
-    {
-      refetchInterval: 5 * 1000,
-      refetchIntervalInBackground: true,
-    },
   ) as {
     data: { allowances: Allowances; isOpenOrderApproved: boolean }
   }
