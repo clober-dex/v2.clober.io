@@ -23,7 +23,7 @@ import {
   zerionWallet,
 } from '@rainbow-me/rainbowkit/wallets'
 import { getSubgraphBlockNumber } from '@clober/v2-sdk'
-import Hotjar from '@hotjar/browser'
+import { hotjar } from 'react-hotjar'
 
 import HeaderContainer from '../containers/header-container'
 import Footer from '../components/footer'
@@ -62,7 +62,7 @@ const { wallets } = getDefaultWallets({
   projectId: PROJECT_ID,
   chains,
 })
-Hotjar.init(5239083, 6)
+hotjar.initialize({ id: 5239083, sv: 6, debug: true })
 
 const connectors = connectorsForWallets([
   ...wallets,
