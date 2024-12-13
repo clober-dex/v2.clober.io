@@ -23,7 +23,7 @@ import {
   zerionWallet,
 } from '@rainbow-me/rainbowkit/wallets'
 import { getSubgraphBlockNumber } from '@clober/v2-sdk'
-import { hotjar } from 'react-hotjar'
+import Hotjar from '@hotjar/browser'
 
 import HeaderContainer from '../containers/header-container'
 import Footer from '../components/footer'
@@ -62,6 +62,7 @@ const { wallets } = getDefaultWallets({
   projectId: PROJECT_ID,
   chains,
 })
+Hotjar.init(5239083, 6)
 
 const connectors = connectorsForWallets([
   ...wallets,
@@ -155,10 +156,6 @@ const PanelWrapper = ({
 const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
   const router = useRouter()
   const { selectedChain } = useChainContext()
-
-  useEffect(() => {
-    hotjar.initialize({ id: 5239083, sv: 6, debug: true })
-  }, [])
 
   return (
     <div className="flex flex-1 relative justify-center bg-gray-950">
