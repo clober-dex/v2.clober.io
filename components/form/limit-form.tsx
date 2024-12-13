@@ -335,7 +335,7 @@ export const LimitForm = ({
           onCurrencyClick={() => setShowInputCurrencySelect(true)}
           price={
             inputCurrency
-              ? prices[getAddress(inputCurrency.address)] ?? 0
+              ? (prices[getAddress(inputCurrency.address)] ?? 0)
               : undefined
           }
         />
@@ -347,7 +347,7 @@ export const LimitForm = ({
           onCurrencyClick={() => setShowOutputCurrencySelect(true)}
           price={
             outputCurrency
-              ? prices[getAddress(outputCurrency.address)] ?? 0
+              ? (prices[getAddress(outputCurrency.address)] ?? 0)
               : undefined
           }
         />
