@@ -237,7 +237,7 @@ export const LimitContainer = () => {
             setInputCurrencyAmount={setInputCurrencyAmount}
             availableInputCurrencyBalance={
               inputCurrency
-                ? balances[getAddress(inputCurrency.address)] ?? 0n
+                ? (balances[getAddress(inputCurrency.address)] ?? 0n)
                 : 0n
             }
             showOutputCurrencySelect={showOutputCurrencySelect}
@@ -248,7 +248,7 @@ export const LimitContainer = () => {
             setOutputCurrencyAmount={setOutputCurrencyAmount}
             availableOutputCurrencyBalance={
               outputCurrency
-                ? balances[getAddress(outputCurrency.address)] ?? 0n
+                ? (balances[getAddress(outputCurrency.address)] ?? 0n)
                 : 0n
             }
             swapInputCurrencyAndOutputCurrency={() => {
@@ -349,14 +349,14 @@ export const LimitContainer = () => {
               text: !walletClient
                 ? 'Connect wallet'
                 : !inputCurrency
-                ? 'Select input currency'
-                : !outputCurrency
-                ? 'Select output currency'
-                : amount === 0n
-                ? 'Enter amount'
-                : amount > balances[getAddress(inputCurrency.address)]
-                ? 'Insufficient balance'
-                : `Place Order`,
+                  ? 'Select input currency'
+                  : !outputCurrency
+                    ? 'Select output currency'
+                    : amount === 0n
+                      ? 'Enter amount'
+                      : amount > balances[getAddress(inputCurrency.address)]
+                        ? 'Insufficient balance'
+                        : `Place Order`,
             }}
           />
         </div>
