@@ -130,6 +130,7 @@ const HotJarProvider = ({ children }: React.PropsWithChildren) => {
           label: 'Clober',
         }
         Hotjar.identify(null, userInfo)
+        Hotjar.event('connect')
         console.log('identify', userInfo)
       }
     }
