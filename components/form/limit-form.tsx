@@ -156,20 +156,24 @@ export const LimitForm = ({
               {isBid ? 'Buy' : 'Sell'}{' '}
               {isBid ? outputCurrency?.symbol : inputCurrency?.symbol} at rate
             </div>
-            {marketPrice > 0 && marketRateDiff >= 10000 ? (
-              <div className="text-xs sm:text-sm font-semibold text-green-400">
-                (&gt;10000%)
-              </div>
-            ) : !isNaN(marketRateDiff) &&
-              isFinite(marketRateDiff) &&
-              marketRateDiff.toFixed(2) !== '0.00' ? (
-              <div
-                className={`text-gray-200 ${
-                  marketRateDiff >= 0 ? 'text-green-400' : 'text-red-400'
-                } sm:text-sm font-semibold`}
-              >
-                ({marketRateDiff.toFixed(2)}%)
-              </div>
+            {!testnetChainIds.includes(chainId) ? (
+              marketPrice > 0 && marketRateDiff >= 10000 ? (
+                <div className="text-xs sm:text-sm font-semibold text-green-400">
+                  (&gt;10000%)
+                </div>
+              ) : !isNaN(marketRateDiff) &&
+                isFinite(marketRateDiff) &&
+                marketRateDiff.toFixed(2) !== '0.00' ? (
+                <div
+                  className={`text-gray-200 ${
+                    marketRateDiff >= 0 ? 'text-green-400' : 'text-red-400'
+                  } sm:text-sm font-semibold`}
+                >
+                  ({marketRateDiff.toFixed(2)}%)
+                </div>
+              ) : (
+                <></>
+              )
             ) : (
               <></>
             )}
