@@ -157,7 +157,7 @@ const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
   const { selectedChain } = useChainContext()
 
   useEffect(() => {
-    Hotjar.init(5239083, 6)
+    Hotjar.init(5239083, 6, { debug: true })
   }, [])
 
   return (

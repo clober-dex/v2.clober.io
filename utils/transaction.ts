@@ -1,7 +1,6 @@
 import { createPublicClient, Hash, http } from 'viem'
 import { GetWalletClientResult } from '@wagmi/core'
 import { CHAIN_IDS, Transaction } from '@clober/v2-sdk'
-import * as Sentry from '@sentry/nextjs'
 
 import { supportChains } from '../constants/chain'
 
@@ -34,7 +33,7 @@ export async function sendTransaction(
     await publicClient.waitForTransactionReceipt({ hash })
     return hash
   } catch (error) {
-    Sentry.captureException(error)
+    console.error(error)
     throw error
   }
 }

@@ -1,5 +1,4 @@
 import React, { Component, ErrorInfo } from 'react'
-import * as Sentry from '@sentry/nextjs'
 
 interface Props {
   children: React.ReactNode
@@ -20,10 +19,6 @@ class ErrorBoundary extends Component<Props, State> {
     {
       localStorage.clear()
       sessionStorage.clear()
-      Sentry.captureException({
-        error,
-        errorInfo,
-      })
     }
     this.setState({ hasError: true })
   }
