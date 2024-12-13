@@ -124,13 +124,12 @@ const HotJarProvider = ({ children }: React.PropsWithChildren) => {
           (response?.data?.status ?? '') === 'success'
             ? Number(response?.data?.message ?? 0)
             : 0
-        const userId = getAddress(address)
         const userInfo = {
-          address: userId,
+          address: getAddress(address),
           totalUsdValue,
           label: 'Clober',
         }
-        Hotjar.identify(userId, userInfo)
+        Hotjar.identify(null, userInfo)
         console.log('identify', userInfo)
       }
     }
