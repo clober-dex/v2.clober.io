@@ -39,11 +39,13 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
             ? Number(response?.data?.message ?? 0)
             : 0
         const userId = getAddress(address)
-        Hotjar.identify(userId, {
+        const userInfo = {
           address: userId,
           totalUsdValue,
           label: 'Clober',
-        })
+        }
+        Hotjar.identify(userId, userInfo)
+        console.log('identify', userInfo)
       }
     }
     action()
