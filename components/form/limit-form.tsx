@@ -162,7 +162,7 @@ export const LimitForm = ({
               </div>
             ) : !isNaN(marketRateDiff) &&
               isFinite(marketRateDiff) &&
-              marketRateDiff >= 0.01 ? (
+              marketRateDiff.toFixed(2) !== '0.00' ? (
               <div
                 className={`text-gray-200 ${
                   marketRateDiff >= 0 ? 'text-green-400' : 'text-red-400'
