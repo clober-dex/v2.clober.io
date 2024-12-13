@@ -102,6 +102,7 @@ const wagmiConfig = createConfig({
 
 const HotJarProvider = ({ children }: React.PropsWithChildren) => {
   const { address } = useAccount()
+  const ready = Hotjar.isReady()
 
   useEffect(() => {
     // init hotjar
@@ -112,7 +113,7 @@ const HotJarProvider = ({ children }: React.PropsWithChildren) => {
 
   useEffect(() => {
     const action = async () => {
-      if (address) {
+      if (address && ready) {
         const response = (await axios.get(
           `/api/debank/userAddress/${address}`,
         )) as {
@@ -138,7 +139,7 @@ const HotJarProvider = ({ children }: React.PropsWithChildren) => {
     }
 
     action()
-  }, [address])
+  }, [address, ready])
   return <>{children}</>
 }
 
