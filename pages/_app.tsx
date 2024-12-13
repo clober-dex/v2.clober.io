@@ -32,6 +32,7 @@ import { getSubgraphBlockNumber } from '@clober/v2-sdk'
 import axios from 'axios'
 import { getAddress } from 'viem'
 import Hotjar from '@hotjar/browser'
+import { v4 as uuidv4 } from 'uuid'
 
 import HeaderContainer from '../containers/header-container'
 import Footer from '../components/footer'
@@ -129,7 +130,8 @@ const HotJarProvider = ({ children }: React.PropsWithChildren) => {
           totalUsdValue,
           label: 'Clober',
         }
-        Hotjar.identify(null, userInfo)
+        const userId = uuidv4()
+        Hotjar.identify(userId, userInfo)
         Hotjar.event('connect')
         console.log('identify', userInfo)
       }
