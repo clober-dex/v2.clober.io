@@ -35,6 +35,7 @@ export const SwapContainer = () => {
   const [showInputCurrencySelect, setShowInputCurrencySelect] = useState(false)
   const [showOutputCurrencySelect, setShowOutputCurrencySelect] =
     useState(false)
+  const [latestRefreshTime, setLatestRefreshTime] = useState(Date.now())
 
   const amountIn = parseUnits(
     inputCurrencyAmount,
@@ -50,6 +51,7 @@ export const SwapContainer = () => {
       slippageInput,
       userAddress,
       selectedChain,
+      latestRefreshTime,
     ],
     async () => {
       if (
@@ -106,7 +108,7 @@ export const SwapContainer = () => {
               setInputCurrencyAmount={setInputCurrencyAmount}
               availableInputCurrencyBalance={
                 inputCurrency
-                  ? balances[getAddress(inputCurrency.address)] ?? 0n
+                  ? (balances[getAddress(inputCurrency.address)] ?? 0n)
                   : 0n
               }
               showOutputCurrencySelect={showOutputCurrencySelect}
@@ -128,6 +130,7 @@ export const SwapContainer = () => {
                   ),
                 ) * (prices[getAddress(zeroAddress)] ?? 0)
               }
+              refresh={() => setLatestRefreshTime(Date.now())}
               actionButtonProps={{
                 disabled:
                   !userAddress ||

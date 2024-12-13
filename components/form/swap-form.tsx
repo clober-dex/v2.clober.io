@@ -37,6 +37,7 @@ export const SwapForm = ({
   slippageInput,
   setSlippageInput,
   gasEstimateValue,
+  refresh,
   actionButtonProps,
 }: {
   chainId: number
@@ -59,6 +60,7 @@ export const SwapForm = ({
   slippageInput: string
   setSlippageInput: (slippageInput: string) => void
   gasEstimateValue: number
+  refresh: () => void
   actionButtonProps: ActionButtonProps
 }) => {
   const { showDropdown, setShowDropdown } = useDropdown()
@@ -181,11 +183,8 @@ export const SwapForm = ({
       </div>
       <div className="flex flex-col sm:flex-row justify-between items-center gap-0.5 sm:gap-0">
         <div className="flex text-xs sm:text-sm text-white mr-auto gap-1 items-center">
-          <button
-            onClick={swapCurrencies}
-            className="flex w-4 h-4 sm:w-6 sm:h-6"
-          >
-            <ExchangeSvg className="w-full h-full" />
+          <button onClick={refresh} className="flex w-4 h-4 sm:w-6 sm:h-6">
+            <ExchangeSvg className="w-full h-full transform hover:rotate-90 transition duration-300" />
           </button>
           1 {inputCurrency?.symbol ?? 'IN'} ={' '}
           {isLoadingResults ? (
