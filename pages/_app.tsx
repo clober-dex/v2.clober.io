@@ -31,7 +31,7 @@ import {
 import { getSubgraphBlockNumber } from '@clober/v2-sdk'
 import axios from 'axios'
 import { getAddress } from 'viem'
-import { hotjar } from 'react-hotjar'
+import Hotjar from '@hotjar/browser'
 
 import HeaderContainer from '../containers/header-container'
 import Footer from '../components/footer'
@@ -104,16 +104,14 @@ const HotJarProvider = ({ children }: React.PropsWithChildren) => {
 
   useEffect(() => {
     // init hotjar
-    hotjar.initialize({
-      id: 5239083,
-      sv: 6,
+    Hotjar.init(5239083, 6, {
       debug: true,
     })
   }, [])
 
   useEffect(() => {
     const action = async () => {
-      if (address && hotjar.initialized()) {
+      if (address) {
         const response = (await axios.get(
           `/api/debank/userAddress/${address}`,
         )) as {
@@ -132,7 +130,7 @@ const HotJarProvider = ({ children }: React.PropsWithChildren) => {
           totalUsdValue,
           label: 'Clober',
         }
-        hotjar.identify(userId, userInfo)
+        Hotjar.identify(userId, userInfo)
         console.log('identify', userInfo)
       }
     }
