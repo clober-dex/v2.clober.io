@@ -29,9 +29,9 @@ import {
   zerionWallet,
 } from '@rainbow-me/rainbowkit/wallets'
 import { getSubgraphBlockNumber } from '@clober/v2-sdk'
-import Hotjar from '@hotjar/browser'
 import axios from 'axios'
 import { getAddress } from 'viem'
+import { hotjar } from 'react-hotjar'
 
 import HeaderContainer from '../containers/header-container'
 import Footer from '../components/footer'
@@ -103,8 +103,17 @@ const HotJarProvider = ({ children }: React.PropsWithChildren) => {
   const { address } = useAccount()
 
   useEffect(() => {
+    // init hotjar
+    hotjar.initialize({
+      id: 5239083,
+      sv: 6,
+      debug: true,
+    })
+  }, [])
+
+  useEffect(() => {
     const action = async () => {
-      if (address) {
+      if (address && hotjar.initialized()) {
         const response = (await axios.get(
           `/api/debank/userAddress/${address}`,
         )) as {
@@ -123,12 +132,10 @@ const HotJarProvider = ({ children }: React.PropsWithChildren) => {
           totalUsdValue,
           label: 'Clober',
         }
-        Hotjar.identify(userId, userInfo)
+        hotjar.identify(userId, userInfo)
         console.log('identify', userInfo)
       }
     }
-    // init hotjar
-    Hotjar.init(5239083, 6, { debug: true })
 
     action()
   }, [address])
