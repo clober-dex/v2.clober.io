@@ -155,6 +155,7 @@ export const LimitContainer = () => {
             if (!inputCurrency || !outputCurrency || !selectedMarket) {
               return
             }
+            setShowWarningModal(false)
             await limit(
               inputCurrency,
               outputCurrency,
