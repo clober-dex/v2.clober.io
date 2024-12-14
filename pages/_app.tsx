@@ -114,21 +114,20 @@ const HotJarProvider = ({ children }: React.PropsWithChildren) => {
   useEffect(() => {
     const action = async () => {
       if (address && ready) {
-        const response = (await axios.get(
-          `/api/debank/userAddress/${address}`,
-        )) as {
-          data: {
-            message: string
-            status: string
-          }
-        }
-        const totalUsdValue =
-          (response?.data?.status ?? '') === 'success'
-            ? Number(response?.data?.message ?? 0)
-            : 0
+        // const response = (await axios.get(
+        //   `/api/debank/userAddress/${address}`,
+        // )) as {
+        //   data: {
+        //     message: string
+        //     status: string
+        //   }
+        // }
+        // const totalUsdValue =
+        //   (response?.data?.status ?? '') === 'success'
+        //     ? Number(response?.data?.message ?? 0)
+        //     : 0
         const userInfo = {
           address: getAddress(address),
-          totalUsdValue,
           label: 'Clober',
         }
         const userId = uuidv4()
