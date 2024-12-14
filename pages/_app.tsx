@@ -29,7 +29,6 @@ import {
   zerionWallet,
 } from '@rainbow-me/rainbowkit/wallets'
 import { getSubgraphBlockNumber } from '@clober/v2-sdk'
-import axios from 'axios'
 import { getAddress } from 'viem'
 import Hotjar from '@hotjar/browser'
 import { v4 as uuidv4 } from 'uuid'
