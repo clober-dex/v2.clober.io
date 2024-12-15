@@ -63,6 +63,7 @@ export class OdosAggregator implements Aggregator {
     pathViz: PathViz | undefined
     aggregator: Aggregator
   }> {
+    this.latestPathId = undefined
     console.log('Fetching quote...')
     const result: {
       outAmounts: string[]
