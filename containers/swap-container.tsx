@@ -108,7 +108,7 @@ export const SwapContainer = () => {
               setInputCurrencyAmount={setInputCurrencyAmount}
               availableInputCurrencyBalance={
                 inputCurrency
-                  ? (balances[getAddress(inputCurrency.address)] ?? 0n)
+                  ? balances[getAddress(inputCurrency.address)] ?? 0n
                   : 0n
               }
               showOutputCurrencySelect={showOutputCurrencySelect}
