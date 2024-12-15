@@ -9,13 +9,7 @@ import {
 } from '@rainbow-me/rainbowkit'
 import Head from 'next/head'
 import type { AppProps } from 'next/app'
-import {
-  configureChains,
-  createConfig,
-  useAccount,
-  useQuery,
-  WagmiConfig,
-} from 'wagmi'
+import { configureChains, createConfig, useQuery, WagmiConfig } from 'wagmi'
 import { jsonRpcProvider } from '@wagmi/core/providers/jsonRpc'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
@@ -29,9 +23,6 @@ import {
   zerionWallet,
 } from '@rainbow-me/rainbowkit/wallets'
 import { getSubgraphBlockNumber } from '@clober/v2-sdk'
-import { getAddress } from 'viem'
-import Hotjar from '@hotjar/browser'
-import { v4 as uuidv4 } from 'uuid'
 
 import HeaderContainer from '../containers/header-container'
 import Footer from '../components/footer'
@@ -99,53 +90,11 @@ const wagmiConfig = createConfig({
   webSocketPublicClient,
 })
 
-const HotJarProvider = ({ children }: React.PropsWithChildren) => {
-  const { address } = useAccount()
-  const ready = Hotjar.isReady()
-
-  useEffect(() => {
-    // init hotjar
-    Hotjar.init(5239083, 6, {
-      debug: true,
-    })
-  }, [])
-
-  useEffect(() => {
-    const action = async () => {
-      if (address && ready) {
-        // const response = (await axios.get(
-        //   `/api/debank/userAddress/${address}`,
-        // )) as {
-        //   data: {
-        //     message: string
-        //     status: string
-        //   }
-        // }
-        // const totalUsdValue =
-        //   (response?.data?.status ?? '') === 'success'
-        //     ? Number(response?.data?.message ?? 0)
-        //     : 0
-        const userInfo = {
-          address: getAddress(address),
-          label: 'Clober',
-        }
-        const userId = uuidv4()
-        Hotjar.identify(userId, userInfo)
-        Hotjar.event('connect')
-        console.log('identify', userInfo)
-      }
-    }
-
-    action()
-  }, [address, ready])
-  return <>{children}</>
-}
-
 const WalletProvider = ({ children }: React.PropsWithChildren) => {
   return (
     <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider chains={supportChains} theme={darkTheme()}>
-        <HotJarProvider>{children}</HotJarProvider>
+        {children}
       </RainbowKitProvider>
     </WagmiConfig>
   )
@@ -205,10 +154,6 @@ const PanelWrapper = ({
 const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
   const router = useRouter()
   const { selectedChain } = useChainContext()
-
-  useEffect(() => {
-    Hotjar.init(5239083, 6, { debug: true })
-  }, [])
 
   return (
     <div className="flex flex-1 relative justify-center bg-gray-950">
