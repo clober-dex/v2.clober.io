@@ -96,11 +96,21 @@ const wagmiConfig = createConfig({
   webSocketPublicClient,
 })
 
+const CacheProvider = ({ children }: React.PropsWithChildren) => {
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    localStorage.removeItem('wagmi.cache')
+  }, [queryClient])
+
+  return <>{children}</>
+}
+
 const WalletProvider = ({ children }: React.PropsWithChildren) => {
   return (
     <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider chains={supportChains} theme={darkTheme()}>
-        {children}
+        <CacheProvider>{children}</CacheProvider>
       </RainbowKitProvider>
     </WagmiConfig>
   )
@@ -160,11 +170,6 @@ const PanelWrapper = ({
 const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
   const router = useRouter()
   const { selectedChain } = useChainContext()
-  const queryClient = useQueryClient()
-
-  useEffect(() => {
-    localStorage.removeItem('wagmi.cache')
-  }, [queryClient])
 
   return (
     <div className="flex flex-1 relative justify-center bg-gray-950">
