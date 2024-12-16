@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useAccount, useBalance, useQuery, useQueryClient } from 'wagmi'
+import { useAccount, useBalance, useQuery } from 'wagmi'
 import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 import { readContracts } from '@wagmi/core'
 import { getContractAddresses } from '@clober/v2-sdk'
@@ -82,7 +82,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [currencies, setCurrencies] = useState<Currency[]>([])
 
   const { data: balances } = useQuery(
-    ['balances', userAddress, selectedChain],
+    ['balances', userAddress, balance, selectedChain, currencies],
     async () => {
       if (!userAddress) {
         return {}
@@ -139,7 +139,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
 
   const { data } = useQuery(
-    ['allowances', userAddress, selectedChain],
+    ['allowances', userAddress, selectedChain, currencies],
     async () => {
       const spenders: `0x${string}`[] = [
         getContractAddresses({ chainId: selectedChain.id }).Controller,
