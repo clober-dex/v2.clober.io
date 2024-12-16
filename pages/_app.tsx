@@ -10,7 +10,6 @@ import {
 import Head from 'next/head'
 import type { AppProps } from 'next/app'
 import { configureChains, createConfig, useQuery, WagmiConfig } from 'wagmi'
-import { jsonRpcProvider } from '@wagmi/core/providers/jsonRpc'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import {
@@ -23,6 +22,7 @@ import {
   zerionWallet,
 } from '@rainbow-me/rainbowkit/wallets'
 import { getSubgraphBlockNumber } from '@clober/v2-sdk'
+import { publicProvider } from '@wagmi/core/providers/public'
 
 import HeaderContainer from '../containers/header-container'
 import Footer from '../components/footer'
@@ -37,7 +37,6 @@ import { OpenOrderProvider } from '../contexts/limit/open-order-context'
 import { LimitContractProvider } from '../contexts/limit/limit-contract-context'
 import { SwapContractProvider } from '../contexts/swap/swap-contract-context'
 import Panel from '../components/panel'
-import { RPC_URL } from '../constants/rpc-urls'
 import ErrorBoundary from '../components/error-boundary'
 import { CurrencyProvider } from '../contexts/currency-context'
 import { PoolProvider } from '../contexts/pool/pool-context'
@@ -45,13 +44,7 @@ import { PoolContractProvider } from '../contexts/pool/pool-contract-context'
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   supportChains.map((chain) => toWagmiChain(chain)),
-  [
-    jsonRpcProvider({
-      rpc: (chain) => ({
-        http: RPC_URL[chain.id],
-      }),
-    }),
-  ],
+  [publicProvider()],
   { rank: true },
 )
 
