@@ -19,7 +19,7 @@ export const OpenOrderProvider = ({
   const { selectedChain } = useChainContext()
 
   const { data: openOrders } = useQuery(
-    ['open-orders', selectedChain, userAddress],
+    ['open-orders', selectedChain.id, userAddress],
     () =>
       userAddress
         ? getOpenOrders({

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { getMarket, Market } from '@clober/v2-sdk'
-import { useQuery } from 'wagmi'
+import { getMarket, getMarketId, Market } from '@clober/v2-sdk'
+import { useQuery, useQueryClient } from 'wagmi'
 import BigNumber from 'bignumber.js'
 import { getAddress } from 'viem'
 
@@ -67,6 +67,7 @@ const Context = React.createContext<MarketContext>({
 
 export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { selectedChain } = useChainContext()
+  const queryClient = useQueryClient()
   const {
     isBid,
     setPriceInput,
@@ -97,10 +98,28 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     'limit',
     selectedChain,
   )
+  const marketId =
+    inputCurrencyAddress && outputCurrencyAddress
+      ? getMarketId(selectedChain.id, [
+          getAddress(inputCurrencyAddress),
+          getAddress(outputCurrencyAddress),
+        ]).marketId
+      : ''
+
   const { data: market } = useQuery(
-    ['market', selectedChain, inputCurrencyAddress, outputCurrencyAddress],
+    ['market', selectedChain, marketId],
     async () => {
       if (inputCurrencyAddress && outputCurrencyAddress) {
+        const queryKeys = queryClient
+          .getQueryCache()
+          .getAll()
+          .map((query) => query.queryKey)
+          .filter((key) => key[0] === 'market')
+        for (const key of queryKeys) {
+          if (key[2] && key[2] !== marketId) {
+            queryClient.removeQueries(key)
+          }
+        }
         return getMarket({
           chainId: selectedChain.id,
           token0: getAddress(inputCurrencyAddress),

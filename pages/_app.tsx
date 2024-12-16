@@ -9,7 +9,13 @@ import {
 } from '@rainbow-me/rainbowkit'
 import Head from 'next/head'
 import type { AppProps } from 'next/app'
-import { configureChains, createConfig, useQuery, WagmiConfig } from 'wagmi'
+import {
+  configureChains,
+  createConfig,
+  useQuery,
+  useQueryClient,
+  WagmiConfig,
+} from 'wagmi'
 import { jsonRpcProvider } from '@wagmi/core/providers/jsonRpc'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
@@ -154,6 +160,11 @@ const PanelWrapper = ({
 const MainComponentWrapper = ({ children }: React.PropsWithChildren) => {
   const router = useRouter()
   const { selectedChain } = useChainContext()
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    localStorage.removeItem('wagmi.cache')
+  }, [queryClient])
 
   return (
     <div className="flex flex-1 relative justify-center bg-gray-950">

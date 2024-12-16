@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useAccount, useBalance, useQuery } from 'wagmi'
+import { useAccount, useBalance, useQuery, useQueryClient } from 'wagmi'
 import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 import { readContracts } from '@wagmi/core'
 import { getContractAddresses } from '@clober/v2-sdk'
@@ -69,7 +69,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { data: balance } = useBalance({ address: userAddress, watch: true })
   const { selectedChain } = useChainContext()
   const { data: whitelistCurrencies } = useQuery(
-    ['currencies', selectedChain],
+    ['currencies', selectedChain.id],
     async () => {
       return fetchWhitelistCurrencies(selectedChain.id)
     },
@@ -82,9 +82,17 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [currencies, setCurrencies] = useState<Currency[]>([])
 
   const { data: balances } = useQuery(
-    ['balances', userAddress, balance, selectedChain, currencies],
+    [
+      'balances',
+      selectedChain,
+      userAddress,
+      currencies
+        .map((c) => c.address)
+        .sort()
+        .join(''),
+    ],
     async () => {
-      if (!userAddress) {
+      if (!userAddress || currencies.length === 0 || !balance) {
         return {}
       }
       const uniqueCurrencies = currencies
@@ -125,7 +133,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
   }
 
   const { data: prices } = useQuery(
-    ['prices', selectedChain],
+    ['prices', selectedChain.id],
     async () => {
       if (testnetChainIds.includes(selectedChain.id)) {
         return (TESTNET_PRICES[selectedChain.id] ?? 0) as Prices
@@ -138,8 +146,17 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
     },
   )
 
+  const queryClient = useQueryClient()
   const { data } = useQuery(
-    ['allowances', userAddress, selectedChain, currencies],
+    [
+      'allowances',
+      selectedChain.id,
+      userAddress,
+      currencies
+        .map((c) => c.address)
+        .sort()
+        .join(''),
+    ],
     async () => {
       const spenders: `0x${string}`[] = [
         getContractAddresses({ chainId: selectedChain.id }).Controller,
@@ -148,7 +165,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
           (aggregator) => aggregator.contract,
         ),
       ]
-      if (!userAddress) {
+      if (!userAddress || currencies.length === 0 || !selectedChain) {
         return {
           allowances: {},
           isOpenOrderApproved: false,
@@ -205,10 +222,6 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
           spenders.reduce((acc, spender) => ({ ...acc, [spender]: {} }), {}),
         ),
       }
-    },
-    {
-      refetchInterval: 5 * 1000,
-      refetchIntervalInBackground: true,
     },
   ) as {
     data: { allowances: Allowances; isOpenOrderApproved: boolean }
