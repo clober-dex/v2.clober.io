@@ -11,6 +11,7 @@ import { isAddressEqual } from 'viem'
 
 import { Pool } from '../model/pool'
 import { POOL_KEY_INFOS } from '../constants/pool'
+import { RPC_URL } from '../constants/rpc-urls'
 import { Prices } from '../model/prices'
 import { StackedLineData } from '../components/chart/stacked/stacked-chart-model'
 import { calculateApy } from '../utils/pool-apy'
@@ -35,6 +36,7 @@ export async function fetchPools(
           salt,
           options: {
             useSubgraph: false,
+            rpcUrl: RPC_URL[chainId],
           },
         })
         const poolPerformanceData = await getPoolPerformance({
@@ -58,6 +60,7 @@ export async function fetchPools(
           options: {
             pool,
             useSubgraph: true,
+            rpcUrl: RPC_URL[chainId],
           },
         })
         return { pool, poolPerformanceData }

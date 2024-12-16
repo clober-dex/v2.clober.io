@@ -13,6 +13,7 @@ import { AddLiquidityForm } from '../components/form/add-liquidity-form'
 import { usePoolContext } from '../contexts/pool/pool-context'
 import { useCurrencyContext } from '../contexts/currency-context'
 import { RemoveLiquidityForm } from '../components/form/remove-liquidity-form'
+import { RPC_URL } from '../constants/rpc-urls'
 import { usePoolContractContext } from '../contexts/pool/pool-contract-context'
 import { toPlacesAmountString } from '../utils/bignumber'
 import { QuestionMarkSvg } from '../components/svg/question-mark-svg'
@@ -85,6 +86,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
         amount1: currency1Amount,
         options: {
           useSubgraph: false,
+          rpcUrl: RPC_URL[selectedChain.id],
           gasLimit: 1_000_000n,
           disableSwap,
           slippage: Number(slippageInput),
@@ -124,6 +126,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
         amount: lpCurrencyAmount,
         options: {
           useSubgraph: false,
+          rpcUrl: RPC_URL[selectedChain.id],
           gasLimit: 1_000_000n,
           slippage: Number(slippageInput),
         },
