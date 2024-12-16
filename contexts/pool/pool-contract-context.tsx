@@ -13,7 +13,6 @@ import { useChainContext } from '../chain-context'
 import { useCurrencyContext } from '../currency-context'
 import { Confirmation, useTransactionContext } from '../transaction-context'
 import { Currency } from '../../model/currency'
-import { RPC_URL } from '../../constants/rpc-urls'
 import { toPlacesAmountString } from '../../utils/bignumber'
 import { maxApprove } from '../../utils/approve20'
 import { sendTransaction } from '../../utils/transaction'
@@ -131,7 +130,6 @@ export const PoolContractProvider = ({
           options: {
             gasLimit: 800_000n,
             useSubgraph: false,
-            rpcUrl: RPC_URL[selectedChain.id],
             disableSwap,
             slippage,
             testnetPrice: prices[baseCurrency.address] ?? 0,
@@ -247,7 +245,6 @@ export const PoolContractProvider = ({
           options: {
             gasLimit: 800_000n,
             useSubgraph: false,
-            rpcUrl: RPC_URL[selectedChain.id],
             slippage: Number(slippageInput),
           },
         })

@@ -16,7 +16,6 @@ import { useChainContext } from '../chain-context'
 import { Currency } from '../../model/currency'
 import { Confirmation, useTransactionContext } from '../transaction-context'
 import { sendTransaction, waitTransaction } from '../../utils/transaction'
-import { RPC_URL } from '../../constants/rpc-urls'
 import { useCurrencyContext } from '../currency-context'
 import { maxApprove } from '../../utils/approve20'
 import { toPlacesAmountString } from '../../utils/bignumber'
@@ -82,9 +81,6 @@ export const LimitContractProvider = ({
             userAddress: walletClient.account.address,
             inputToken: inputCurrency.address,
             outputToken: outputCurrency.address,
-            options: {
-              rpcUrl: RPC_URL[selectedChain.id],
-            },
           })
           if (openTransaction) {
             setConfirmation({
@@ -126,7 +122,6 @@ export const LimitContractProvider = ({
           price: price,
           options: {
             postOnly,
-            rpcUrl: RPC_URL[selectedChain.id],
             roundingDownTakenBid: true,
             roundingDownMakeAsk: true,
           },
@@ -216,9 +211,6 @@ export const LimitContractProvider = ({
           const hash = await setApprovalOfOpenOrdersForAll({
             chainId: walletClient.chain.id,
             walletClient: walletClient as any,
-            options: {
-              rpcUrl: RPC_URL[walletClient.chain.id],
-            },
           })
           if (hash) {
             await waitTransaction(walletClient.chain.id, hash)
@@ -229,9 +221,6 @@ export const LimitContractProvider = ({
           chainId: selectedChain.id,
           userAddress: walletClient.account.address,
           ids: openOrders.map((order) => String(order.id)),
-          options: {
-            rpcUrl: RPC_URL[selectedChain.id],
-          },
         })
 
         setConfirmation({
@@ -283,9 +272,6 @@ export const LimitContractProvider = ({
           const hash = await setApprovalOfOpenOrdersForAll({
             chainId: walletClient.chain.id,
             walletClient: walletClient as any,
-            options: {
-              rpcUrl: RPC_URL[walletClient.chain.id],
-            },
           })
           if (hash) {
             await waitTransaction(walletClient.chain.id, hash)
@@ -296,9 +282,6 @@ export const LimitContractProvider = ({
           chainId: selectedChain.id,
           userAddress: walletClient.account.address,
           ids: openOrders.map((order) => String(order.id)),
-          options: {
-            rpcUrl: RPC_URL[selectedChain.id],
-          },
         })
 
         setConfirmation({

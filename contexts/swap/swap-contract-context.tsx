@@ -1,12 +1,11 @@
 import React, { useCallback } from 'react'
-import { getAddress, isAddressEqual, zeroAddress } from 'viem'
+import { getAddress, http, isAddressEqual, zeroAddress } from 'viem'
 import { useQueryClient, useWalletClient } from 'wagmi'
 import { Transaction } from '@clober/v2-sdk'
 
 import { Currency } from '../../model/currency'
 import { formatUnits } from '../../utils/bigint'
 import { fetchSwapData } from '../../apis/swap/data'
-import { useChainContext } from '../chain-context'
 import { useTransactionContext } from '../transaction-context'
 import { sendTransaction } from '../../utils/transaction'
 import { useCurrencyContext } from '../currency-context'

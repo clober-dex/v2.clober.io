@@ -16,7 +16,7 @@ import {
   useQueryClient,
   WagmiConfig,
 } from 'wagmi'
-import { jsonRpcProvider } from '@wagmi/core/providers/jsonRpc'
+import { publicProvider } from '@wagmi/core/providers/public'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import {
@@ -43,7 +43,6 @@ import { OpenOrderProvider } from '../contexts/limit/open-order-context'
 import { LimitContractProvider } from '../contexts/limit/limit-contract-context'
 import { SwapContractProvider } from '../contexts/swap/swap-contract-context'
 import Panel from '../components/panel'
-import { RPC_URL } from '../constants/rpc-urls'
 import ErrorBoundary from '../components/error-boundary'
 import { CurrencyProvider } from '../contexts/currency-context'
 import { PoolProvider } from '../contexts/pool/pool-context'
@@ -51,14 +50,8 @@ import { PoolContractProvider } from '../contexts/pool/pool-contract-context'
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   supportChains.map((chain) => toWagmiChain(chain)),
-  [
-    jsonRpcProvider({
-      rpc: (chain) => ({
-        http: RPC_URL[chain.id],
-      }),
-    }),
-  ],
-  { rank: true },
+  [publicProvider()],
+  { rank: false },
 )
 
 const PROJECT_ID = '14e09398dd595b0d1dccabf414ac4531'
