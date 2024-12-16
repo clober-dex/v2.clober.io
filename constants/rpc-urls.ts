@@ -5,7 +5,6 @@ const ALCHEMY_API_KEY = '3Um4IcT1mrq2MEOYurXvsRAzk_v3Q_4X'
 export const RPC_URL: {
   [chain in CHAIN_IDS]: string
 } = {
-  [CHAIN_IDS.ARBITRUM_SEPOLIA]: `https://arb-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
   [CHAIN_IDS.MITOSIS_TESTNET]: 'https://rpc.testnet.mitosis.org',
   // [CHAIN_IDS.BASE]: `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
   // [CHAIN_IDS.ZKSYNC]: `https://zksync-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,

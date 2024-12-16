@@ -2,7 +2,7 @@ import React from 'react'
 import '../../styles/globals.css'
 import { Meta, StoryObj } from '@storybook/react'
 import { zeroAddress } from 'viem'
-import { arbitrumSepolia } from 'viem/chains'
+import { base } from 'viem/chains'
 
 import { dummyCurrencies } from '../../.storybook/dummy-data/currencies'
 
@@ -25,7 +25,7 @@ type Story = StoryObj<typeof OpenOrderCard>
 
 export const Bid: Story = {
   args: {
-    chainId: arbitrumSepolia.id,
+    chainId: base.id,
     openOrder: {
       id: '1',
       isBid: true,
@@ -64,7 +64,7 @@ export const Bid: Story = {
 
 export const Ask: Story = {
   args: {
-    chainId: arbitrumSepolia.id,
+    chainId: base.id,
     openOrder: {
       id: '1',
       isBid: false,
