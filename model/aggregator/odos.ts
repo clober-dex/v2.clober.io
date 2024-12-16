@@ -15,7 +15,12 @@ export class OdosAggregator implements Aggregator {
   public readonly chain: Chain
   private readonly TIMEOUT = 5000
 
-  private latestPathId: string | undefined
+  private latestState:
+    | {
+        pathId: string
+        amountIn: bigint
+      }
+    | undefined = undefined
 
   constructor(contract: `0x${string}`, chain: Chain) {
     this.contract = contract
@@ -63,7 +68,7 @@ export class OdosAggregator implements Aggregator {
     pathViz: PathViz | undefined
     aggregator: Aggregator
   }> {
-    this.latestPathId = undefined
+    this.latestState = undefined
     console.log('Fetching quote...')
     const result: {
       outAmounts: string[]
@@ -99,7 +104,7 @@ export class OdosAggregator implements Aggregator {
         referralCode: '1939997089',
       },
     })
-    this.latestPathId = result.pathId
+    this.latestState = { pathId: result.pathId, amountIn }
     return {
       amountOut: BigInt(result.outAmounts[0]),
       gasLimit: BigInt(result.gasEstimate),
@@ -123,7 +128,10 @@ export class OdosAggregator implements Aggregator {
     nonce?: number
     gasPrice?: bigint
   }> {
-    if (!this.latestPathId) {
+    if (
+      !this.latestState ||
+      (this.latestState && (this.latestState?.amountIn ?? 0n) !== amountIn)
+    ) {
       console.log('Path ID is not defined, fetching...')
       const { pathId } = await fetchApi<{
         pathId: string
@@ -156,11 +164,12 @@ export class OdosAggregator implements Aggregator {
           referralCode: '1939997089',
         },
       })
-      this.latestPathId = pathId
+      this.latestState = { pathId, amountIn }
     }
-    if (!this.latestPathId) {
+    if (!this.latestState) {
       throw new Error('Path ID is not defined')
     }
+    console.log('Assembling transaction...', this.latestState)
     const result = await fetchApi<{
       transaction: {
         data: `0x${string}`
@@ -177,7 +186,7 @@ export class OdosAggregator implements Aggregator {
         accept: 'application/json',
       },
       data: {
-        pathId: this.latestPathId,
+        pathId: this.latestState.pathId,
         simulate: true,
         userAddr: userAddress,
       },

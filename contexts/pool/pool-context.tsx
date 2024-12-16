@@ -54,7 +54,7 @@ export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [slippageInput, setSlippageInput] = React.useState('1')
 
   const { data: pools } = useQuery(
-    ['pools', selectedChain],
+    ['pools', selectedChain.id],
     async () => {
       return fetchPools(selectedChain.id, prices)
     },
@@ -68,7 +68,7 @@ export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
   }
 
   const { data: lpBalances } = useQuery(
-    ['lp-balances', userAddress, selectedChain],
+    ['lp-balances', userAddress, selectedChain.id],
     async () => {
       if (!userAddress) {
         return {}

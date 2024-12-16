@@ -35,7 +35,6 @@ export const SwapContractProvider = ({
 }: React.PropsWithChildren<{}>) => {
   const queryClient = useQueryClient()
 
-  const { selectedChain } = useChainContext()
   const { data: walletClient } = useWalletClient()
   const { setConfirmation } = useTransactionContext()
   const { allowances, prices } = useCurrencyContext()
