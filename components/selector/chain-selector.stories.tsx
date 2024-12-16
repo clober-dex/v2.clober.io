@@ -1,13 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react'
-import {
-  arbitrum,
-  arbitrumSepolia,
-  base,
-  fantom,
-  mainnet,
-  polygon,
-  zkSync,
-} from 'viem/chains'
+import { arbitrum, base, fantom, mainnet, polygon, zkSync } from 'viem/chains'
+
+import { mitosisTestnet } from '../../constants/chains/mitosis-testnet-chain'
 
 import ChainSelector from './chain-selector'
 
@@ -24,9 +18,9 @@ export default {
 type Story = StoryObj<typeof ChainSelector>
 export const Default: Story = {
   args: {
-    chain: arbitrumSepolia,
+    chain: base,
     setChain: () => {},
-    chains: [arbitrumSepolia, base, zkSync],
+    chains: [base, zkSync],
   },
 }
 
@@ -40,9 +34,9 @@ export const OnlyMainnet: Story = {
 
 export const OnlyTestnet: Story = {
   args: {
-    chain: arbitrumSepolia,
+    chain: mitosisTestnet,
     setChain: () => {},
-    chains: [arbitrumSepolia],
+    chains: [mitosisTestnet],
   },
 }
 

@@ -18,21 +18,6 @@ export const WHITELISTED_CURRENCIES: {
   [CHAIN_IDS.CLOBER_TESTNET]: [],
   [CHAIN_IDS.CLOBER_TESTNET_2]: [],
   [CHAIN_IDS.BERACHAIN_TESTNET]: [],
-  [CHAIN_IDS.ARBITRUM_SEPOLIA]: [
-    ETH,
-    {
-      address: '0xF2e615A933825De4B39b497f6e6991418Fb31b78',
-      name: 'Wrapped Ether',
-      symbol: 'WETH',
-      decimals: 18,
-    },
-    {
-      address: '0x00BFD44e79FB7f6dd5887A9426c8EF85A0CD23e0',
-      name: 'USD Coin',
-      symbol: 'USDC',
-      decimals: 6,
-    },
-  ],
   [CHAIN_IDS.BASE]: [
     {
       address: '0x67f0870BB897F5E1c369976b4A2962d527B9562c',
@@ -51,12 +36,6 @@ export const DEFAULT_INPUT_CURRENCY: {
   [CHAIN_IDS.CLOBER_TESTNET]: ETH,
   [CHAIN_IDS.CLOBER_TESTNET_2]: ETH,
   [CHAIN_IDS.BERACHAIN_TESTNET]: ETH,
-  [CHAIN_IDS.ARBITRUM_SEPOLIA]: {
-    address: '0xF2e615A933825De4B39b497f6e6991418Fb31b78',
-    name: 'Wrapped Ether',
-    symbol: 'WETH',
-    decimals: 18,
-  },
   [CHAIN_IDS.MITOSIS_TESTNET]: {
     address: zeroAddress,
     name: 'Mitosis Token',
@@ -79,12 +58,6 @@ export const DEFAULT_OUTPUT_CURRENCY: {
   [CHAIN_IDS.CLOBER_TESTNET]: ETH,
   [CHAIN_IDS.CLOBER_TESTNET_2]: ETH,
   [CHAIN_IDS.BERACHAIN_TESTNET]: ETH,
-  [CHAIN_IDS.ARBITRUM_SEPOLIA]: {
-    address: '0x00BFD44e79FB7f6dd5887A9426c8EF85A0CD23e0',
-    name: 'USD Coin',
-    symbol: 'USDC',
-    decimals: 6,
-  },
   [CHAIN_IDS.MITOSIS_TESTNET]: {
     address: '0xCB0CedF61be0Bf4d5F6596b8ab296614b154db91',
     name: 'USDT',

@@ -9,7 +9,6 @@ import { findSupportChain } from './chain'
 export const AGGREGATORS: {
   [chain in CHAIN_IDS]: Aggregator[]
 } = {
-  [CHAIN_IDS.ARBITRUM_SEPOLIA]: [],
   [CHAIN_IDS.MITOSIS_TESTNET]: [],
   [CHAIN_IDS.BASE]: [
     new OdosAggregator(
