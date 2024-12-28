@@ -13,7 +13,7 @@ export class OdosAggregator implements Aggregator {
   public readonly baseUrl = 'https://api.odos.xyz'
   public readonly contract: `0x${string}`
   public readonly chain: Chain
-  private readonly TIMEOUT = 5000
+  private readonly TIMEOUT = 10 * 1000
 
   private latestState:
     | {
@@ -69,7 +69,12 @@ export class OdosAggregator implements Aggregator {
     aggregator: Aggregator
   }> {
     this.latestState = undefined
-    console.log('Fetching quote...')
+    console.log(
+      'Fetching quote...',
+      inputCurrency.symbol,
+      outputCurrency.symbol,
+      amountIn,
+    )
     const result: {
       outAmounts: string[]
       pathViz: PathViz
