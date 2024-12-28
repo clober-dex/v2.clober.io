@@ -32,6 +32,7 @@ export const SwapContainer = () => {
   const { address: userAddress } = useAccount()
   const { selectedChain } = useChainContext()
 
+  const [debouncedValue, setDebouncedValue] = useState('')
   const [showInputCurrencySelect, setShowInputCurrencySelect] = useState(false)
   const [showOutputCurrencySelect, setShowOutputCurrencySelect] =
     useState(false)
@@ -41,6 +42,14 @@ export const SwapContainer = () => {
     inputCurrencyAmount,
     inputCurrency?.decimals ?? 18,
   )
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(inputCurrencyAmount)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [inputCurrencyAmount])
 
   const { data } = useQuery(
     [
@@ -52,6 +61,7 @@ export const SwapContainer = () => {
       userAddress,
       selectedChain,
       latestRefreshTime,
+      debouncedValue,
     ],
     async () => {
       if (
@@ -59,7 +69,8 @@ export const SwapContainer = () => {
         feeData.gasPrice &&
         inputCurrency &&
         outputCurrency &&
-        amountIn > 0n
+        amountIn > 0n &&
+        Number(debouncedValue) === Number(inputCurrencyAmount)
       ) {
         return fetchQuotes(
           AGGREGATORS[selectedChain.id],
@@ -73,6 +84,7 @@ export const SwapContainer = () => {
       }
       return null
     },
+    { enabled: !!debouncedValue },
   )
 
   useEffect(() => {
