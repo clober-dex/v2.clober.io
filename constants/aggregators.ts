@@ -3,6 +3,7 @@ import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Aggregator } from '../model/aggregator'
 import { OdosAggregator } from '../model/aggregator/odos'
+import { MagpieAggregator } from '../model/aggregator/magpie'
 
 import { findSupportChain } from './chain'
 
@@ -13,6 +14,10 @@ export const AGGREGATORS: {
   [CHAIN_IDS.BASE]: [
     new OdosAggregator(
       getAddress('0x19cEeAd7105607Cd444F5ad10dd51356436095a1'),
+      findSupportChain(CHAIN_IDS.BASE.valueOf())!,
+    ),
+    new MagpieAggregator(
+      getAddress('0xef42f78d25f4c681dcad2597fa04877ff802ef4b'),
       findSupportChain(CHAIN_IDS.BASE.valueOf())!,
     ),
   ],

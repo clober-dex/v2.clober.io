@@ -5,15 +5,11 @@ import { useAccount, useFeeData, useQuery } from 'wagmi'
 import { SwapForm } from '../components/form/swap-form'
 import { useChainContext } from '../contexts/chain-context'
 import { formatUnits } from '../utils/bigint'
-import PathVizViewer from '../components/path-viz-viewer'
 import { fetchQuotes } from '../apis/swap/quotes'
 import { AGGREGATORS } from '../constants/aggregators'
 import { useSwapContext } from '../contexts/swap/swap-context'
 import { useSwapContractContext } from '../contexts/swap/swap-contract-context'
-import { testnetChainIds } from '../constants/chain'
 import { useCurrencyContext } from '../contexts/currency-context'
-import { OdosLogoSvg } from '../components/svg/odos-logo-svg'
-import { mitosisTestnet } from '../constants/chains/mitosis-testnet-chain'
 
 export const SwapContainer = () => {
   const {
@@ -91,11 +87,6 @@ export const SwapContainer = () => {
     setShowInputCurrencySelect(false)
   }, [selectedChain])
 
-  const poweredByLink =
-    selectedChain.id === mitosisTestnet.id
-      ? 'https://www.oogabooga.io/'
-      : 'https://www.odos.xyz/'
-
   return (
     <div className="flex flex-col w-fit mb-4 sm:mb-6">
       <div className="flex flex-col gap-3">
@@ -138,6 +129,7 @@ export const SwapContainer = () => {
                 ) * (prices[getAddress(zeroAddress)] ?? 0)
               }
               refresh={() => setLatestRefreshTime(Date.now())}
+              aggregatorName={data?.aggregator?.name ?? ''}
               actionButtonProps={{
                 disabled:
                   !userAddress ||
@@ -178,24 +170,14 @@ export const SwapContainer = () => {
               }}
             />
           </div>
-          {data?.pathViz ? (
-            <div className="relative flex flex-col rounded-2xl bg-gray-900 p-6">
-              <PathVizViewer pathVizData={data.pathViz} />
-            </div>
-          ) : (
-            <div className="hidden min-h-[270px] h-full w-full md:w-[528px] xl:w-[648px] lg:flex flex-col rounded-2xl bg-gray-900 p-6" />
-          )}
+          {/*{data?.pathViz ? (*/}
+          {/*  <div className="relative flex flex-col rounded-2xl bg-gray-900 p-6">*/}
+          {/*    <PathVizViewer pathVizData={data.pathViz} />*/}
+          {/*  </div>*/}
+          {/*) : (*/}
+          {/*  <div className="hidden min-h-[270px] h-full w-full md:w-[528px] xl:w-[648px] lg:flex flex-col rounded-2xl bg-gray-900 p-6" />*/}
+          {/*)}*/}
         </div>
-        {!testnetChainIds.includes(selectedChain.id) ? (
-          <div className="flex ml-auto text-white items-center gap-2">
-            <div className="text-gray-400 text-xs font-medium">Powered by</div>
-            <a target="_blank" href={poweredByLink} rel="noreferrer">
-              <OdosLogoSvg />
-            </a>
-          </div>
-        ) : (
-          <></>
-        )}
       </div>
     </div>
   )
