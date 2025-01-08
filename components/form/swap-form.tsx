@@ -38,6 +38,7 @@ export const SwapForm = ({
   setSlippageInput,
   gasEstimateValue,
   refresh,
+  aggregatorName,
   actionButtonProps,
 }: {
   chainId: number
@@ -61,6 +62,7 @@ export const SwapForm = ({
   setSlippageInput: (slippageInput: string) => void
   gasEstimateValue: number
   refresh: () => void
+  aggregatorName: string
   actionButtonProps: ActionButtonProps
 }) => {
   const { showDropdown, setShowDropdown } = useDropdown()
@@ -241,6 +243,24 @@ export const SwapForm = ({
             <></>
           )}
         </button>
+
+        {!isLoadingResults ? (
+          <div className="flex ml-auto text-sm text-gray-400 items-center gap-1 flex-row">
+            via
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+            >
+              <circle cx="8" cy="8" r="8" fill="#D9D9D9" />
+            </svg>
+            {aggregatorName}
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
       <ActionButton {...actionButtonProps} />
     </>
