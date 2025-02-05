@@ -1,4 +1,6 @@
 import React from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 
 import { textStyles } from '../../themes/text-styles'
 import useDropdown from '../../hooks/useDropdown'
@@ -173,6 +175,26 @@ function ChainList({
                 )}
               </div>
             ))}
+
+          {title === 'Mainnet' ? (
+            <Link
+              target="_blank"
+              href="https://starknet.clober.io/"
+              className={`flex items-center gap-2 px-3 py-2 self-stretch cursor-pointer text-white ${textStyles.body3Bold} hover:bg-gray-600`}
+              key="starknet"
+            >
+              <Image
+                className="rounded-full"
+                src="/starknet-logo.png"
+                alt="ChainIcon"
+                width={18}
+                height={18}
+              />
+              <span>Starknet</span>
+            </Link>
+          ) : (
+            <></>
+          )}
         </div>
       </div>
     </div>
