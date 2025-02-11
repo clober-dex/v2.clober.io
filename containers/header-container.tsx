@@ -47,9 +47,9 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
           </PageButton>
 
           <PageButton
-            disabled={false /* TODO: router.pathname === '/earn' */}
+            disabled={router.pathname === '/earn'}
             onClick={() => {
-              // router.push(`/earn?chain=${selectedChain.id}`)
+              router.push(`/earn?chain=${selectedChain.id}`)
             }}
           >
             <VaultPageSvg className="w-4 h-4" />
