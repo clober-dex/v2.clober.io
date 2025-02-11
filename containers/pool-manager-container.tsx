@@ -146,7 +146,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
 
   useEffect(
     () => {
-      if (disableSwap) {
+      if (disableSwap && pool.reserve0 + pool.reserve1 > 0) {
         // when change currency0Amount
         if (previousValues.current.currency0Amount !== currency0Amount) {
           const _currency1Amount = new BigNumber(currency0Amount)
