@@ -1,6 +1,23 @@
 import { CHAIN_IDS } from '@clober/v2-sdk'
 import { zeroHash } from 'viem'
 
+export const START_LP_INFO: {
+  [chain in CHAIN_IDS]: {
+    quoteAmount: number
+    baseAmount: number
+    lpAmount: number
+  } | null
+} = {
+  [CHAIN_IDS.ARBITRUM_SEPOLIA]: null,
+  [CHAIN_IDS.MITOSIS_TESTNET]: null,
+  [CHAIN_IDS.BASE]: {
+    quoteAmount: 271.254,
+    baseAmount: 0.1,
+    lpAmount: 271.254,
+  },
+  [CHAIN_IDS.ZKSYNC]: null,
+}
+
 export const POOL_KEY_INFOS: {
   [chain in CHAIN_IDS]: {
     token0: `0x${string}`

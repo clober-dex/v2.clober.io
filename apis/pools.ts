@@ -10,7 +10,7 @@ import {
 import { isAddressEqual } from 'viem'
 
 import { Pool } from '../model/pool'
-import { POOL_KEY_INFOS } from '../constants/pool'
+import { POOL_KEY_INFOS, START_LP_INFO } from '../constants/pool'
 import { Prices } from '../model/prices'
 import { StackedLineData } from '../components/chart/stacked/stacked-chart-model'
 import { calculateApy } from '../utils/pool-apy'
@@ -71,6 +71,10 @@ export async function fetchPools(
     )
     const historicalLpPrices = poolPerformanceData.poolSnapshots
       .map(({ price, liquidityA, liquidityB, totalSupply, timestamp }) => {
+        const onHoldValuePerLp =
+          (START_LP_INFO[chainId]!.quoteAmount +
+            START_LP_INFO[chainId]!.baseAmount * Number(price)) /
+          START_LP_INFO[chainId]!.lpAmount
         const usdValue = isAddressEqual(
           base.address,
           liquidityA.currency.address,
@@ -84,6 +88,7 @@ export async function fetchPools(
         return {
           lpPrice,
           time: Number(timestamp),
+          pnl: lpPrice / onHoldValuePerLp,
         }
       })
       .sort((a, b) => a.time - b.time)
@@ -94,12 +99,14 @@ export async function fetchPools(
       firstNonZeroIndex === -1
         ? 1
         : historicalLpPrices[firstNonZeroIndex].lpPrice
-    const historicalPriceIndex = historicalLpPrices.map(({ lpPrice, time }) => {
-      return {
-        values: [lpPrice !== 0 ? lpPrice / startLpPrice : 0, 0],
-        time,
-      }
-    })
+    const historicalPriceIndex = historicalLpPrices.map(
+      ({ pnl, lpPrice, time }) => {
+        return {
+          values: [lpPrice !== 0 ? lpPrice / startLpPrice : 0, pnl, 0],
+          time,
+        }
+      },
+    )
     const tvl =
       (prices[pool.currencyA.address] ?? 0) *
         Number(pool.liquidityA.total.value) +

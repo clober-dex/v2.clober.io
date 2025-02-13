@@ -345,6 +345,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
               </div>
               <VaultChartContainer
                 historicalPriceIndex={pool.historicalPriceIndex}
+                advancedMode={false}
               />
             </div>
           </div>
