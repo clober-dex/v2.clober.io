@@ -39,7 +39,7 @@ export const VaultChartContainer = ({
         },
       ],
     }),
-    [historicalPriceIndex],
+    [advancedMode, historicalPriceIndex],
   )
 
   return (
@@ -63,14 +63,14 @@ export const VaultChartContainer = ({
                       ? [
                           {
                             label: 'Index',
-                            color: '#4C82FB',
+                            color: '#FC72FF',
                             value: `${(
                               (crosshairData as any)?.values[0] ?? 0
                             ).toFixed(4)}`,
                           },
                           {
                             label: 'PnL',
-                            color: '#FC72FF',
+                            color: '#4C82FB',
                             value: `${(
                               (crosshairData as any)?.values[1] ?? 0
                             ).toFixed(4)}`,
