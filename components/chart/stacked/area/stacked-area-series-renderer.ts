@@ -48,7 +48,7 @@ function moveYs(
   ys: number,
   verticalPixelRatio: number,
 ): number {
-  return ys * verticalPixelRatio + (ys / firstYs - 1) * 1000
+  return ys * verticalPixelRatio + (ys / firstYs - 1) * 500
 }
 
 export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
@@ -109,7 +109,7 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
 
     const fullLinesMeshed = linesMeshed.slice(0, 3)
     const highlightLinesMeshed = options.hoveredLogicalIndex
-      ? linesMeshed.slice(3)
+      ? linesMeshed.slice(4)
       : []
 
     const areaPaths = this._createAreas(fullLinesMeshed)

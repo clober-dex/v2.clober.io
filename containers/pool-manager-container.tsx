@@ -16,6 +16,7 @@ import { RemoveLiquidityForm } from '../components/form/remove-liquidity-form'
 import { usePoolContractContext } from '../contexts/pool/pool-contract-context'
 import { toPlacesAmountString } from '../utils/bignumber'
 import { QuestionMarkSvg } from '../components/svg/question-mark-svg'
+import { SettingSvg } from '../components/svg/setting-svg'
 
 import { VaultChartContainer } from './vault-chart-container'
 
@@ -26,6 +27,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
   const router = useRouter()
   const { data: walletClient } = useWalletClient()
   const { selectedChain } = useChainContext()
+  const [advancedMode, setAdvancedMode] = React.useState(false)
   const { balances, prices } = useCurrencyContext()
   const {
     currency0Amount,
@@ -317,8 +319,11 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
             </div>
             <div className="flex-col items-start gap-3 md:gap-4 self-stretch hidden sm:flex">
               <div className="flex flex-col gap-0.5">
-                <div className="text-white text-sm md:text-base font-bold">
+                <div className="text-white text-sm md:text-base font-bold flex flex-row gap-1 items-center justify-center">
                   Historical Performance
+                  <button onClick={() => setAdvancedMode(!advancedMode)}>
+                    <SettingSvg className="sm:w-4 sm:h-4 w-3 h-3 fill-white" />
+                  </button>
                 </div>
                 <div className="flex flex-row gap-2">
                   <div className="flex text-gray-500 text-xs md:text-sm">
@@ -345,6 +350,7 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
               </div>
               <VaultChartContainer
                 historicalPriceIndex={pool.historicalPriceIndex}
+                advancedMode={advancedMode}
               />
             </div>
           </div>
