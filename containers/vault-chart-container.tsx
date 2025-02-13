@@ -69,7 +69,7 @@ export const VaultChartContainer = ({
                             ).toFixed(4)}`,
                           },
                           {
-                            label: 'PnL',
+                            label: 'RPI',
                             color: '#4C82FB',
                             value: `${(
                               (crosshairData as any)?.values[1] ?? 0
