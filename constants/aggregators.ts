@@ -11,6 +11,7 @@ export const AGGREGATORS: {
   [chain in CHAIN_IDS]: Aggregator[]
 } = {
   [CHAIN_IDS.MITOSIS_TESTNET]: [],
+  [CHAIN_IDS.MONAD_TESTNET]: [],
   [CHAIN_IDS.BASE]: [
     new OdosAggregator(
       getAddress('0x19cEeAd7105607Cd444F5ad10dd51356436095a1'),

@@ -5,6 +5,7 @@ export const EXPLORER_URL: {
 } = {
   [CHAIN_IDS.MITOSIS_TESTNET]:
     'https://blockscout-internal.testnet.mitosis.org',
+  [CHAIN_IDS.MONAD_TESTNET]: 'https://testnet.monadexplorer.com',
   [CHAIN_IDS.BASE]: `https://basescan.org`,
   [CHAIN_IDS.ZKSYNC]: `https://explorer.zksync.io`,
 }

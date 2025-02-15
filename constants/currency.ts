@@ -12,6 +12,14 @@ export const ETH: Currency = {
   decimals: 18,
 }
 
+const MOD: Currency = {
+  address: zeroAddress,
+  name: 'Monad Token',
+  symbol: 'MOD',
+  decimals: 18,
+  icon: '/monad.svg',
+}
+
 export const WHITELISTED_CURRENCIES: {
   [chain in CHAIN_IDS]: Currency[]
 } = {
@@ -28,6 +36,15 @@ export const WHITELISTED_CURRENCIES: {
   ],
   [CHAIN_IDS.ZKSYNC]: [],
   [CHAIN_IDS.MITOSIS_TESTNET]: MITOSIS_WHITELISTED_CURRENCIES,
+  [CHAIN_IDS.MONAD_TESTNET]: [
+    MOD,
+    {
+      address: '0x43D614B1bA4bA469fAEAa4557AEAFdec039b8795',
+      name: 'USD Coin',
+      symbol: 'USDC',
+      decimals: 6,
+    },
+  ],
 }
 
 export const DEFAULT_INPUT_CURRENCY: {
@@ -42,6 +59,13 @@ export const DEFAULT_INPUT_CURRENCY: {
     symbol: 'MITO',
     decimals: 18,
     icon: 'https://avatars.githubusercontent.com/u/150423703',
+  },
+  [CHAIN_IDS.MONAD_TESTNET]: {
+    address: zeroAddress,
+    name: 'Monad Token',
+    symbol: 'MOD',
+    decimals: 18,
+    icon: '/monad.svg',
   },
   [CHAIN_IDS.BASE]: {
     address: '0x4200000000000000000000000000000000000006',
@@ -62,6 +86,12 @@ export const DEFAULT_OUTPUT_CURRENCY: {
     address: '0xCB0CedF61be0Bf4d5F6596b8ab296614b154db91',
     name: 'USDT',
     symbol: 'USDT',
+    decimals: 6,
+  },
+  [CHAIN_IDS.MONAD_TESTNET]: {
+    address: '0x43D614B1bA4bA469fAEAa4557AEAFdec039b8795',
+    name: 'USD Coin',
+    symbol: 'USDC',
     decimals: 6,
   },
   [CHAIN_IDS.BASE]: {

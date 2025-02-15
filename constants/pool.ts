@@ -10,6 +10,7 @@ export const START_LP_INFO: {
 } = {
   [CHAIN_IDS.ARBITRUM_SEPOLIA]: null,
   [CHAIN_IDS.MITOSIS_TESTNET]: null,
+  [CHAIN_IDS.MONAD_TESTNET]: null,
   [CHAIN_IDS.BASE]: {
     quoteAmount: 271.254,
     baseAmount: 0.1,
@@ -27,6 +28,7 @@ export const POOL_KEY_INFOS: {
   }[]
 } = {
   [CHAIN_IDS.MITOSIS_TESTNET]: [],
+  [CHAIN_IDS.MONAD_TESTNET]: [],
   [CHAIN_IDS.BASE]: [
     {
       token0: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
