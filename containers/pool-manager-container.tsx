@@ -190,9 +190,8 @@ export const PoolManagerContainer = ({ pool }: { pool: Pool }) => {
   const latestPriceIndex = useMemo(
     () =>
       pool.historicalPriceIndex.length > 0
-        ? pool.historicalPriceIndex[
-            pool.historicalPriceIndex.length - 1
-          ].values.reduce((sum, value) => sum + value, 0)
+        ? pool.historicalPriceIndex[pool.historicalPriceIndex.length - 1]
+            .values[0]
         : 0,
     [pool.historicalPriceIndex],
   )
