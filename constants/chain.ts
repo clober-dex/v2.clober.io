@@ -8,19 +8,13 @@ import { monadTestnet } from './chains/monad-testnet-chain'
 export const DEFAULT_CHAIN_ID = monadTestnet.id
 
 export const supportChains: Chain[] = [
-  base,
-  zkSync,
-  {
-    ...mitosisTestnet,
-    icon: 'https://avatars.githubusercontent.com/u/150423703',
-  },
   {
     ...monadTestnet,
     icon: '/monad.svg',
   },
 ]
 
-export const testnetChainIds: number[] = [mitosisTestnet.id, monadTestnet.id]
+export const testnetChainIds: number[] = [monadTestnet.id]
 
 export const findSupportChain = (chainId: number): Chain | undefined =>
   supportChains.find((chain) => chain.id === chainId)
